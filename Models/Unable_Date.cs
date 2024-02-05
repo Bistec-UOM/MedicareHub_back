@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    internal class Appointment
+    internal class Unable_Date
     {
     }
 }
