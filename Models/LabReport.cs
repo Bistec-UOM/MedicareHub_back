@@ -11,8 +11,8 @@ namespace Models
 
         public int Id { get; set; }
         public string PrescriptID { get; set; } = null!;
-        public TimeOnly Time { get; set; }
-        public DateOnly Date { get; set; }
+        public DateTime Time { get; set; }
+        public  DateTime Date { get; set; } 
         public string TestName { get; set; } = null!;
         public string Status { get; set; } = null!;
     }
