@@ -16,11 +16,7 @@ namespace DataAccessLayer
             _dbSet = _dbContext.Set<T>();
         }
 
-        public void Add(T entity)
-        {
-            _dbSet.Add(entity);
-            _dbContext.SaveChanges();
-        }
+
 
         public async Task AddAsync(T item)
         {
@@ -28,22 +24,25 @@ namespace DataAccessLayer
             await _dbContext.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            var requiredObjectToDelete = Get(id);
-            _dbSet.Remove(requiredObjectToDelete);
-            _dbContext.SaveChanges();
+            var requiredObjectToDelete = await GetAsync(id);
+
+            if (requiredObjectToDelete != null)
+            {
+                _dbSet.Remove(requiredObjectToDelete);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                // Handle the case where the entity with the given id doesn't exist.
+                // For now, I'm just logging to the console as an example.
+                Console.WriteLine($"Entity with id {id} not found. Delete operation aborted.");
+            }
         }
 
-        public T Get(int id)
-        {
-            return _dbSet.Find(id);
-        }
 
-        public List<T> GetAll()
-        {
-            return _dbSet.ToList();
-        }
+
 
         public async Task<List<T>> GetAllAsync()
         {
@@ -55,11 +54,6 @@ namespace DataAccessLayer
             return await _dbSet.FindAsync(id);
         }
 
-        public void Update(T entity)
-        {
-            _dbSet.Update(entity);
-            _dbContext.SaveChanges();
-        }
 
         public async Task UpdateAsync(T entity)
         {
