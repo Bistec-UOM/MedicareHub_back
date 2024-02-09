@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -15,39 +17,63 @@ namespace API.Controllers
         {
             _patientService = patientService;
         }
+
         // GET: api/<PatientController>
         [HttpGet]
-        public IEnumerable<Patient> Get()
+        public async Task<IActionResult> Get()
         {
-            return _patientService.GetAllPatients();
+            var patients = await _patientService.GetAllPatientsAsync();
+            return Ok(patients);
         }
 
         // GET api/<PatientController>/5
         [HttpGet("{id}")]
-        public Patient Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return _patientService.GetPatient(id);
+            var patient = await _patientService.GetPatientAsync(id);
+
+            if (patient == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(patient);
         }
 
         // POST api/<PatientController>
         [HttpPost]
-        public void Post([FromBody] Patient value)
+        public async Task<IActionResult> Post([FromBody] Patient value)
         {
-            _patientService.AddPatient(value);
+            await _patientService.AddPatientAsync(value);
+            return Ok(); // Assuming a successful operation
         }
 
         // PUT api/<PatientController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Patient value)
+        public async Task<IActionResult> Put(int id, [FromBody] Patient value)
         {
-            _patientService.UpdatePatient(value);
+            // Assuming you want to return a 404 if the patient doesn't exist
+            if (await _patientService.GetPatientAsync(id) == null)
+            {
+                return NotFound();
+            }
+
+            await _patientService.UpdatePatientAsync(value);
+            return Ok(); // Assuming a successful operation
         }
 
         // DELETE api/<PatientController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            // Assuming you want to return a 404 if the patient doesn't exist
+            if (await _patientService.GetPatientAsync(id) == null)
+            {
+                return NotFound();
+            }
+
             _patientService.DeletePatient(id);
+            return Ok(); // Assuming a successful operation
         }
     }
 }
