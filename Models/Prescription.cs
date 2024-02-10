@@ -8,7 +8,7 @@ namespace Models
 {
     public class Prescription
     {
-        public string PrescriptID { get; set; }
+        public string Id { get; set; }
 
         public string AppointID { get; set; }
 
