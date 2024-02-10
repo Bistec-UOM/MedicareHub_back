@@ -12,5 +12,6 @@ namespace Models
         public string TestName { get; set; } = null!;
         public float Price { get; set; }
         public string Provider { get; set; } = null!;
+
     }
 }
