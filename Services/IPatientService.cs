@@ -9,10 +9,10 @@ namespace Services
 {
     public interface IPatientService
     {
-        void AddPatient(Patient patient);
-        Patient GetPatient(int id);
-        List<Patient> GetAllPatients();
-        void UpdatePatient(Patient patient);
+        Task AddPatientAsync(Patient patient);
         void DeletePatient(int id);
+        Task<Patient> GetPatientAsync(int id);
+        Task<List<Patient>> GetAllPatientsAsync();
+        Task UpdatePatientAsync(Patient patient);
     }
 }
