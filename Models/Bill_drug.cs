@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    internal class Bill_drug
+    public class Bill_drug
     {
-        public string PrescriptID { get; set; }
+        public string Id { get; set; }
         public string DrugID { get; set; }
         public float amount { get; set; }
     }

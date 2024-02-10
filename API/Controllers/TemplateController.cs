@@ -16,13 +16,13 @@ namespace API.Controllers
             _tmpl = tmpl;
         }
 
-        [HttpGet("tmplt")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
             return Ok(await _tmpl.GetAllTests());
         }
 
-        [HttpGet("tmplt/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Test>> GetTest(int id)
         {
             var tst = await _tmpl.GetTest(id);
@@ -33,21 +33,21 @@ namespace API.Controllers
             return Ok(tst);
         }
 
-        [HttpPost("tmplt")]
+        [HttpPost]
         public async Task<ActionResult<Test>> AddProduct(Test item)
         {
             await _tmpl.Addtest(item);
             return CreatedAtAction(nameof(GetTest), new { id = item.Id }, item);
         }
 
-        [HttpDelete("tmplt/{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTest(int id)
         {
             await _tmpl.DeleteTest(id);
             return NoContent();
         }
 
-        [HttpPut("tmpl/{id}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult> EditTest(int id, Test item)
         {
             if (id != item.Id)

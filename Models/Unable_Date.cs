@@ -8,7 +8,7 @@ namespace Models
 {
     public class Unable_Date
     {
-        public int UserId { get; set; }
+        public int Id { get; set; }
         public DateTime Date { get; set; }
 
         //hello

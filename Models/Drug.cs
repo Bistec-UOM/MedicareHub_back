@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    internal class Drug
+    public class Drug
     {
         public string DrugID { get; set; }
         public string GenericN { get; set; }
