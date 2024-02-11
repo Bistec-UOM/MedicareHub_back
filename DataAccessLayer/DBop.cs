@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public class Test<T> : ICrud<T> where T : class
+    public class DBop<T> : IDBop<T> where T : class
     {
         private readonly ApplicationDbContext _dbCon;
         private readonly DbSet<T> _dbSet;
 
-        public Test(ApplicationDbContext dbcontext)
+        public DBop(ApplicationDbContext dbcontext)
         {
             _dbCon = dbcontext;
             _dbSet = _dbCon.Set<T>();

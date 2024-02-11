@@ -10,8 +10,8 @@ namespace Services
 {
     public class TemplateService
     {
-        private readonly ICrud<Test> _test;
-        public TemplateService(ICrud<Test> test) 
+        private readonly IDBop<Test> _test;
+        public TemplateService(IDBop<Test> test) 
         { 
             _test = test;
         }
