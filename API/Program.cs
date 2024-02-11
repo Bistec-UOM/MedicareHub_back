@@ -34,7 +34,7 @@ builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 
 //Lab--------------------------------------------------------------------
 builder.Services.AddScoped<TemplateService>();
-builder.Services.AddScoped<ICrud<Test>,Test<Test>>();
+builder.Services.AddScoped<IDBop<Test>,DBop<Test>>();
 
 //=================================================================================================================
 //=================================================================================================================

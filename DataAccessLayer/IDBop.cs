@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer
 {
-    public interface ICrud<T> where T : class
+    public interface IDBop<T> where T : class
     {
         Task<T> Get(int id);
         Task<IEnumerable<T>> GetAll();
