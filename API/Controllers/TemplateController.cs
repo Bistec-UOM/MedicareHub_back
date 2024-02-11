@@ -17,15 +17,15 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
+        public async Task<ActionResult<IEnumerable<ReportFileds>>> GetAllFields()
         {
-            return Ok(await _tmpl.GetAllTests());
+            return Ok(await _tmpl.GetAllFields());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Test>> GetTest(int id)
+        public async Task<ActionResult<ReportFileds>> GetField(int id)
         {
-            var tst = await _tmpl.GetTest(id);
+            var tst = await _tmpl.GetField(id);
             if (tst == null)
             {
                 return NotFound();
@@ -34,21 +34,21 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Test>> AddProduct(Test item)
+        public async Task<ActionResult<ReportFileds>> AddField(ReportFileds item)
         {
-            await _tmpl.Addtest(item);
-            return CreatedAtAction(nameof(GetTest), new { id = item.Id }, item);
+            await _tmpl.AddField(item);
+            return CreatedAtAction(nameof(GetField), new { id = item.Id }, item);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTest(int id)
+        public async Task<ActionResult> DeleteFiled(int id)
         {
-            await _tmpl.DeleteTest(id);
+            await _tmpl.DeleteField(id);
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> EditTest(int id, Test item)
+        public async Task<ActionResult> EditFiled(int id, ReportFileds item)
         {
             if (id != item.Id)
             {
@@ -57,7 +57,7 @@ namespace API.Controllers
 
             try
             {
-                await _tmpl.EditTest(item);
+                await _tmpl.EditField(item);
                 return Ok();
             }
             catch (KeyNotFoundException)

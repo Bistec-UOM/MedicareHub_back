@@ -10,38 +10,38 @@ namespace Services
 {
     public class TemplateService
     {
-        private readonly IDBop<Test> _test;
-        public TemplateService(IDBop<Test> test) 
+        private readonly IDBop<ReportFileds> _tmplt;
+        public TemplateService(IDBop<ReportFileds> tmplt) 
         { 
-            _test = test;
+            _tmplt = tmplt;
         }
 
-        public async Task<IEnumerable<Test>> GetAllTests()
+        public async Task<IEnumerable<ReportFileds>> GetAllFields()
         {
-            return await _test.GetAll();
+            return await _tmplt.GetAll();
         }
 
-        public async Task<Test> GetTest(int id)
+        public async Task<ReportFileds> GetField(int id)
         {
-            return await _test.Get(id);
+            return await _tmplt.Get(id);
         }
 
-        public async Task Addtest(Test item)
+        public async Task AddField(ReportFileds item)
         {
-            await _test.Add(item);
+            await _tmplt.Add(item);
         }
 
-        public async Task EditTest(Test item)
+        public async Task EditField(ReportFileds item)
         {
-            await _test.Update(item);
+            await _tmplt.Update(item);
         }
 
-        public async Task DeleteTest(int id)
+        public async Task DeleteField(int id)
         {
-            var product = await _test.Get(id);
-            if (product != null)
+            var x = await _tmplt.Get(id);
+            if (x != null)
             {
-                await _test.Delete(id);
+                await _tmplt.Delete(id);
             }
         }
     }
