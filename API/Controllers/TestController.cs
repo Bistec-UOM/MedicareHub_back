@@ -35,7 +35,7 @@ namespace API.Controllers
         public async Task<ActionResult<Test>> AddTest(Test item)
         {
             await _tmpl.Addtest(item);
-            return CreatedAtAction(nameof(GetTest), new { id = item.Id }, item);
+            return CreatedAtAction(nameof(GetTest), new { id = item.TestId }, item);
         }
 
         [HttpDelete("{id}")]
@@ -45,23 +45,23 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> EditTest(int id, Test item)
-        {
-            if (id != item.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult> EditTest(int id, Test item)
+        //{
+        //    if (id != item.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            try
-            {
-                await _tmpl.EditTest(item);
-                return Ok();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
+        //    try
+        //    {
+        //        await _tmpl.EditTest(item);
+        //        return Ok();
+        //    }
+        //    catch (KeyNotFoundException)
+        //    {
+        //        return NotFound();
+        //    }
+        //}
     }
  }
