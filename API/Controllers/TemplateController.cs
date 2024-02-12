@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.DTO;
 using Services;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -18,13 +19,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReportFileds>>> GetAllFields()
+        public async Task<ActionResult<IEnumerable<ReportFields>>> GetAllFields()
         {
             return Ok(await _tmpl.GetAllFields());
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReportFileds>> GetField(int id)
+        public async Task<ActionResult<ReportFields>> GetField(int id)
         {
             var tst = await _tmpl.GetField(id);
             if (tst == null)
@@ -34,12 +35,20 @@ namespace API.Controllers
             return Ok(tst);
         }
 
+        //[HttpPost]
+        //public async Task<ActionResult> AddOneTemplate(List<ReportFields> item)
+        //{
+        //    await _tmpl.AddField(item);
+        //    return Ok();
+        //}
+
         [HttpPost]
-        public async Task<ActionResult> AddTemplate([FromBody] Templt tmp)
+        public async Task<ActionResult> Addtmp(TemplateObj item)
         {
-            await _tmpl.AddTemplate(tmp.Titem,tmp.RFitme);
+            await _tmpl.AddTemplate(item);
             return Ok();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteFiled(int id)
@@ -49,7 +58,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> EditFiled(int id, ReportFileds item)
+        public async Task<ActionResult> EditFiled(int id, ReportFields item)
         {
             if (id != item.Id)
             {
@@ -68,9 +77,4 @@ namespace API.Controllers
         }
     }
 
-    public class Templt
-    {
-        public Test Titem { get; set; } = null!;
-        public List<ReportFileds> RFitme { get; set; } = null!;
-    }
 }
