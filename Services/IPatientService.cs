@@ -13,6 +13,6 @@ namespace Services
         void DeletePatient(int id);
         Task<Patient> GetPatientAsync(int id);
         Task<List<Patient>> GetAllPatientsAsync();
-        Task UpdatePatientAsync(Patient patient);
+        public void UpdatePatient(Patient patient);
     }
 }

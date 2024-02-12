@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Services
     public class PatientService : IPatientService
     {
         private readonly IRepository<Patient> _repository;
+        private readonly ApplicationDbContext _dbContext;
 
         public PatientService(IRepository<Patient> repository)
         {
@@ -34,9 +36,9 @@ namespace Services
             return await _repository.GetAllAsync();
         }
 
-        public async Task UpdatePatientAsync(Patient patient)
+        public void UpdatePatient(Patient patient)
         {
-            await _repository.UpdateAsync(patient);
+            _repository.Update(patient);
         }
     }
 }
