@@ -31,10 +31,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 });
 
 
+//=================================================================================================================
+//                                Injections list
+//=================================================================================================================
 
-//add new injection
+//Receptionist-----------------------------------------------------------
+
+//Doctor-----------------------------------------------------------------
+
+//Pharmacy---------------------------------------------------------------
+
+//Admin------------------------------------------------------------------
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
+
+//Lab--------------------------------------------------------------------
+builder.Services.AddScoped<TestService>();
+builder.Services.AddScoped<TemplateService>();
+
+builder.Services.AddScoped<IDBop<ReportFileds>,DBop<ReportFileds>>();
+builder.Services.AddScoped<IDBop<Test>, DBop<Test>>();
+
+//=================================================================================================================
+//=================================================================================================================
 
 var app = builder.Build();
 

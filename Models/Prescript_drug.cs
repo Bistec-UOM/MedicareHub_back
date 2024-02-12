@@ -8,7 +8,7 @@ namespace Models
 {
     public class Prescript_drug
     {
-        public string PrescriptID { get; set; }
+        public string Id { get; set; }
 
         public string GenericN { get; set; }
 
