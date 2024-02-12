@@ -20,7 +20,8 @@ namespace DataAccessLayer
 
         public async Task<T> Get(int id)
         {
-            return await _dbSet.FindAsync(id);
+
+                return await _dbSet.FindAsync(id);
         }
 
         public async Task<IEnumerable<T>> GetAll()

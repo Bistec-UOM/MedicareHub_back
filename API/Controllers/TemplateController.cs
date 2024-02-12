@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace API.Controllers
 {
@@ -34,10 +35,10 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ReportFileds>> AddField(ReportFileds item)
+        public async Task<ActionResult> AddTemplate([FromBody] Templt tmp)
         {
-            await _tmpl.AddField(item);
-            return CreatedAtAction(nameof(GetField), new { id = item.Id }, item);
+            await _tmpl.AddTemplate(tmp.Titem,tmp.RFitme);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -65,5 +66,11 @@ namespace API.Controllers
                 return NotFound();
             }
         }
+    }
+
+    public class Templt
+    {
+        public Test Titem { get; set; } = null!;
+        public List<ReportFileds> RFitme { get; set; } = null!;
     }
 }
