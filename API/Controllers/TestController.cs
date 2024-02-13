@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services;
@@ -42,7 +43,7 @@ namespace API.Controllers
         public async Task<ActionResult> DeleteTest(int id)
         {
             await _tmpl.DeleteTest(id);
-            return NoContent();
+            return Ok();
         }
 
         //[HttpPut("{id}")]

@@ -79,6 +79,14 @@ namespace Services
             await _tmplt.Update(item);
         }
 
+        public async Task EditTemplate(List<ReportFields> data)
+        {
+            foreach (var i in data)
+            {
+                await _tmplt.Update(i);
+            }
+        }
+
         public async Task DeleteField(int id)
         {
             var x = await _tmplt.Get(id);

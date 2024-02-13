@@ -10,7 +10,6 @@ namespace DataAccessLayer
     {
  
         Task DeleteAsync(int id);
-
         Task AddAsync(T entity);
         Task<T> GetAsync(int id);
         Task<List<T>> GetAllAsync();
