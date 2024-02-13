@@ -38,7 +38,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 //Receptionist-----------------------------------------------------------
 
 //Doctor-----------------------------------------------------------------
-
+builder.Services.AddScoped <Prescript_drugService>();
+builder.Services.AddScoped<IRepository<Prescript_drug>, Repository<Prescript_drug>>();
 //Pharmacy---------------------------------------------------------------
 
 //Admin------------------------------------------------------------------
