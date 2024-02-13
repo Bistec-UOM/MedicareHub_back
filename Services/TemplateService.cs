@@ -13,9 +13,9 @@ namespace Services
 {
     public class TemplateService
     {
-        private readonly IDBop<ReportFields> _tmplt;
-        private readonly IDBop<Test> _tst;
-        public TemplateService(IDBop<ReportFields> tmplt,IDBop<Test> tst) 
+        private readonly IRepository<ReportFields> _tmplt;
+        private readonly IRepository<Test> _tst;
+        public TemplateService(IRepository<ReportFields> tmplt,IRepository<Test> tst) 
         { 
             _tmplt = tmplt;
             _tst = tst;
