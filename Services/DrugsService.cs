@@ -16,7 +16,7 @@ namespace Services
             _drg = drg;
         }
 
-        public async Task Adddrug(Test item)
+        public async Task Adddrug(Drug item)
         {
             await _drg.Add(item);
         }
