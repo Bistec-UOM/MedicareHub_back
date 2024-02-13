@@ -22,7 +22,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var patients = await _patientService.GetAllPatientsAsync();
+            var patients = await _patientService.GetAllPatients();
             return Ok(patients);
         }
 
@@ -30,7 +30,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var patient = await _patientService.GetPatientAsync(id);
+            var patient = await _patientService.GetPatient(id);
 
             if (patient == null)
             {
@@ -44,30 +44,25 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Patient value)
         {
-            await _patientService.AddPatientAsync(value);
+            await _patientService.AddPatient(value);
             return Ok(); // Assuming a successful operation
         }
 
         // PUT api/<PatientController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Patient value)
+        public void Put(int id, [FromBody] Patient value)
         {
-            // Assuming you want to return a 404 if the patient doesn't exist
-            if (await _patientService.GetPatientAsync(id) == null)
-            {
-                return NotFound();
-            }
-
-            await _patientService.UpdatePatientAsync(value);
-            return Ok(); // Assuming a successful operation
+            _patientService.UpdatePatient(value);
         }
+
+
 
         // DELETE api/<PatientController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             // Assuming you want to return a 404 if the patient doesn't exist
-            if (await _patientService.GetPatientAsync(id) == null)
+            if (await _patientService.GetPatient(id) == null)
             {
                 return NotFound();
             }
