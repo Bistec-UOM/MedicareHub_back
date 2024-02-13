@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240212064107_socool")]
-    partial class socool
+    [Migration("20240213175203_third")]
+    partial class third
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,83 @@ namespace DataAccessLayer.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Models.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PatitenId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecepId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("appointments");
+                });
+
+            modelBuilder.Entity("Models.Bill_drug", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DrugID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("amount")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("bill_Drugs");
+                });
+
+            modelBuilder.Entity("Models.Drug", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Avaliable")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BrandN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GenericN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<float>("Weight")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("drugs");
+                });
 
             modelBuilder.Entity("Models.LabReport", b =>
                 {
@@ -109,6 +186,48 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Patient_Teles");
                 });
 
+            modelBuilder.Entity("Models.Prescript_drug", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GenericN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Weight")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("prescript_Drugs");
+                });
+
+            modelBuilder.Entity("Models.Prescription", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AppointID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CashierID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("total")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("prescriptions");
+                });
+
             modelBuilder.Entity("Models.Record", b =>
                 {
                     b.Property<int>("Id")
@@ -133,7 +252,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("records");
                 });
 
-            modelBuilder.Entity("Models.ReportFileds", b =>
+            modelBuilder.Entity("Models.ReportFields", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,9 +273,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<float>("MinRef")
                         .HasColumnType("real");
 
-                    b.Property<string>("TestName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TestId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -164,16 +282,18 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TestId");
+
                     b.ToTable("reportFileds");
                 });
 
             modelBuilder.Entity("Models.Test", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TestId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestId"));
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -186,9 +306,25 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("TestId");
 
                     b.ToTable("tests");
+                });
+
+            modelBuilder.Entity("Models.Unable_Date", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("unable_Dates");
                 });
 
             modelBuilder.Entity("Models.User", b =>
@@ -239,6 +375,22 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("user_Teles");
+                });
+
+            modelBuilder.Entity("Models.ReportFields", b =>
+                {
+                    b.HasOne("Models.Test", "Test")
+                        .WithMany("ReportFields")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Test");
+                });
+
+            modelBuilder.Entity("Models.Test", b =>
+                {
+                    b.Navigation("ReportFields");
                 });
 #pragma warning restore 612, 618
         }

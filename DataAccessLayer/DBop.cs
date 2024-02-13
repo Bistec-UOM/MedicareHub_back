@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,6 +47,17 @@ namespace DataAccessLayer
         {
             _dbSet.Update(item);
             await _dbCon.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetByProp(string propName,object val)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, propName);
+            var constant = Expression.Constant(val);
+            var equals = Expression.Equal(property, constant);
+            var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
+
+            return await _dbSet.Where(lambda).ToListAsync();
         }
     }
 }

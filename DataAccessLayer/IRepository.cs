@@ -10,7 +10,6 @@ namespace DataAccessLayer
     {
  
         Task Delete(int id);
-
         Task Add(T entity);
         Task<T> Get(int id);
         Task<List<T>> GetAll();

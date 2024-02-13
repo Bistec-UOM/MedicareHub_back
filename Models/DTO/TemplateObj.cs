@@ -1,25 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Models
+namespace Models.DTO
 {
-    public class Test
+    public class TemplateObj
     {
-        [Key]
+        //Name of template:  Test object
         public int TestId { get; set; }
         public string TestName { get; set; } = null!;
         public float Price { get; set; }
         public string Provider { get; set; } = null!;
 
-        [JsonIgnore]
-        [InverseProperty("Test")]
-        public ICollection<ReportFields>? ReportFields { get; set; }
+        //Actual template : ReportFields object
+        public List<ReportFields> ReportFields { get; set; }
 
     }
 }

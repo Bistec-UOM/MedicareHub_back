@@ -70,8 +70,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Drug", b =>
                 {
-                    b.Property<string>("DrugID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Avaliable")
                         .IsRequired()
@@ -91,7 +94,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<float>("Weight")
                         .HasColumnType("real");
 
-                    b.HasKey("DrugID");
+                    b.HasKey("Id");
 
                     b.ToTable("drugs");
                 });
@@ -246,7 +249,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("records");
                 });
 
-            modelBuilder.Entity("Models.ReportFileds", b =>
+            modelBuilder.Entity("Models.ReportFields", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -267,9 +270,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<float>("MinRef")
                         .HasColumnType("real");
 
-                    b.Property<string>("TestName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TestId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Unit")
                         .IsRequired()
@@ -277,16 +279,18 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TestId");
+
                     b.ToTable("reportFileds");
                 });
 
             modelBuilder.Entity("Models.Test", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TestId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestId"));
 
                     b.Property<float>("Price")
                         .HasColumnType("real");
@@ -299,7 +303,7 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("TestId");
 
                     b.ToTable("tests");
                 });
@@ -368,6 +372,22 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("user_Teles");
+                });
+
+            modelBuilder.Entity("Models.ReportFields", b =>
+                {
+                    b.HasOne("Models.Test", "Test")
+                        .WithMany("ReportFields")
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Test");
+                });
+
+            modelBuilder.Entity("Models.Test", b =>
+                {
+                    b.Navigation("ReportFields");
                 });
 #pragma warning restore 612, 618
         }
