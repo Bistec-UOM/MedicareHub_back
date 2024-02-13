@@ -18,15 +18,15 @@ namespace DataAccessLayer
 
 
 
-        public async Task AddAsync(T item)
+        public async Task Add(T item)
         {
             await _dbSet.AddAsync(item);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task Delete(int id)
         {
-            var requiredObjectToDelete = await GetAsync(id);
+            var requiredObjectToDelete = await Get(id);
 
             if (requiredObjectToDelete != null)
             {
@@ -44,12 +44,12 @@ namespace DataAccessLayer
 
 
 
-        public async Task<List<T>> GetAllAsync()
+        public async Task<List<T>> GetAll()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T> GetAsync(int id)
+        public async Task<T> Get(int id)
         {
             return await _dbSet.FindAsync(id);
         }

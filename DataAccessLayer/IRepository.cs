@@ -9,11 +9,11 @@ namespace DataAccessLayer
     public interface IRepository<T> where T : class
     {
  
-        Task DeleteAsync(int id);
+        Task Delete(int id);
 
-        Task AddAsync(T entity);
-        Task<T> GetAsync(int id);
-        Task<List<T>> GetAllAsync();
+        Task Add(T entity);
+        Task<T> Get(int id);
+        Task<List<T>> GetAll();
         void Update(T entity);
     }
 }
