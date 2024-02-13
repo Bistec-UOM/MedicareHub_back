@@ -36,9 +36,9 @@ namespace Services
             return await _repository.GetAll();
         }
 
-        public void UpdatePatient(Patient patient)
+        public async Task UpdatePatient(Patient patient)
         {
-            _repository.Update(patient);
+            await _repository.Update(patient);
         }
 
 

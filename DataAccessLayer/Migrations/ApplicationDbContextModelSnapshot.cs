@@ -70,8 +70,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Drug", b =>
                 {
-                    b.Property<string>("DrugID")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Avaliable")
                         .IsRequired()
@@ -91,7 +94,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<float>("Weight")
                         .HasColumnType("real");
 
-                    b.HasKey("DrugID");
+                    b.HasKey("Id");
 
                     b.ToTable("drugs");
                 });

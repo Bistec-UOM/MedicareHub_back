@@ -36,14 +36,9 @@ namespace DataAccessLayer
             }
             else
             {
-                // Handle the case where the entity with the given id doesn't exist.
-                // For now, I'm just logging to the console as an example.
                 Console.WriteLine($"Entity with id {id} not found. Delete operation aborted.");
             }
         }
-
-
-
 
         public async Task<List<T>> GetAll()
         {

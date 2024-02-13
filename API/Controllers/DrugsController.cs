@@ -18,7 +18,7 @@ namespace API.Controllers
         public async Task<ActionResult<string>> AddDrug(Drug item)
         {
             await _drg.Adddrug(item);
-            return Ok("success");
+            return Ok("Success");
         }
     }
 }
