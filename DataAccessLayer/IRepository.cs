@@ -13,8 +13,6 @@ namespace DataAccessLayer
         Task Add(T entity);
         Task<T> Get(int id);
         Task<List<T>> GetAll();
-        Task Update(T entity);
-        Task<IEnumerable<T>> GetByProp(string propName, object value);
-
+        void Update(T entity);
     }
 }
