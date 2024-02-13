@@ -54,10 +54,10 @@ namespace DataAccessLayer
             return await _dbSet.FindAsync(id);
         }
 
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
             _dbSet.Update(entity);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
