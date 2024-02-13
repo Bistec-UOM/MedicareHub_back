@@ -14,8 +14,8 @@ namespace DataAccessLayer
         public DbSet<Unable_Date> unable_Dates { get; set; }
 
         //Doctor==================================================================
-        //public DbSet<Prescription> prescriptions { get; set; }
-       // public DbSet<Prescript_drug> prescript_Drugs { get; set; }
+        public DbSet<Prescription> prescriptions { get; set; }
+        public DbSet<Prescript_drug> prescript_Drugs { get; set; }
 
         //Pharmacy================================================================
         public DbSet<Drug> drugs { get; set; }

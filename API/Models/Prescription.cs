@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,11 +8,9 @@ namespace Models
 {
     public class Prescription
     {
-        //[Key]
-        //public int Id { get; set; }
+        public string Id { get; set; }
 
-
-        public int AppointID { get; set; }
+        public string AppointID { get; set; }
 
         public float total { get; set; }
 

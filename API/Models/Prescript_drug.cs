@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,9 +8,7 @@ namespace Models
 {
     public class Prescript_drug
     {
-        //public int Id { get; set; }
-        [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string GenericN { get; set; }
 

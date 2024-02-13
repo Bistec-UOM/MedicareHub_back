@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Prescript_drug
+    public class Drug
     {
-        //public int Id { get; set; }
         [Key]
         public int Id { get; set; }
-
-        public string GenericN { get; set; }
-
+        public string GenericN { get; set; } = null!;
+        public string BrandN { get; set; } = null!;
         public float Weight { get; set; }
-
-        public String Period { get; set; }
+        public float Price { get; set; }
+        public string Avaliable { get; set; }
     }
 }
