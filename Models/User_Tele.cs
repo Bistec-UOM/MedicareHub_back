@@ -11,6 +11,7 @@ namespace Models
     public class User_Tele
     {
         public int Id { get; set; }
+        public int User_Id { get; set; }
         public int telephonenumber { get; set; }
     }
 }

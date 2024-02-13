@@ -53,15 +53,17 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Bill_drug", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("DrugID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float>("amount")
+                    b.Property<float>("Amount")
                         .HasColumnType("real");
+
+                    b.Property<int>("DrugID")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -110,9 +112,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PrescriptID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PrescriptID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -144,8 +145,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DOB")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DOB")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -175,6 +176,9 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
                     b.Property<int>("telephonenumber")
                         .HasColumnType("int");
 
@@ -192,9 +196,8 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
@@ -206,16 +209,17 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Prescription", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<string>("AppointID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CashierID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AppointID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CashierID")
+                        .HasColumnType("int");
 
                     b.Property<float>("total")
                         .HasColumnType("real");
@@ -319,6 +323,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Doc_Id")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("unable_Dates");
@@ -365,6 +372,9 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("User_Id")
+                        .HasColumnType("int");
 
                     b.Property<int>("telephonenumber")
                         .HasColumnType("int");

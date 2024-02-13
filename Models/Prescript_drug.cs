@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,6 @@ namespace Models
 
         public float Weight { get; set; }
 
-        public String Period { get; set; }
+        public int Period { get; set; }
     }
 }
