@@ -22,7 +22,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var patients = await _patientService.GetAllPatientsAsync();
+            var patients = await _patientService.GetAllPatients();
             return Ok(patients);
         }
 
@@ -30,7 +30,7 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var patient = await _patientService.GetPatientAsync(id);
+            var patient = await _patientService.GetPatient(id);
 
             if (patient == null)
             {
@@ -44,7 +44,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Patient value)
         {
-            await _patientService.AddPatientAsync(value);
+            await _patientService.AddPatient(value);
             return Ok(); // Assuming a successful operation
         }
 
@@ -62,7 +62,7 @@ namespace API.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             // Assuming you want to return a 404 if the patient doesn't exist
-            if (await _patientService.GetPatientAsync(id) == null)
+            if (await _patientService.GetPatient(id) == null)
             {
                 return NotFound();
             }
