@@ -71,5 +71,10 @@ namespace DataAccessLayer
 
             return await _dbSet.Where(lambda).ToListAsync();
         }
+
+        Task IRepository<T>.Update(T entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
