@@ -10,7 +10,7 @@ namespace Models
     public class Drug
     {
         [Key]
-        public string DrugID { get; set; }
+        public int Id { get; set; }
         public string GenericN { get; set; } = null!;
         public string BrandN { get; set; } = null!;
         public float Weight { get; set; }

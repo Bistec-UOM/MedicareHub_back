@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240212130112_FK init")]
-    partial class FKinit
+    [Migration("20240213160640_mamasavemekt2")]
+    partial class mamasavemekt2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,34 +71,6 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("bill_Drugs");
                 });
 
-            modelBuilder.Entity("Models.Drug", b =>
-                {
-                    b.Property<string>("DrugID")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Avaliable")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("BrandN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GenericN")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Price")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Weight")
-                        .HasColumnType("real");
-
-                    b.HasKey("DrugID");
-
-                    b.ToTable("drugs");
-                });
-
             modelBuilder.Entity("Models.LabReport", b =>
                 {
                     b.Property<int>("Id")
@@ -141,10 +113,19 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DOB")
-                        .HasColumnType("int");
+                    b.Property<string>("ContactNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DOB")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NIC")
@@ -240,7 +221,7 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("records");
                 });
 
-            modelBuilder.Entity("Models.ReportFileds", b =>
+            modelBuilder.Entity("Models.ReportFields", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -365,10 +346,10 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("user_Teles");
                 });
 
-            modelBuilder.Entity("Models.ReportFileds", b =>
+            modelBuilder.Entity("Models.ReportFields", b =>
                 {
                     b.HasOne("Models.Test", "Test")
-                        .WithMany("ReportFiles")
+                        .WithMany("ReportFields")
                         .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -378,7 +359,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Test", b =>
                 {
-                    b.Navigation("ReportFiles");
+                    b.Navigation("ReportFields");
                 });
 #pragma warning restore 612, 618
         }
