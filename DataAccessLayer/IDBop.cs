@@ -13,5 +13,6 @@ namespace DataAccessLayer
         Task Add(T item);
         Task Update(T item);
         Task Delete(int id);
+        Task<IEnumerable<T>> GetByProp(string propName,object value);
     }
 }

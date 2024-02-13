@@ -10,8 +10,8 @@ namespace Services
 {
     public class TestService
     {
-        private readonly IDBop<Test> _test;
-        public TestService(IDBop<Test> test)
+        private readonly IRepository<Test> _test;
+        public TestService(IRepository<Test> test)
         {
             _test = test;
         }

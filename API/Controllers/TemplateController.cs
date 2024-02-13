@@ -24,6 +24,7 @@ namespace API.Controllers
             return Ok(await _tmpl.GetAllFields());
         }
 
+
         [HttpGet("{id}")]
         public async Task<ActionResult<ReportFields>> GetField(int id)
         {
@@ -57,24 +58,36 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> EditFiled(int id, ReportFields item)
-        {
-            if (id != item.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult> Edittmplt(int id,List<ReportFields> data)
+        //{
 
-            try
-            {
-                await _tmpl.EditField(item);
-                return Ok();
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
+        //}
+
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult> EditFiled(int id, ReportFields item)
+        //{
+        //    if (id != item.Id)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    try
+        //    {
+        //        await _tmpl.EditField(item);
+        //        return Ok();
+        //    }
+        //    catch (KeyNotFoundException)
+        //    {
+        //        return NotFound();
+        //    }
+
+        [HttpPut]
+        public async Task EditTemplate(List<ReportFields> data)
+        {
+            await _tmpl.EditTemplate(data);
         }
     }
-
 }
+
+
