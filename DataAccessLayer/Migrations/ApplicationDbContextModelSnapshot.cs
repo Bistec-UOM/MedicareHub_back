@@ -185,8 +185,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Prescript_drug", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("GenericN")
                         .IsRequired()
@@ -206,8 +209,11 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Prescription", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AppointID")
                         .IsRequired()

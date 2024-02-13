@@ -9,7 +9,6 @@ namespace Models
 {
     public class Drug
     {
-        [Key]
         public int Id { get; set; }
         public string GenericN { get; set; } = null!;
         public string BrandN { get; set; } = null!;
