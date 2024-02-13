@@ -15,10 +15,10 @@ namespace API.Controllers
             _drg = drg;
         }
         [HttpPost]
-        public async Task<ActionResult<Test>> AddDrug(Drug item)
+        public async Task<ActionResult<string>> AddDrug(Drug item)
         {
-            await _drg.Addtest(item);
-            //return CreatedAtAction(nameof(GetTest), new { id = item.TestId }, item);
+            await _drg.Adddrug(item);
+            return Ok("success");
         }
     }
 }
