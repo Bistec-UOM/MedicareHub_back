@@ -13,6 +13,6 @@ namespace Services
         void DeletePatient(int id);
         Task<Patient> GetPatient(int id);
         Task<List<Patient>> GetAllPatients();
-        Task UpdatePatient(Patient patient);
+        Task<int> UpdatePatient(Patient patient);
     }
 }

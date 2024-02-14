@@ -50,10 +50,10 @@ namespace DataAccessLayer
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task Update(T entity)
+        public async Task<int> Update(T entity)
         {
             _dbSet.Update(entity);
-            await _dbContext.SaveChangesAsync();
+            return await _dbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<T>> GetByProp(string propName, object val)
@@ -67,9 +67,6 @@ namespace DataAccessLayer
             return await _dbSet.Where(lambda).ToListAsync();
         }
 
-        Task IRepository<T>.Update(T entity)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }
