@@ -13,6 +13,6 @@ namespace DataAccessLayer
         Task Add(T entity);
         Task<T> Get(int id);
         Task<List<T>> GetAll();
-        Task Update(T entity);
+        Task<int> Update(T entity);
     }
 }

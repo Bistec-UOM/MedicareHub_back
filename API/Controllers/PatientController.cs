@@ -50,9 +50,10 @@ namespace API.Controllers
 
         // PUT api/<PatientController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Patient value)
+        public async Task<IActionResult> Put(int id, [FromBody] Patient value)
         {
-            _patientService.UpdatePatient(value);
+            await _patientService.UpdatePatient(value);
+            return Ok(value);
         }
 
 
