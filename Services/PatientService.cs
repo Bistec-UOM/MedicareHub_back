@@ -9,7 +9,7 @@ namespace Services
     public class PatientService : IPatientService
     {
         private readonly IRepository<Patient> _repository;
-        private readonly ApplicationDbContext _dbContext;
+        //private readonly ApplicationDbContext _dbContext;
 
         public PatientService(IRepository<Patient> repository)
         {
