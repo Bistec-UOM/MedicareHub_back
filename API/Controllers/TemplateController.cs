@@ -82,9 +82,15 @@ namespace API.Controllers
         //    }
 
         [HttpPut]
-        public async Task EditTemplate(List<ReportFields> data)
+        public async Task EditTemplate(EdittemplateObj data)
         {
             await _tmpl.EditTemplate(data);
+        }
+
+        [HttpPut("/put")]
+        public async Task Updatefields(List<ReportFields> data)
+        {
+            await _tmpl.UpdateFields(data);
         }
     }
 }

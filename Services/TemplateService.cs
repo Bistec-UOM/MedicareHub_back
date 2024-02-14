@@ -79,7 +79,42 @@ namespace Services
             await _tmplt.Update(item);
         }
 
-        public async Task EditTemplate(List<ReportFields> data)
+        public async Task EditTemplate(EdittemplateObj data)
+        {
+            //Delete removed fields
+            foreach (var id in data.Del_id)
+            {
+                var book = await _tmplt.Get(id);
+                if (book != null)
+                {
+                   await _tmplt.Delete(id);
+                }
+            }
+
+            //Edit edited fields
+            foreach (var i in data.EditedFields)
+            {
+                await _tmplt.Update(i);
+            }
+
+            //Add newly added fields
+            foreach (var i in data.AddedFields)
+            {
+                await _tmplt.Add(new ReportFields
+                {
+                    Fieldname = i.Fieldname,
+                    Index = i.Index,
+                    MinRef = i.MinRef,
+                    MaxRef = i.MaxRef,
+                    Unit = i.Unit,
+                    TestId = data.TestId
+                });
+            }
+
+
+        }
+
+        public async Task UpdateFields(List<ReportFields> data)
         {
             foreach (var i in data)
             {
