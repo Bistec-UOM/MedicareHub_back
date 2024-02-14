@@ -17,7 +17,7 @@ namespace API.Controllers
             _tmpl = tmpl;
         }
 
-        //Get the list of all lab tests
+        //Get the list of all lab tests to display in test list
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
@@ -25,20 +25,7 @@ namespace API.Controllers
             return Ok(await _tmpl.GetAllTests());
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Test>> GetTest(int id)
-        {
-                var tst = await _tmpl.GetTest(id);
-                return Ok(tst);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Test>> AddTest(Test item)
-        {
-            await _tmpl.Addtest(item);
-            return CreatedAtAction(nameof(GetTest), new { id = item.TestId }, item);
-        }
-
+        //Delete a test from available test list
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTest(int id)
         {
