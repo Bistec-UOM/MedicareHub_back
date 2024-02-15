@@ -2,6 +2,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Services;
+using Services.AppointmentService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,9 @@ builder.Services.AddScoped<TemplateService>();
 
 builder.Services.AddScoped<IRepository<ReportFields>,Repository<ReportFields>>();
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
+
+
+builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
 
 //=================================================================================================================
 //=================================================================================================================
