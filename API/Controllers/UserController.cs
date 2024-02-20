@@ -60,7 +60,7 @@ namespace API.Controllers
             {
                 return NotFound();
             }
-            _userService.DeleteUser(id);
+            await _userService.DeleteUser(id);
             return Ok();
         }
     }

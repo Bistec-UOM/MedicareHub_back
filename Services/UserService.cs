@@ -21,9 +21,9 @@ namespace Services
             await _Repository.Add(user);
         }
 
-        public void DeleteUser(int id)
+        public async Task DeleteUser(int id)
         {
-            _Repository.Delete(id);
+            await _Repository.Delete(id);
         }
 
         public async Task<List<User>> GetAllUsers()

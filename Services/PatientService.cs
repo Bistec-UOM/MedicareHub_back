@@ -21,9 +21,9 @@ namespace Services
            await _repository.Add(patient);
         }
 
-        public void DeletePatient(int id)
+        public async Task DeletePatient(int id)
         {
-            _repository.Delete(id);
+            await _repository.Delete(id);
         }
 
         public async Task<Patient> GetPatient(int id)
