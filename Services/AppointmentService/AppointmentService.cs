@@ -72,5 +72,13 @@ namespace Services.AppointmentService
             return doctorDayAppointments.ToList();  
             
         }
+
+        public async Task<List<User>> GetDoctors()
+        {
+
+            var doctors = _dbcontext.users.Where(d => d.Role == "Doctor");
+            return doctors.ToList();
+           
+        }
     }
 }

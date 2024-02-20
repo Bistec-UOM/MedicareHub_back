@@ -79,5 +79,15 @@ namespace API.Controllers
             return NoContent();
 
         }
+
+        [HttpGet("doctors")]
+        public async Task<ActionResult<ICollection<User>>> GetDoctors()
+        {
+            var doctors=_repository.GetDoctors();
+            return Ok(doctors);
+        }
+
+
+        
     }
 }

@@ -20,5 +20,7 @@ namespace Services.AppointmentService
         public Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date);
 
         public Task DeleteAllDoctorDayAppointments(int doctorId, DateTime date);
+
+        public Task<List<User>> GetDoctors();
     }
 }
