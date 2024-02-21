@@ -68,7 +68,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            _patientService.DeletePatient(id);
+            await _patientService.DeletePatient(id);
             return Ok(); // Assuming a successful operation
         }
     }
