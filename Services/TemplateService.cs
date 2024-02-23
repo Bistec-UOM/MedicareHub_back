@@ -31,6 +31,11 @@ namespace Services
             return await _tmplt.Get(id);
         }
 
+        public async Task<IEnumerable<ReportFields>> GetFieldByTest(int id)
+        {
+            return await _tmplt.GetByProp("testId", id);
+        }
+
         //public async Task AddField(List<ReportFields> item)
         //{
         //    foreach (var i in item)

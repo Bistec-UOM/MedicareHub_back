@@ -23,16 +23,21 @@ namespace API.Controllers
             return Ok(await _tmpl.GetAllFields());
         }
 
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<ReportFields>> GetField(int id)
+        //{
+        //    var tst = await _tmpl.GetField(id);
+        //    if (tst == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(tst);
+        //}
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ReportFields>> GetField(int id)
+        [HttpGet("{id}")]//Get a set of fields according to the selected test
+        public async Task<ActionResult<IEnumerable<ReportFields>>> GetFieldsByTest(int id)
         {
-            var tst = await _tmpl.GetField(id);
-            if (tst == null)
-            {
-                return NotFound();
-            }
-            return Ok(tst);
+            return Ok(await  _tmpl.GetFieldByTest(id));
         }
 
         //[HttpPost]

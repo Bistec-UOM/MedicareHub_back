@@ -14,5 +14,6 @@ namespace DataAccessLayer
         Task<T> Get(int id);
         Task<List<T>> GetAll();
         Task<int> Update(T entity);
+        Task<List<T>> GetByProp(string propName,object val);
     }
 }

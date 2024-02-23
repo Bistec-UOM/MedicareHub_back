@@ -56,7 +56,7 @@ namespace DataAccessLayer
             return await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<T>> GetByProp(string propName, object val)
+        public async Task<List<T>> GetByProp(string propName, object val)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
             var property = Expression.Property(parameter, propName);
