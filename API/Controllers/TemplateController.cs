@@ -17,37 +17,15 @@ namespace API.Controllers
             _tmpl = tmpl;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReportFields>>> GetAllFields()
-        {
-            return Ok(await _tmpl.GetAllFields());
-        }
-
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<ReportFields>> GetField(int id)
-        //{
-        //    var tst = await _tmpl.GetField(id);
-        //    if (tst == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return Ok(tst);
-        //}
 
         [HttpGet("{id}")]//Get a set of fields according to the selected test
         public async Task<ActionResult<IEnumerable<ReportFields>>> GetFieldsByTest(int id)
         {
-            return Ok(await  _tmpl.GetFieldByTest(id));
+            return Ok(await _tmpl.GetFieldByTest(id));
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult> AddOneTemplate(List<ReportFields> item)
-        //{
-        //    await _tmpl.AddField(item);
-        //    return Ok();
-        //}
 
-        [HttpPost]
+        [HttpPost]//Add new test
         public async Task<ActionResult> Addtmp(TemplateObj item)
         {
             await _tmpl.AddTemplate(item);
@@ -55,48 +33,13 @@ namespace API.Controllers
         }
 
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteFiled(int id)
-        {
-            await _tmpl.DeleteField(id);
-            return NoContent();
-        }
-
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult> Edittmplt(int id,List<ReportFields> data)
-        //{
-
-        //}
-
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult> EditFiled(int id, ReportFields item)
-        //{
-        //    if (id != item.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    try
-        //    {
-        //        await _tmpl.EditField(item);
-        //        return Ok();
-        //    }
-        //    catch (KeyNotFoundException)
-        //    {
-        //        return NotFound();
-        //    }
-
-        [HttpPut]
-        public async Task EditTemplate(EdittemplateObj data)
+        [HttpPut]//edit existing template
+        public async Task<ActionResult> Edittmplt(EdittemplateObj data)
         {
             await _tmpl.EditTemplate(data);
+            return Ok();
         }
 
-        [HttpPut("/put")]
-        public async Task Updatefields(List<ReportFields> data)
-        {
-            await _tmpl.UpdateFields(data);
-        }
     }
 }
 
