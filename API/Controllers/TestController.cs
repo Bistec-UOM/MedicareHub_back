@@ -32,5 +32,11 @@ namespace API.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        public async Task<ActionResult> EditTest(Test data)
+        {
+            await _tmpl.EditTest(data);
+            return Ok();
+        }
     }
  }
