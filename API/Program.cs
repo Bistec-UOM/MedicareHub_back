@@ -21,10 +21,6 @@ builder.Services.AddCors(options => {
         .AllowAnyOrigin()
         );
 });
-builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
-{
-    build.WithOrigins(" *").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
-}));
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
@@ -77,7 +73,6 @@ app.UseHttpsRedirection();
 
 //pass policy name for react
 app.UseCors("ReactJSDomain");
-app.UseCors("corspolicy");
 
 app.UseAuthorization();
 
