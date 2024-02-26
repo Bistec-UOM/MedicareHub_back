@@ -4,6 +4,7 @@ using Models;
 using Models.DTO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -84,39 +85,30 @@ namespace Services
             await _tmplt.Update(item);
         }
 
+
         public async Task EditTemplate(EdittemplateObj data)
         {
-            //Delete removed fields
-            foreach (var id in data.Del_id)
+            var existingF = await _tmplt.GetByProp("testId", data.TestId);
+
+            //delete all existing fields
+            foreach (var item in existingF)
             {
-                var book = await _tmplt.Get(id);
-                if (book != null)
-                {
-                   await _tmplt.Delete(id);
-                }
+                await _tmplt.Delete(item.Id);
             }
 
-            //Edit edited fields
-            foreach (var i in data.EditedFields)
-            {
-                await _tmplt.Update(i);
-            }
-
-            //Add newly added fields
-            foreach (var i in data.AddedFields)
+            //Add all sent fields
+            foreach (var item in data.Fields)
             {
                 await _tmplt.Add(new ReportFields
                 {
-                    Fieldname = i.Fieldname,
-                    Index = i.Index,
-                    MinRef = i.MinRef,
-                    MaxRef = i.MaxRef,
-                    Unit = i.Unit,
+                    Fieldname = item.Fieldname,
+                    Index = item.Index,
+                    MinRef = item.MinRef,
+                    MaxRef = item.MaxRef,
+                    Unit = item.Unit,
                     TestId = data.TestId
                 });
             }
-
-
         }
 
         public async Task UpdateFields(List<ReportFields> data)

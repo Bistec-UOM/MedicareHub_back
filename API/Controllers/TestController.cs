@@ -21,7 +21,6 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
-            
             return Ok(await _tmpl.GetAllTests());
         }
 
@@ -33,23 +32,11 @@ namespace API.Controllers
             return Ok();
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<ActionResult> EditTest(int id, Test item)
-        //{
-        //    if (id != item.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    try
-        //    {
-        //        await _tmpl.EditTest(item);
-        //        return Ok();
-        //    }
-        //    catch (KeyNotFoundException)
-        //    {
-        //        return NotFound();
-        //    }
-        //}
+        [HttpPut]
+        public async Task<ActionResult> EditTest(Test data)
+        {
+            await _tmpl.EditTest(data);
+            return Ok();
+        }
     }
  }
