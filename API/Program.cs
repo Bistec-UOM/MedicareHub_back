@@ -40,6 +40,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 //Doctor-----------------------------------------------------------------
 
+builder.Services.AddScoped<PrescriptionService>();
+builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
 //Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
