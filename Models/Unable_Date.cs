@@ -11,9 +11,5 @@ namespace Models
         public int Id { get; set; }
         public DateTime Date { get; set; }
 
-        //hello
-
-
-
     }
 }
