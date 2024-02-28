@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,8 @@ namespace Models
 {
     public class ReportFields
     {
-        public int Id { get; set; }
+        [Key]
+        public int RepFId { get; set; }
         public string Fieldname { get; set; } = null!;
         public short Index { get; set; }
         public float MinRef { get; set; }

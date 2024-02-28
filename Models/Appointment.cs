@@ -12,7 +12,7 @@ namespace Models
     public class Appointment
     {
         [Key]
-        public int Id { get; set; }
+        public int AppointId { get; set; }
         public DateTime Time { get; set; }
         public string Status { get; set; } = null!;
 
@@ -30,5 +30,10 @@ namespace Models
         public int PriscriptId { get; set; }
         [JsonIgnore]
         public Prescription? prescription { get; set; }
+
+        [ForeignKey("LapRepId")]
+        public int LabRepId { get; set; }
+        [JsonIgnore]
+        public LabReport? labReport { get; set; }
     }
 }

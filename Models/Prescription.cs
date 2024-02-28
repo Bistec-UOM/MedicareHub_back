@@ -22,6 +22,6 @@ namespace Models
 
         [JsonIgnore]
         [InverseProperty("Prescript_drug")]
-        public I
+        public ICollection<Prescript_drug>? prescript_Drugs { get; set; }
     }
 }
