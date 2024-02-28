@@ -17,7 +17,6 @@ namespace Models
         public float MaxRef { get; set; }
         public string Unit { get; set; } = null!;
 
-
         [ForeignKey("Id")]
         public int TestId { get; set; }
         [JsonIgnore]
