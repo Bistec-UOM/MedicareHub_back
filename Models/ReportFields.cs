@@ -11,8 +11,7 @@ namespace Models
 {
     public class ReportFields
     {
-        [Key]
-        public int RepFId { get; set; }
+        public int Id { get; set; }
         public string Fieldname { get; set; } = null!;
         public short Index { get; set; }
         public float MinRef { get; set; }

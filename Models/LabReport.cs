@@ -11,16 +11,12 @@ namespace Models
 {
     public class LabReport
     {
-        [Key]
-        public int LabRepId { get; set; }
+        public int Id { get; set; }
         public string PrescriptID { get; set; } = null!;
         public DateTime Time { get; set; }
         public  DateTime Date { get; set; } 
         public string TestName { get; set; } = null!;
         public string Status { get; set; } = null!;
 
-        [JsonIgnore]
-        [InverseProperty("Prescription")]
-        public Prescription? prescription { get; set; }
     }
 }

@@ -9,8 +9,7 @@ namespace Models
 {
     public class Bill_drug
     {
-        [Key]
-        public string BilDrgId { get; set; }
+        public string Id { get; set; }
         public string DrugID { get; set; }
         public float amount { get; set; }
     }

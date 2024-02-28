@@ -11,8 +11,7 @@ namespace Models
 {
     public class Patient
     {
-        [Key]
-        public int PatientId { get; set; }
+        public int Id { get; set; }
         public string? NIC { get; set; }
         public string? Name { get; set; }
         public string? FullName { get; set; }
@@ -21,10 +20,6 @@ namespace Models
         public string? Address { get; set; }
         public string? Email { get; set; }
         public string? Gender { get; set; }
-
-        [JsonIgnore]
-        [InverseProperty("Appointment")]
-        public ICollection<Appointment>? Appointments { get; set; }
 
     }
 }

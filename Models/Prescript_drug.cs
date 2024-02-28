@@ -11,8 +11,7 @@ namespace Models
 {
     public class Prescript_drug
     {
-        [Key]
-        public int PresDrugId { get; set; }
+        public int Id { get; set; }
         public string GenericN { get; set; }
         public float Weight { get; set; }
         public String Period { get; set; }

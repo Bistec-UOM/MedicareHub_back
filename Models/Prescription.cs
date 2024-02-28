@@ -11,17 +11,10 @@ namespace Models
 {
     public class Prescription
     {
-        [Key]
-        public int PrescriptId { get; set; }
+        public int Id { get; set; }
         public string AppointID { get; set; }
         public float total { get; set; }
         public string CashierID { get; set; }
 
-        [JsonIgnore]
-        public Appointment? appointment { get; set; }
-
-        [JsonIgnore]
-        [InverseProperty("Prescript_drug")]
-        public ICollection<Prescript_drug>? prescript_Drugs { get; set; }
     }
 }

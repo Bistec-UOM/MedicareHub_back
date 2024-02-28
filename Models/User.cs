@@ -11,8 +11,7 @@ namespace Models
 {
     public class User
     {
-        [Key]
-        public int UserId { get; set; }
+        public int Id { get; set; }
         public string? Name { get; set; }
         public string? FullName { get; set; }
         public string? Password { get; set; }
@@ -24,10 +23,6 @@ namespace Models
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
         public string? age { get; set; }
-
-        [JsonIgnore]
-        [InverseProperty("Appointment")]
-        public ICollection<Appointment>? Appointments { get; set; }
 
     }
 }

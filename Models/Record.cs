@@ -9,8 +9,7 @@ namespace Models
 {
     public class Record
     {
-        [Key]
-        public int RecId { get; set; }
+        public int Id { get; set; }
         public string FieldName { get; set; } = null!;
         public float Result { get; set; }
         public string Status { get; set; } = null!;
