@@ -12,6 +12,7 @@ namespace Models
     public class Prescript_drug
     {
 
+        
         public int Id { get; set; }
 
 
@@ -19,7 +20,6 @@ namespace Models
         public int PrescriptionId { get; set; }
         [JsonIgnore]
         public Prescription? Prescription { get; set; }
-
 
         public int GenericN { get; set; }
         public float Weight { get; set; }

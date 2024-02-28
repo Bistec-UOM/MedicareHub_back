@@ -26,7 +26,9 @@ namespace Models
         public List<LabReport>? LabReport { get; set; }
 
         [JsonIgnore]
-        public List<Bill_drug>? Bill_drug { get; set; }
+
+        public List<Bill_drug>? Bill_drug { get;set; }
+
 
 
         public float Total { get; set; }

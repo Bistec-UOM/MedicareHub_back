@@ -14,7 +14,8 @@ namespace Models
         [Key]
         public int Id { get; set; }
         public DateTime Time { get; set; }
-        public string? Status { get; set; }
+
+        public string? Status { get; set; } 
 
         [ForeignKey("Id")]
         public int PatientId { get; set; }
@@ -27,7 +28,8 @@ namespace Models
         [ForeignKey("Id")]
         public int RecepId { get; set; }
         [JsonIgnore]
-        public User? User { get; set; }
+
+        public User? User { get; set; } 
 
 
     }

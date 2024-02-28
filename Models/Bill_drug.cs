@@ -13,18 +13,19 @@ namespace Models
         public int Id { get; set; }
 
 
-        [ForeignKey("Id")]
+
+        [ForeignKey("Id")]        
         public int DrugID { get; set; }
         [JsonIgnore]
         public Drug? Drug { get; set; }
 
 
 
-        [ForeignKey("Id")]
+        [ForeignKey("Id")]  
         public int PrescriptionID { get; set; }
         [JsonIgnore]
         public Prescription? Prescription { get; set; }
-
+       
 
         public int Amount { get; set; }
     }
