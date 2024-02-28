@@ -11,16 +11,18 @@ namespace Models
 {
     public class Test
     {
-        [Key]
-        public int TestId { get; set; }
+        public int Id { get; set; }
         public string TestName { get; set; } = null!;
-        public string Abb {  get; set; }=null!;
+        public string Abb { get; set; } = null!;
         public float Price { get; set; }
         public string Provider { get; set; } = null!;
 
+
         [JsonIgnore]
-        [InverseProperty("Test")]
-        public ICollection<ReportFields>? ReportFields { get; set; }
+        public List<ReportFields>? ReportFields { get; set; }
+        [JsonIgnore]
+        public LabReport? LabReport { get; set; }
+
 
     }
 }

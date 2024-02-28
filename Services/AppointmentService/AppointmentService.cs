@@ -62,13 +62,13 @@ namespace Services.AppointmentService
 
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)
         {
-            var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
+            var doctorAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId);
             return doctorAppointments.ToList();
         }
 
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
-            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.Time.Date == date);
+            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId && a.Time.Date == date);
             return doctorDayAppointments.ToList();  
             
         }

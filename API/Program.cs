@@ -21,10 +21,6 @@ builder.Services.AddCors(options => {
         .AllowAnyOrigin()
         );
 });
-builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
-{
-    build.WithOrigins(" *").AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
-}));
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
@@ -40,6 +36,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 //Doctor-----------------------------------------------------------------
 
+builder.Services.AddScoped<PrescriptionService>();
+builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
 //Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
@@ -77,7 +75,6 @@ app.UseHttpsRedirection();
 
 //pass policy name for react
 app.UseCors("ReactJSDomain");
-app.UseCors("corspolicy");
 
 app.UseAuthorization();
 

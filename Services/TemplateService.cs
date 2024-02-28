@@ -34,7 +34,7 @@ namespace Services
 
         public async Task<IEnumerable<ReportFields>> GetFieldByTest(int id)
         {
-            return await _tmplt.GetByProp("testId", id);
+            return await _tmplt.GetByProp("Id", id);
         }
 
         //public async Task AddField(List<ReportFields> item)
@@ -64,7 +64,7 @@ namespace Services
             };
             await _tst.Add(x);
 
-            var testId = x.TestId;
+            var Id = x.Id;
 
             foreach(var i in data.ReportFields) 
             {
@@ -75,7 +75,7 @@ namespace Services
                     MinRef=i.MinRef,
                     MaxRef=i.MaxRef,
                     Unit=i.Unit,
-                    TestId=testId
+                    Id=Id
                 });  
             }
         }
@@ -88,7 +88,7 @@ namespace Services
 
         public async Task EditTemplate(EdittemplateObj data)
         {
-            var existingF = await _tmplt.GetByProp("testId", data.TestId);
+            var existingF = await _tmplt.GetByProp("Id", data.Id);
 
             //delete all existing fields
             foreach (var item in existingF)
@@ -106,7 +106,7 @@ namespace Services
                     MinRef = item.MinRef,
                     MaxRef = item.MaxRef,
                     Unit = item.Unit,
-                    TestId = data.TestId
+                    Id = data.Id
                 });
             }
         }
