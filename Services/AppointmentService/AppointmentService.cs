@@ -80,5 +80,61 @@ namespace Services.AppointmentService
             return doctors.ToList();
            
         }
+
+        public async Task<User> GetPatient(int id)
+        {
+            var patient=_dbcontext.users.FirstOrDefaultAsync(p=>p.Id==id);
+            return await patient;
+        }
+
+        public async Task<List<User>> GetPatients()
+        {
+            var patients = _dbcontext.users.Where(p => p.Role == "Patient");
+            return patients.ToList();
+        }
+
+        public async Task<Appointment> UpdateAppointment(int id, Appointment appointment)
+
+
+{
+
+            System.Diagnostics.Debug.WriteLine("inside update");
+            System.Diagnostics.Debug.WriteLine("newtime", appointment.Time.ToString(),appointment.DoctorId);
+            var oldAppointment = await GetAppointment(id);
+
+    if (oldAppointment != null)
+    {
+                // Update properties of the existing appointment
+
+                
+            oldAppointment.Time = appointment.Time;
+        oldAppointment.Status = appointment.Status;
+        oldAppointment.PatitenId = appointment.PatitenId;
+        oldAppointment.DoctorId = appointment.DoctorId;
+        oldAppointment.RecepId = appointment.RecepId;
+
+        try
+        {
+            await _dbcontext.SaveChangesAsync();
+            return oldAppointment;
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Handle concurrency conflict
+            // You can implement custom logic here, such as merging changes or retrying the update
+            Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
+            throw;
+        }
+    }
+    else
+    {
+        // Handle case where appointment does not exist
+        // You can throw an exception or return null based on your requirement
+        throw new ArgumentException($"Appointment with id {id} not found.");
+    }
+}
+
+
+        
     }
 }
