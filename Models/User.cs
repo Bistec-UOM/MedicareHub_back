@@ -22,7 +22,7 @@ namespace Models
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
         public string? DOB { get; set; }
-        
+
 
         [JsonIgnore]
         public List<Appointment>? Appointment { get; set; }

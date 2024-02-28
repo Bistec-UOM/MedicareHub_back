@@ -19,8 +19,10 @@ namespace Models
         public Prescription? Prescription { get; set; }
 
 
-        public DateTime Time { get; set; }
+        public DateTime DateTime { get; set; }
+
         public  DateTime Date { get; set; }
+
 
 
         [ForeignKey("Id")]
