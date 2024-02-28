@@ -16,9 +16,5 @@ namespace Models
         public float Weight { get; set; }
         public String Period { get; set; }
 
-        [ForeignKey("PrescriptId")]
-        public int PrescriptId { get; set; }
-        [JsonIgnore]
-        public Prescription? prescription { get; set; }
     }
 }
