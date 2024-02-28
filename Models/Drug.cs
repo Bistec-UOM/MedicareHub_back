@@ -12,8 +12,10 @@ namespace Models
         public int Id { get; set; }
         public string GenericN { get; set; } = null!;
         public string BrandN { get; set; } = null!;
-        public float Weight { get; set; }
+        public int Weight { get; set; }
         public float Price { get; set; }
-        public string Avaliable { get; set; }
+        public string? Avaliable { get; set; }
+
+        public Bill_drug? Bill_drug { get; set; }
     }
 }

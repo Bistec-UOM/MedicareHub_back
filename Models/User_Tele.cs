@@ -11,6 +11,7 @@ namespace Models
     public class User_Tele
     {
         public int Id { get; set; }
-        public int telephonenumber { get; set; }
+        public int Telephonenumber { get; set; }
+        public User? User { get; set; }
     }
 }

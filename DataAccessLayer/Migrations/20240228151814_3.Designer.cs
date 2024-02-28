@@ -4,6 +4,7 @@ using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240228151814_3")]
+    partial class _3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -276,10 +279,10 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("LabReportId")
+                    b.Property<int>("FieldId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReportFieldsId")
+                    b.Property<int?>("LabReportId")
                         .HasColumnType("int");
 
                     b.Property<int>("ReportId")
@@ -295,8 +298,6 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LabReportId");
-
-                    b.HasIndex("ReportFieldsId");
 
                     b.ToTable("records");
                 });
@@ -321,9 +322,6 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<float>("MinRef")
                         .HasColumnType("real");
-
-                    b.Property<int>("RecordId")
-                        .HasColumnType("int");
 
                     b.Property<int>("TestId")
                         .HasColumnType("int");
@@ -544,13 +542,7 @@ namespace DataAccessLayer.Migrations
                         .WithMany("Record")
                         .HasForeignKey("LabReportId");
 
-                    b.HasOne("Models.ReportFields", "ReportFields")
-                        .WithMany("Record")
-                        .HasForeignKey("ReportFieldsId");
-
                     b.Navigation("LabReport");
-
-                    b.Navigation("ReportFields");
                 });
 
             modelBuilder.Entity("Models.ReportFields", b =>
@@ -597,11 +589,6 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("LabReport");
 
                     b.Navigation("Prescript_drug");
-                });
-
-            modelBuilder.Entity("Models.ReportFields", b =>
-                {
-                    b.Navigation("Record");
                 });
 
             modelBuilder.Entity("Models.Test", b =>
