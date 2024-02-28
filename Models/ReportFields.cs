@@ -26,6 +26,6 @@ namespace Models
         [ForeignKey("Id")]
         public int RecordId { get; set; }
         [JsonIgnore]
-        public List<Record>? Record { get; set; }
+        public List<Record>? Record { get; set;}
     }
 }
