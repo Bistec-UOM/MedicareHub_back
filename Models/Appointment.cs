@@ -16,16 +16,19 @@ namespace Models
         public DateTime Time { get; set; }
         public string Status { get; set; } = null!;
 
+        [ForeignKey("PatientId")]
+        public int PatientId { get; set; }
         [JsonIgnore]
-        [InverseProperty("Patient")]
         public Patient? patient { get; set; }
 
+        [ForeignKey("UserId")]
+        public int UserId { get; set; }
         [JsonIgnore]
-        [InverseProperty("User")]
-        public User? doctor { get; set; }
+        public User? user { get; set; }
 
+        [ForeignKey("PriscriptId")]
+        public int PriscriptId { get; set; }
         [JsonIgnore]
-        [InverseProperty("Prescription")]
         public Prescription? prescription { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -9,7 +11,8 @@ namespace Models
 {
     public class Prescription
     {
-        public int Id { get; set; }
+        [Key]
+        public int PrescriptId { get; set; }
         public string AppointID { get; set; }
         public float total { get; set; }
         public string CashierID { get; set; }
@@ -17,5 +20,8 @@ namespace Models
         [JsonIgnore]
         public Appointment? appointment { get; set; }
 
+        [JsonIgnore]
+        [InverseProperty("Prescript_drug")]
+        public I
     }
 }
