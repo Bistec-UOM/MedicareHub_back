@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Models
@@ -14,10 +16,16 @@ namespace Models
         public DateTime Time { get; set; }
         public string Status { get; set; } = null!;
 
-        public int PatitenId { get; set; }
+        [JsonIgnore]
+        [InverseProperty("Patient")]
+        public Patient? patient { get; set; }
 
-        public int DoctorId { get; set; }
+        [JsonIgnore]
+        [InverseProperty("User")]
+        public User? doctor { get; set; }
 
-        public int RecepId { get; set; }
+        [JsonIgnore]
+        [InverseProperty("Prescription")]
+        public Prescription? prescription { get; set; }
     }
 }
