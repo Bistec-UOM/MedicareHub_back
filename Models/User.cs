@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -22,7 +21,15 @@ namespace Models
         public string? Qualifications { get; set; }
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
-        public string? age { get; set; }
+        public string? DOB { get; set; }
+
+
+        [JsonIgnore]
+        public List<Appointment>? Appointment { get; set; }
+
+
+        [JsonIgnore]
+        public List<User_Tele>? User_Tele { get; set; }
 
     }
 }

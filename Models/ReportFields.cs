@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -18,10 +17,16 @@ namespace Models
         public float MaxRef { get; set; }
         public string Unit { get; set; } = null!;
 
-        [ForeignKey("TestId")]
+
+        [ForeignKey("Id")]
         public int TestId { get; set; }
         [JsonIgnore]
         public Test? Test { get; set; }
+
+        [ForeignKey("Id")]
+        public int RecordId { get; set; }
+        [JsonIgnore]
+        public List<Record>? Record { get; set; }
 
     }
 }
