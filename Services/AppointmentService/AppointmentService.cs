@@ -68,7 +68,7 @@ namespace Services.AppointmentService
 
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
-            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
+            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId && a.DateTime.Date == date);
             return doctorDayAppointments.ToList();  
             
         }

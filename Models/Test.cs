@@ -21,7 +21,7 @@ namespace Models
         [JsonIgnore]
         public List<ReportFields>? ReportFields { get; set; }
         [JsonIgnore]
-        public LabReport? LabReport { get; set; }
+        public List<LabReport>? LabReport { get; set; }
 
 
     }
