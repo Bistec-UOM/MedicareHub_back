@@ -21,9 +21,6 @@ namespace Models
 
         public DateTime DateTime { get; set; }
 
-        public  DateTime Date { get; set; }
-
-
 
         [ForeignKey("Id")]
         public int TestId { get; set; }
@@ -33,6 +30,7 @@ namespace Models
 
         [JsonIgnore]
         public List<Record>? Record { get; set; }
+
 
         public string Status { get; set; } = null!;
 
