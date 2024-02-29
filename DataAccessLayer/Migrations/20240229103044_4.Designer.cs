@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240228153924_5")]
-    partial class _5
+    [Migration("20240229103044_4")]
+    partial class _4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
@@ -45,17 +48,13 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
 
                     b.HasIndex("PatientId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RecepId");
 
                     b.ToTable("appointments");
                 });
@@ -125,13 +124,10 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PrescriptID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PrescriptionId")
+                    b.Property<int>("PrescriptionID")
                         .HasColumnType("int");
 
                     b.Property<string>("Status")
@@ -141,15 +137,11 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("TestId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("PrescriptionId");
+                    b.HasIndex("PrescriptionID");
 
-                    b.HasIndex("TestId")
-                        .IsUnique();
+                    b.HasIndex("TestId");
 
                     b.ToTable("labReports");
                 });
@@ -247,26 +239,29 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppointID")
+                    b.Property<int>("AppointmentID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AppointmentId")
+                    b.Property<int>("CashierId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CachierID")
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LbAstID")
                         .HasColumnType("int");
 
                     b.Property<float>("Total")
                         .HasColumnType("real");
 
-                    b.Property<int?>("UerId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentID")
+                        .IsUnique();
 
-                    b.HasIndex("UerId");
+                    b.HasIndex("CashierId");
+
+                    b.HasIndex("LbAstID");
 
                     b.ToTable("prescriptions");
                 });
@@ -279,29 +274,25 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("LabReportId")
+                    b.Property<int>("LabReportId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ReportFieldsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReportId")
+                    b.Property<int>("ReportFieldId")
                         .HasColumnType("int");
 
                     b.Property<float>("Result")
                         .HasColumnType("real");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LabReportId");
 
-                    b.HasIndex("ReportFieldsId");
+                    b.HasIndex("ReportFieldId");
 
-                    b.ToTable("records");
+                    b.ToTable("Record");
                 });
 
             modelBuilder.Entity("Models.ReportFields", b =>
@@ -324,9 +315,6 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<float>("MinRef")
                         .HasColumnType("real");
-
-                    b.Property<int>("RecordId")
-                        .HasColumnType("int");
 
                     b.Property<int>("TestId")
                         .HasColumnType("int");
@@ -455,19 +443,29 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Appointment", b =>
                 {
+                    b.HasOne("Models.User", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Models.Patient", "Patient")
                         .WithMany("Appointment")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.User", "User")
+                    b.HasOne("Models.User", "Recep")
                         .WithMany("Appointment")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("RecepId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
 
                     b.Navigation("Patient");
 
-                    b.Navigation("User");
+                    b.Navigation("Recep");
                 });
 
             modelBuilder.Entity("Models.Bill_drug", b =>
@@ -493,11 +491,13 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("Models.Prescription", "Prescription")
                         .WithMany("LabReport")
-                        .HasForeignKey("PrescriptionId");
+                        .HasForeignKey("PrescriptionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Models.Test", "Test")
-                        .WithOne("LabReport")
-                        .HasForeignKey("Models.LabReport", "TestId")
+                        .WithMany("LabReport")
+                        .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -529,31 +529,47 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("Models.Prescription", b =>
                 {
                     b.HasOne("Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId");
+                        .WithOne("Prescription")
+                        .HasForeignKey("Models.Prescription", "AppointmentID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Models.User", "Uer")
+                    b.HasOne("Models.User", "Cashier")
                         .WithMany()
-                        .HasForeignKey("UerId");
+                        .HasForeignKey("CashierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.User", "LbAst")
+                        .WithMany()
+                        .HasForeignKey("LbAstID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Appointment");
 
-                    b.Navigation("Uer");
+                    b.Navigation("Cashier");
+
+                    b.Navigation("LbAst");
                 });
 
             modelBuilder.Entity("Models.Record", b =>
                 {
                     b.HasOne("Models.LabReport", "LabReport")
-                        .WithMany("Record")
-                        .HasForeignKey("LabReportId");
+                        .WithMany("Records")
+                        .HasForeignKey("LabReportId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Models.ReportFields", "ReportFields")
+                    b.HasOne("Models.ReportFields", "ReportField")
                         .WithMany("Record")
-                        .HasForeignKey("ReportFieldsId");
+                        .HasForeignKey("ReportFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("LabReport");
 
-                    b.Navigation("ReportFields");
+                    b.Navigation("ReportField");
                 });
 
             modelBuilder.Entity("Models.ReportFields", b =>
@@ -576,6 +592,11 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Models.Appointment", b =>
+                {
+                    b.Navigation("Prescription");
+                });
+
             modelBuilder.Entity("Models.Drug", b =>
                 {
                     b.Navigation("Bill_drug");
@@ -583,7 +604,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.LabReport", b =>
                 {
-                    b.Navigation("Record");
+                    b.Navigation("Records");
                 });
 
             modelBuilder.Entity("Models.Patient", b =>

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Models
 {
@@ -23,12 +18,16 @@ namespace Models
         public Patient? Patient { get; set; }
 
 
-        [ForeignKey("Id")]
+        [ForeignKey("DoctorId")]
         public int DoctorId { get; set; }
-        [ForeignKey("Id")]
+        [JsonIgnore]
+        public User? Doctor { get; set; }
+
+
+        [ForeignKey("RecepId")]
         public int RecepId { get; set; }
         [JsonIgnore]
-        public User? User { get; set; }
+        public User? Recep { get; set; }
 
 
         [JsonIgnore]
