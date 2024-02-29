@@ -14,7 +14,7 @@ namespace Models
 
 
         [ForeignKey("Id")]
-        public int AppointID { get; set; }
+        public int AppointmentID { get; set; }
         [JsonIgnore]
         public Appointment? Appointment { get; set; }
 
@@ -26,19 +26,16 @@ namespace Models
         public List<LabReport>? LabReport { get; set; }
 
         [JsonIgnore]
-
         public List<Bill_drug>? Bill_drug { get;set; }
-
 
 
         public float Total { get; set; }
 
 
-
         [ForeignKey("Id")]
         public int CachierID { get; set; }
         [JsonIgnore]
-        public User? Uer { get; set; }
+        public User? User { get; set; }
 
     }
 }
