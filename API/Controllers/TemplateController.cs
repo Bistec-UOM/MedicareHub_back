@@ -18,14 +18,19 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("{id}")]//Get a set of fields according to the selected test
+        //Get a set of fields according to the selected test===============
+
+        [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<ReportFields>>> GetFieldsByTest(int id)
         {
             return Ok(await _tmpl.GetFieldByTest(id));
         }
 
 
-        [HttpPost]//Add new test
+
+        //Add new test (with templates)====================================
+
+        [HttpPost]
         public async Task<ActionResult> Addtmp(TemplateObj item)
         {
             await _tmpl.AddTemplate(item);
@@ -33,7 +38,10 @@ namespace API.Controllers
         }
 
 
-        [HttpPut]//edit existing template
+
+        //edit existing template=============================================
+
+        [HttpPut]
         public async Task<ActionResult> Edittmplt(EdittemplateObj data)
         {
             await _tmpl.EditTemplate(data);
