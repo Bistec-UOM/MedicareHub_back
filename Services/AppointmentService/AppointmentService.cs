@@ -80,5 +80,69 @@ namespace Services.AppointmentService
             return doctors.ToList();
            
         }
+
+        public async Task<Patient> GetPatient(int id)
+        {
+            var patient=_dbcontext.patients.FirstOrDefaultAsync(p=>p.Id==id);
+            return await patient;
+        }
+
+        public async Task<List<Patient>> GetPatients()
+        {
+           
+            return  _dbcontext.patients.ToList();
+        }
+
+        public async Task RegisterPatient(Patient patient)
+        {
+           await _dbcontext.patients.AddAsync(patient);
+            await _dbcontext.SaveChangesAsync();
+
+
+        }
+
+        public async Task<Appointment> UpdateAppointment(int id, Appointment appointment)
+
+
+{
+
+            System.Diagnostics.Debug.WriteLine("inside update");
+            System.Diagnostics.Debug.WriteLine("newtime", appointment.DateTime.ToString(),appointment.DoctorId);
+            var oldAppointment = await GetAppointment(id);
+
+    if (oldAppointment != null)
+    {
+                // Update properties of the existing appointment
+
+                
+            oldAppointment.DateTime = appointment.DateTime;
+        oldAppointment.Status = appointment.Status;
+        oldAppointment.PatientId = appointment.PatientId;
+        oldAppointment.DoctorId = appointment.DoctorId;
+        oldAppointment.RecepId = appointment.RecepId;
+
+        try
+        {
+            await _dbcontext.SaveChangesAsync();
+            return oldAppointment;
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            // Handle concurrency conflict
+            // You can implement custom logic here, such as merging changes or retrying the update
+            Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
+            throw;
+        }
+    }
+    else
+    {
+        // Handle case where appointment does not exist
+        // You can throw an exception or return null based on your requirement
+        throw new ArgumentException($"Appointment with id {id} not found.");
+    }
+}
+
+
+        
     }
 }
