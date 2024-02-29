@@ -22,11 +22,15 @@ namespace Services.AppointmentService
         public Task DeleteAllDoctorDayAppointments(int doctorId, DateTime date);
 
         public Task<List<User>> GetDoctors();
-        public Task<User> GetPatient(int id);
+        public Task<Patient> GetPatient(int id);
 
         public Task<Appointment> UpdateAppointment(int id,Appointment appointment);
 
-        public Task<List<User>> GetPatients();
+        public Task<List<Patient>> GetPatients();
+
+        public Task RegisterPatient(Patient patient);
+
+
 
 
     }

@@ -69,7 +69,7 @@ namespace API.Controllers
 
             foreach(var appointment in doctorDayAppointments)
             {
-                var patientDetails = await _repository.GetPatient(appointment.PatitenId);
+                var patientDetails = await _repository.GetPatient(appointment.PatientId);
                 AppointmentWithPatientDetails newappointment = new AppointmentWithPatientDetails
                 {
                     Appointment=appointment,
@@ -120,6 +120,14 @@ namespace API.Controllers
         {
             var patients=await _repository.GetPatients();
             return Ok(patients);
+        }
+
+        [HttpPost("patients")]
+        public async Task RegisterPatient(Patient patient)
+        {
+
+            await _repository.RegisterPatient(patient);
+
         }
 
 

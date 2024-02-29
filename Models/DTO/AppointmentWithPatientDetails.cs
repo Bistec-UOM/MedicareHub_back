@@ -9,6 +9,6 @@ namespace Models.DTO
     public class AppointmentWithPatientDetails
     {
         public Appointment Appointment { get; set; }
-        public User patient { get; set; }
+        public Patient patient { get; set; }
     }
 }

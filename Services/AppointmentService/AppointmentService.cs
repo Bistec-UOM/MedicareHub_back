@@ -68,7 +68,7 @@ namespace Services.AppointmentService
 
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
-            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId && a.Time.Date == date);
+            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
             return doctorDayAppointments.ToList();  
             
         }
@@ -81,16 +81,24 @@ namespace Services.AppointmentService
            
         }
 
-        public async Task<User> GetPatient(int id)
+        public async Task<Patient> GetPatient(int id)
         {
-            var patient=_dbcontext.users.FirstOrDefaultAsync(p=>p.Id==id);
+            var patient=_dbcontext.patients.FirstOrDefaultAsync(p=>p.Id==id);
             return await patient;
         }
 
-        public async Task<List<User>> GetPatients()
+        public async Task<List<Patient>> GetPatients()
         {
-            var patients = _dbcontext.users.Where(p => p.Role == "Patient");
-            return patients.ToList();
+           
+            return  _dbcontext.patients.ToList();
+        }
+
+        public async Task RegisterPatient(Patient patient)
+        {
+           await _dbcontext.patients.AddAsync(patient);
+            await _dbcontext.SaveChangesAsync();
+
+
         }
 
         public async Task<Appointment> UpdateAppointment(int id, Appointment appointment)
@@ -99,7 +107,7 @@ namespace Services.AppointmentService
 {
 
             System.Diagnostics.Debug.WriteLine("inside update");
-            System.Diagnostics.Debug.WriteLine("newtime", appointment.Time.ToString(),appointment.DoctorId);
+            System.Diagnostics.Debug.WriteLine("newtime", appointment.DateTime.ToString(),appointment.DoctorId);
             var oldAppointment = await GetAppointment(id);
 
     if (oldAppointment != null)
@@ -107,9 +115,9 @@ namespace Services.AppointmentService
                 // Update properties of the existing appointment
 
                 
-            oldAppointment.Time = appointment.Time;
+            oldAppointment.DateTime = appointment.DateTime;
         oldAppointment.Status = appointment.Status;
-        oldAppointment.PatitenId = appointment.PatitenId;
+        oldAppointment.PatientId = appointment.PatientId;
         oldAppointment.DoctorId = appointment.DoctorId;
         oldAppointment.RecepId = appointment.RecepId;
 
