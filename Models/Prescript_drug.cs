@@ -11,8 +11,7 @@ namespace Models
 {
     public class Prescript_drug
     {
-
-        
+     
         public int Id { get; set; }
 
 
