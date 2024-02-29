@@ -14,7 +14,7 @@ namespace Models
         public int Id { get; set; }
 
         [ForeignKey("Id")]
-        public int PrescriptID { get; set; }
+        public int PrescriptionID { get; set; }
         [JsonIgnore]
         public Prescription? Prescription { get; set; }
 
@@ -29,7 +29,7 @@ namespace Models
 
 
         [JsonIgnore]
-        public List<Record>? Record { get; set; }
+        public List<Record>? Records { get; set; }
 
 
         public string Status { get; set; } = null!;

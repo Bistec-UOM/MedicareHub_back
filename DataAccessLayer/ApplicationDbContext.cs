@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models;
 
 namespace DataAccessLayer
@@ -23,7 +24,7 @@ namespace DataAccessLayer
 
         //Lab=====================================================================
         public DbSet<LabReport> labReports { get; set; }
-        public DbSet<Record> records { get; set; }
+        //public DbSet<Record> records { get; set; }
         public DbSet<Test> tests { get; set; }
         public DbSet<ReportFields> reportFields { get; set; }
 
@@ -33,5 +34,20 @@ namespace DataAccessLayer
         public DbSet<User> users { get; set; }
         public DbSet<User_Tele> user_Teles { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Doctor)
+                .WithMany()
+                .HasForeignKey(a => a.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict); // Adjust delete behavior as needed
+
+            // Configure other entity relationships
+
+            base.OnModelCreating(modelBuilder);
+        }
+
     }
+
+
 }

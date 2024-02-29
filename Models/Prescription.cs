@@ -11,6 +11,7 @@ namespace Models
     public class Prescription
     {
         public int Id { get; set; }
+        public DateTime DateTime { get; set; }
 
 
         [ForeignKey("Id")]
@@ -32,10 +33,15 @@ namespace Models
         public float Total { get; set; }
 
 
-        [ForeignKey("Id")]
-        public int CachierID { get; set; }
+        [ForeignKey("CashierId")]
+        public int CashierId { get; set; }
         [JsonIgnore]
-        public User? User { get; set; }
+        public User? Cashier { get; set; }
+
+        [ForeignKey("LbAstID")]
+        public int LbAstID { get; set; }
+        [JsonIgnore]
+        public User? LbAst { get; set; }
 
     }
 }
