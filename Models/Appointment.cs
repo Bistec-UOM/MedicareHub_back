@@ -34,5 +34,6 @@ namespace Models
         [JsonIgnore]
         public Prescription? Prescription { get; set; } = null;
 
+
     }
 }
