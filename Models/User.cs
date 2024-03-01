@@ -31,5 +31,9 @@ namespace Models
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
 
+        [JsonIgnore]
+        public List<LabReport>? LabReport { get; set; }
+        [JsonIgnore]
+        public List<Prescription>? Prescription { get; set; }
     }
 }
