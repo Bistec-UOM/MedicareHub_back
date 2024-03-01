@@ -34,5 +34,10 @@ namespace Models
 
         public string Status { get; set; } = null!;
 
+
+        [ForeignKey("LbAstID")]
+        public int LbAstID { get; set; }
+        [JsonIgnore]
+        public User? LbAst { get; set; }
     }
 }
