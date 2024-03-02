@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO;
 using Services.AppointmentService;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace API.Controllers
@@ -15,7 +16,7 @@ namespace API.Controllers
         public AppointmentController(IAppointmentRepository repository)
         {
             _repository = repository;
-            
+
         }
 
         [HttpGet]
@@ -30,9 +31,9 @@ namespace API.Controllers
         [HttpPost]
         public async Task AddAppointment(Appointment appointment)
         {
-              await _repository.AddAppointment(appointment);
+            await _repository.AddAppointment(appointment);
         }
-        [HttpGet("{id}",Name ="GetAppointment")]
+        [HttpGet("{id}", Name = "GetAppointment")]
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)
         {
@@ -54,26 +55,26 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpGet("doctor/{doctorId}",Name ="GetDoctorAppointments")]
+        [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
         public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)
         {
             var doctorAppointments = await _repository.GetDoctorAppointments(doctorId);
             return Ok(doctorAppointments);
         }
         [HttpGet("doctor/{doctorId}/day/{date}")]
-        public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId,DateTime date)
+        public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
-            var doctorDayAppointments=await _repository.GetDoctorAppointmentsByDate(doctorId,date);
+            var doctorDayAppointments = await _repository.GetDoctorAppointmentsByDate(doctorId, date);
             List<AppointmentWithPatientDetails> appointmentsWithDetails = new List<AppointmentWithPatientDetails>();
 
 
-            foreach(var appointment in doctorDayAppointments)
+            foreach (var appointment in doctorDayAppointments)
             {
                 var patientDetails = await _repository.GetPatient(appointment.PatientId);
                 AppointmentWithPatientDetails newappointment = new AppointmentWithPatientDetails
                 {
-                    Appointment=appointment,
-                    patient=patientDetails
+                    Appointment = appointment,
+                    patient = patientDetails
 
                 };
 
@@ -104,21 +105,21 @@ namespace API.Controllers
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors()
         {
-            var doctors=_repository.GetDoctors();
+            var doctors = _repository.GetDoctors();
             return Ok(doctors);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody]Appointment appointment)
+        public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment)
         {
-            
+
             return Ok(await _repository.UpdateAppointment(id, appointment));
         }
 
         [HttpGet("patients")]
         public async Task<ActionResult<ICollection<User>>> GetPatients()
         {
-            var patients=await _repository.GetPatients();
+            var patients = await _repository.GetPatients();
             return Ok(patients);
         }
 
@@ -130,7 +131,22 @@ namespace API.Controllers
 
         }
 
+        [HttpPut("/updateStatus/{id}")]
+        public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)
+        {
+            return Ok(await _repository.UpdateAppointment(id, appointment));
 
-        
+
+        }
+
+        [HttpPut("doctor/{doctorId}/day/{date}")]
+        public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId,DateTime date)
+        {
+            return Ok(await _repository.CancelAllAppointments(doctorId, date));
+        }
+
+
+
+
     }
 }
