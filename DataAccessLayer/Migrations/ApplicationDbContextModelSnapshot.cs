@@ -289,7 +289,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("ReportFieldId");
 
-                    b.ToTable("Record");
+                    b.ToTable("records");
                 });
 
             modelBuilder.Entity("Models.ReportFields", b =>
@@ -441,9 +441,9 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("Models.Appointment", b =>
                 {
                     b.HasOne("Models.User", "Doctor")
-                        .WithMany()
+                        .WithMany("Appointment")
                         .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Models.Patient", "Patient")
@@ -453,7 +453,7 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.User", "Recep")
-                        .WithMany("Appointment")
+                        .WithMany()
                         .HasForeignKey("RecepId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

@@ -24,7 +24,7 @@ namespace DataAccessLayer
 
         //Lab=====================================================================
         public DbSet<LabReport> labReports { get; set; }
-        //public DbSet<Record> records { get; set; }
+        public DbSet<Record> records { get; set; }
         public DbSet<Test> tests { get; set; }
         public DbSet<ReportFields> reportFields { get; set; }
 
