@@ -27,6 +27,19 @@ namespace Services.AppointmentService
             
         }
 
+        public async Task<List<Appointment>> CancelAllAppointments(int doctorId, DateTime date)
+        {
+           var appointments= await GetDoctorAppointmentsByDate(doctorId, date);
+            List<Appointment> updatedReults = new List<Appointment>();
+           foreach(Appointment app in appointments)
+            {
+              var upAppointment= await  UpdateOnlyOneAppointmentUsingId(app.Id);
+              updatedReults.Add(upAppointment);
+
+            }
+            return updatedReults;
+        }
+
         public async Task DeleteAllDoctorDayAppointments(int doctorId, DateTime date)
         {
             var targetAppointments=await GetDoctorAppointmentsByDate(doctorId, date);
@@ -68,7 +81,7 @@ namespace Services.AppointmentService
 
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
-            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId && a.DateTime.Date == date);
+            var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
             return doctorDayAppointments.ToList();  
             
         }
@@ -142,7 +155,75 @@ namespace Services.AppointmentService
     }
 }
 
+        public async Task<Appointment> UpdateAppointmentStatus(int id, Appointment appointment)
+        {
+            var oldAppointment = await GetAppointment(id);
 
-        
+            if (oldAppointment != null)
+            {
+                // Update properties of the existing appointment
+
+
+                oldAppointment.DateTime = appointment.DateTime;
+                oldAppointment.Status = appointment.Status;
+                oldAppointment.PatientId = appointment.PatientId;
+                oldAppointment.DoctorId = appointment.DoctorId;
+                oldAppointment.RecepId = appointment.RecepId;
+
+                try
+                {
+                    await _dbcontext.SaveChangesAsync();
+                    return oldAppointment;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+               
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
+
+        }
+
+        public async Task<Appointment> UpdateOnlyOneAppointmentUsingId(int id)
+        {
+            var oldAppointment = await GetAppointment(id);
+
+
+            if (oldAppointment != null)
+            {
+                // Update properties of the existing appointment
+
+
+                oldAppointment.DateTime = oldAppointment.DateTime;
+                oldAppointment.Status = "cancelled";
+                oldAppointment.PatientId = oldAppointment.PatientId;
+                oldAppointment.DoctorId = oldAppointment.DoctorId;
+                oldAppointment.RecepId = oldAppointment.RecepId;
+
+                try
+                {
+                    await _dbcontext.SaveChangesAsync();
+                    return oldAppointment;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
+                    throw;
+                }
+            }
+            else
+            {
+
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
+
+        }
+
+      
     }
 }
