@@ -40,7 +40,7 @@ namespace Services
         public async Task<bool> UpdateDrug(int id, Drug updatedDrug)
         {
             var existingDrug = await _drg.Get(id);
-            if (existingDrug == null)
+            if (existingDrug == null) { }
                 return false;
 
             existingDrug.BrandN = updatedDrug.BrandN;
