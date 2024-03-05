@@ -40,7 +40,7 @@ namespace Services
         public async Task<bool> UpdateDrug(int id, Drug updatedDrug)
         {
             var existingDrug = await _drg.Get(id);
-            if (existingDrug == null) { }
+            if (existingDrug == null)
                 return false;
 
             existingDrug.BrandN = updatedDrug.BrandN;
@@ -48,13 +48,12 @@ namespace Services
             existingDrug.Price = updatedDrug.Price;
             existingDrug.Weight = updatedDrug.Weight;
             existingDrug.Avaliable = updatedDrug.Avaliable;
-            
+
             // Update other properties as needed
 
             await _drg.Update(existingDrug);
             return true;
         }
-
 
     }
 }
