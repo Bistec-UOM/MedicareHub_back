@@ -11,11 +11,12 @@ namespace Models.DTO
         //Name of template:  Test object
         public int Id { get; set; }
         public string TestName { get; set; } = null!;
+        public string? Abb { get; set; }
         public float Price { get; set; }
         public string Provider { get; set; } = null!;
 
         //Actual template : ReportFields object
-        public List<ReportFields> ReportFields { get; set; }
+        public List<ReportFields>? ReportFields { get; set; }
 
     }
 }

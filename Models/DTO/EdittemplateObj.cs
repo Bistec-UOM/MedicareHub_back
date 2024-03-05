@@ -9,6 +9,6 @@ namespace Models.DTO
     public class EdittemplateObj
     {
         public int TestId { get; set; }
-        public List<ReportFields> Fields { get; set; }
+        public List<ReportFields>? Fields { get; set; }
     }
 }

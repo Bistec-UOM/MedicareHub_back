@@ -59,6 +59,7 @@ namespace Services
             var x = new Test 
             { 
                 TestName= data.TestName,
+                Abb=data.Abb,
                 Price= data.Price,
                 Provider= data.Provider,
             };
@@ -66,17 +67,17 @@ namespace Services
 
             var Id = x.Id;
 
-            foreach(var i in data.ReportFields) 
+            foreach (var i in data.ReportFields)
             {
                 await _tmplt.Add(new ReportFields
                 {
-                    Fieldname= i.Fieldname,
-                    Index=i.Index,
-                    MinRef=i.MinRef,
-                    MaxRef=i.MaxRef,
-                    Unit=i.Unit,
-                    Id=Id
-                });  
+                    Fieldname = i.Fieldname,
+                    Index = i.Index,
+                    MinRef = i.MinRef,
+                    MaxRef = i.MaxRef,
+                    Unit = i.Unit,
+                    TestId = Id
+                }) ;
             }
         }
 
