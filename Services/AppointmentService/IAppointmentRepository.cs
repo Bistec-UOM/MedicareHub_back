@@ -30,6 +30,12 @@ namespace Services.AppointmentService
 
         public Task RegisterPatient(Patient patient);
 
+        public Task<Appointment> UpdateAppointmentStatus(int id,Appointment appointment);
+
+        public Task<List<Appointment>> CancelAllAppointments(int doctorId,DateTime date);
+
+        public Task<Appointment> UpdateOnlyOneAppointmentUsingId(int id);
+
 
 
 
