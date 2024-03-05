@@ -10,13 +10,26 @@ namespace API.Controllers
     {
         public static User user = new User();
 
-        [HttpPost]
+        [HttpPost("Reg")]
         public async Task<ActionResult<User>> RegUser(User req)
         {
             string paswrdHash=BCrypt.Net.BCrypt.HashPassword(req.Password);
             user = req;
-            req.Password = paswrdHash;
+            user.Password = paswrdHash;
             return Ok(user);
+        }
+
+        [HttpPost("Log")]
+        public async Task<ActionResult<String>> LogUser(User req)
+        {
+            if (BCrypt.Net.BCrypt.Verify(req.Password, user.Password))
+            {
+                return Ok("Valid");
+            }
+            else
+            {
+                return BadRequest("Invalid");
+            }
         }
     }
 }
