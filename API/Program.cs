@@ -1,5 +1,7 @@
 using DataAccessLayer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Models;
 using Services;
 using Services.AppointmentService;
@@ -12,6 +14,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 //for enable cores in react.js in below code for front end admin
 builder.Services.AddCors(options => {
     options.AddPolicy("ReactJSDomain",
