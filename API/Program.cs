@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using Models;
 using Services;
 using Services.AppointmentService;
+using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;
 
 

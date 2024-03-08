@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.LabService;
 
 namespace API.Controllers
 {

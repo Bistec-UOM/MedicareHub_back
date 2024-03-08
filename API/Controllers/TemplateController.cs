@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.DTO;
-using Services;
+using Models.DTO.Lab;
+using Services.LabService;
 
 namespace API.Controllers
 {
