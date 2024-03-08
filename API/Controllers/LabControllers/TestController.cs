@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.LabService;
 
-namespace API.Controllers
+namespace API.Controllers.LabControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -48,4 +48,4 @@ namespace API.Controllers
             return Ok();
         }
     }
- }
+}

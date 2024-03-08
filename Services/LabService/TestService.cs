@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Services.LabService
 {
     public class TestService
     {
@@ -23,7 +23,7 @@ namespace Services
 
         public async Task<Test> GetTest(int id)
         {
-                return await _test.Get(id);
+            return await _test.Get(id);
         }
 
         public async Task Addtest(Test item)
