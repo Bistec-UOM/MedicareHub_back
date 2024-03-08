@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Models;
 using Services;
+using Services.AdminServices;
 using Services.AppointmentService;
 using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;

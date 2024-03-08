@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.AdminServices;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace API.Controllers
+namespace API.Controllers.AdminControllers
 {
     [Route("api/[controller]")]
     [ApiController]

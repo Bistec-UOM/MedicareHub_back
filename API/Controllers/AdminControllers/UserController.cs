@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.AdminServices;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace API.Controllers
+namespace API.Controllers.AdminControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -29,7 +29,7 @@ namespace API.Controllers
         public async Task<IActionResult> Get(int id)
         {
             var user = await _userService.GetUser(id);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
@@ -46,7 +46,7 @@ namespace API.Controllers
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id,[FromBody] User value)
+        public async Task<IActionResult> Put(int id, [FromBody] User value)
         {
             await _userService.UpdateUser(value);
             return Ok();
@@ -56,7 +56,7 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if(await _userService.GetUser(id) == null)
+            if (await _userService.GetUser(id) == null)
             {
                 return NotFound();
             }
