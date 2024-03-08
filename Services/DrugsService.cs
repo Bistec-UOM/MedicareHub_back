@@ -48,13 +48,12 @@ namespace Services
             existingDrug.Price = updatedDrug.Price;
             existingDrug.Weight = updatedDrug.Weight;
             existingDrug.Avaliable = updatedDrug.Avaliable;
-            
+
             // Update other properties as needed
 
             await _drg.Update(existingDrug);
             return true;
         }
-
 
     }
 }

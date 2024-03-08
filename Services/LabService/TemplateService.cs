@@ -1,7 +1,7 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Models.DTO;
+using Models.DTO.Lab;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,14 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Services
+namespace Services.LabService
 {
     public class TemplateService
     {
         private readonly IRepository<ReportFields> _tmplt;
         private readonly IRepository<Test> _tst;
-        public TemplateService(IRepository<ReportFields> tmplt,IRepository<Test> tst) 
-        { 
+        public TemplateService(IRepository<ReportFields> tmplt, IRepository<Test> tst)
+        {
             _tmplt = tmplt;
             _tst = tst;
         }
@@ -56,27 +56,28 @@ namespace Services
 
         public async Task AddTemplate(TemplateObj data)
         {
-            var x = new Test 
-            { 
-                TestName= data.TestName,
-                Price= data.Price,
-                Provider= data.Provider,
+            var x = new Test
+            {
+                TestName = data.TestName,
+                Abb = data.Abb,
+                Price = data.Price,
+                Provider = data.Provider,
             };
             await _tst.Add(x);
 
             var Id = x.Id;
 
-            foreach(var i in data.ReportFields) 
+            foreach (var i in data.ReportFields)
             {
                 await _tmplt.Add(new ReportFields
                 {
-                    Fieldname= i.Fieldname,
-                    Index=i.Index,
-                    MinRef=i.MinRef,
-                    MaxRef=i.MaxRef,
-                    Unit=i.Unit,
-                    Id=Id
-                });  
+                    Fieldname = i.Fieldname,
+                    Index = i.Index,
+                    MinRef = i.MinRef,
+                    MaxRef = i.MaxRef,
+                    Unit = i.Unit,
+                    TestId = Id
+                });
             }
         }
 
