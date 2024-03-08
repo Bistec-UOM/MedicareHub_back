@@ -4,7 +4,7 @@ using Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Services
+namespace Services.AdminServices
 {
     public class PatientService : IPatientService
     {
@@ -18,7 +18,7 @@ namespace Services
 
         public async Task AddPatient(Patient patient)
         {
-           await _repository.Add(patient);
+            await _repository.Add(patient);
         }
 
         public async Task DeletePatient(int id)
