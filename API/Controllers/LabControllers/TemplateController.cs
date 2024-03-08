@@ -4,7 +4,7 @@ using Models;
 using Models.DTO.Lab;
 using Services.LabService;
 
-namespace API.Controllers
+namespace API.Controllers.LabControllers
 {
     [Route("api/[controller]")]
     [ApiController]
