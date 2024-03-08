@@ -67,6 +67,12 @@ namespace API.Controllers
 
             return jwt;
         }
+
+        [HttpGet,Authorize]
+        public async Task<ActionResult<string>> getVal()
+        {
+            return Ok("Result");
+        }
     }
    
 }

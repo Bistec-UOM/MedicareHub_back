@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.0.1" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.4.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.4" />
   </ItemGroup>
 
   <ItemGroup>
