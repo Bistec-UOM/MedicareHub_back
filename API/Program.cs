@@ -2,6 +2,7 @@ using DataAccessLayer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
 using Services;
@@ -9,6 +10,7 @@ using Services.AdminServices;
 using Services.AppointmentService;
 using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,18 +20,29 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Auth", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
-        In=ParameterLocation.Header,
-        Name="Authorization",
-        Type=SecuritySchemeType.ApiKey
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                builder.Configuration.GetSection("AppSettings:Token").Value!.PadRight(64, '\0')))
+    };
+});
 
 //for enable cores in react.js in below code for front end admin
 builder.Services.AddCors(options => {
