@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using Services.AdminServices;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,10 +16,12 @@ namespace API.Controllers
     {
         public static User user = new User(); // For demo purposes only, not recommended in real applications
         private readonly IConfiguration _configuration;
+        private readonly IUserService _userService;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration,IUserService userService)
         {
             _configuration = configuration;
+            _userService = userService;
         }
 
         [HttpPost("Reg")]
@@ -35,7 +38,7 @@ namespace API.Controllers
         {
             if (BCrypt.Net.BCrypt.Verify(req.Password, user.Password))
             {
-                string token = createToken(user);
+                string token = CreateToken(user);
                 return Ok(token);
             }
             else
@@ -44,7 +47,7 @@ namespace API.Controllers
             }
         }
 
-        private string createToken(User user)
+        private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, user.Name),
@@ -53,7 +56,7 @@ namespace API.Controllers
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value!.PadRight(64, '0')));
+                _configuration.GetSection("AppSettings:Token").Value!.PadRight(64,'\0')));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
