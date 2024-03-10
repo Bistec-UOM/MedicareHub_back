@@ -220,6 +220,13 @@ namespace API.Controllers
             return Ok(await _repository.GetPatient(id));
         }
 
+        [HttpGet("doctor/{doctorId}/month/{mId}")]
+        public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId,int mId)
+        {
+            var appointments=await _repository.GetAppointmentCountOfDays(doctorId, mId);
+            return Ok(appointments);
+        }
+
 
 
 
