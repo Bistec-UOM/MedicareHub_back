@@ -62,6 +62,8 @@ namespace Services.AppointmentService
             return updatedResults;
         }
 
+        //comment for locally
+
 
 
         public async Task<List<Appointment>> DeleteAllDoctorDayAppointments(int doctorId, DateTime date)
