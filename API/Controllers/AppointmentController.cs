@@ -5,6 +5,8 @@ using Models.DTO;
 using Services.AppointmentService;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Services.AppointmentService;
+using System.Net.Mail;
 
 namespace API.Controllers
 {
@@ -43,7 +45,7 @@ namespace API.Controllers
 
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAppointment(int id)
+        public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
         {
             var targetAppointment = await _repository.GetAppointment(id);
             if (targetAppointment is null)
@@ -51,8 +53,29 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            _repository.DeleteAppointment(id);
-            return NoContent();
+           var deletedAppointment= _repository.DeleteAppointment(id);
+           var targetPatient=await _repository.GetPatient(deletedAppointment.Result.PatientId);
+            if(targetPatient!=null)
+            {
+
+                var targetEmail=targetPatient.Email;
+                var targetday = deletedAppointment.Result.DateTime.Date;
+                var targettime = deletedAppointment.Result.DateTime;
+
+                string emailsubject = "appointment update: cancellation notification";
+                string username = targetPatient.FullName;
+                string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+
+
+                EmailSender emailSernder = new EmailSender();
+                await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+
+            }
+
+
+
+
+            return Ok(deletedAppointment);
         }
 
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
@@ -97,8 +120,29 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            _repository.DeleteAllDoctorDayAppointments(doctorId, date);
-            return NoContent();
+          var targetDeletedAppointments=  _repository.DeleteAllDoctorDayAppointments(doctorId, date);
+          foreach(var app in await targetDeletedAppointments)
+          {
+                var targetPatient = await _repository.GetPatient(app.PatientId);
+                if (targetPatient != null)
+                {
+
+                    var targetEmail = targetPatient.Email;
+                    var targetday = app.DateTime.Date;
+                    var targettime =app.DateTime;
+
+                    string emailsubject = "appointment update: cancellation notification";
+                    string username = targetPatient.FullName;
+                    string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+
+
+                    EmailSender emailSernder = new EmailSender();
+                    await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+
+                }
+
+            }
+          return NoContent();
 
         }
 
@@ -142,7 +186,38 @@ namespace API.Controllers
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId,DateTime date)
         {
-            return Ok(await _repository.CancelAllAppointments(doctorId, date));
+
+
+            var targetCancelledAppointments = _repository.CancelAllAppointments(doctorId, date);
+            foreach (var app in await targetCancelledAppointments)
+            {
+                var targetPatient = await _repository.GetPatient(app.PatientId);
+                if (targetPatient != null)
+                {
+
+                    var targetEmail = targetPatient.Email;
+                    var targetday = app.DateTime.Date;
+                    var targettime = app.DateTime;
+
+                    string emailsubject = "appointment update: cancellation notification";
+                    string username = targetPatient.FullName;
+                    string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+
+
+                    EmailSender emailSernder = new EmailSender();
+                    await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+
+                }
+
+            }
+            return NoContent();
+        }
+
+        [HttpGet("patient/{id}", Name="GetPatient")]
+
+        public async Task<ActionResult<Patient>> GetPatient(int id)
+        {
+            return Ok(await _repository.GetPatient(id));
         }
 
 

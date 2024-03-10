@@ -207,6 +207,21 @@ namespace Services.AppointmentService
 
                 try
                 {
+                    var targetPatient=await  GetPatient(oldAppointment.PatientId);
+
+                    var targetEmail = targetPatient.Email;
+                    var targetDay = oldAppointment.DateTime.Date;
+                    var targetTime = oldAppointment.DateTime.TimeOfDay;
+
+
+                    string emailSubject = "Appointment Update: Cancellation Notification";
+                    string userName = targetPatient.FullName;
+                    string emailMessage = "Dear " + targetPatient.Name + ",\n" + " We regret to inform you that your scheduled appointment with Medicare Hub on" + "fdsaf" + "at" + "fdsaf" + "has been cancelled. We apologize for any inconvenience this may cause you.";
+
+
+                    EmailSender emailSernder = new EmailSender();
+                    await emailSernder.SendMail(emailSubject, targetEmail, userName, emailMessage);
+
                     await _dbcontext.SaveChangesAsync();
                     return oldAppointment;
                 }
