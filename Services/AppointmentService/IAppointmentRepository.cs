@@ -1,4 +1,5 @@
 ﻿using Models;
+using Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +15,12 @@ namespace Services.AppointmentService
 
         public Task<Appointment> GetAppointment(int id);
 
-        public Task DeleteAppointment(int id);
+        public Task<Appointment> DeleteAppointment(int id);
         public Task <List<Appointment>> GetDoctorAppointments(int id);
 
         public Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date);
 
-        public Task DeleteAllDoctorDayAppointments(int doctorId, DateTime date);
+        public Task<List<Appointment>> DeleteAllDoctorDayAppointments(int doctorId, DateTime date);
 
         public Task<List<User>> GetDoctors();
         public Task<Patient> GetPatient(int id);
@@ -35,6 +36,10 @@ namespace Services.AppointmentService
         public Task<List<Appointment>> CancelAllAppointments(int doctorId,DateTime date);
 
         public Task<Appointment> UpdateOnlyOneAppointmentUsingId(int id);
+
+        
+
+     
 
 
 
