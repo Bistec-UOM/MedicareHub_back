@@ -81,6 +81,9 @@ builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
+
 //Lab--------------------------------------------------------------------
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<TemplateService>();
