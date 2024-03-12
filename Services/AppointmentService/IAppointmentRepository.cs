@@ -37,6 +37,8 @@ namespace Services.AppointmentService
 
         public Task<Appointment> UpdateOnlyOneAppointmentUsingId(int id);
 
+        public Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId);
+
         
 
      

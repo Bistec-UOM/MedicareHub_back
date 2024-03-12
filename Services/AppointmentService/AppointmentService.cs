@@ -395,6 +395,10 @@ namespace Services.AppointmentService
 
         }
 
-      
+        public async Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId)
+        {
+            var targetAppointment=_dbcontext.appointments.Where(a=>a.DoctorId==doctorId && (a.DateTime.Month)-1==monthId).ToList();
+            return targetAppointment;
+        }
     }
 }
