@@ -178,7 +178,35 @@ namespace API.Controllers
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)
         {
-            return Ok(await _repository.UpdateAppointment(id, appointment));
+           // return Ok(await _repository.UpdateAppointment(id, appointment));
+           var targetAppointment=await _repository.UpdateAppointmentStatus(id, appointment);
+            if (targetAppointment is null)
+            {
+                return NotFound();
+            }
+
+            var targetPatient = await _repository.GetPatient(targetAppointment.PatientId);
+            if (targetPatient != null)
+            {
+
+                var targetEmail = targetPatient.Email;
+                var targetday = targetAppointment.DateTime.Date;
+                var targettime = targetAppointment.DateTime;
+
+                string emailsubject = "appointment update: cancellation notification";
+                string username = targetPatient.FullName;
+                string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+
+
+                EmailSender emailSernder = new EmailSender();
+                await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+
+            }
+
+
+
+
+            return Ok(targetAppointment);
 
 
         }
