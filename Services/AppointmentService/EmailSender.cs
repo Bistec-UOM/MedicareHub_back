@@ -12,9 +12,14 @@ namespace Services.AppointmentService
     public class EmailSender
     {
 
+        string akey= "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";
+
+
+
+
         public async Task SendMail(string subject,string toEmail,string userName,string message)
         {
-            var apiKey = "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";
+            var apiKey = akey;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("chathuraishara63@gmail.com", "Medicare Hub");
            
