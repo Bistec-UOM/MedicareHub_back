@@ -27,8 +27,9 @@ namespace API.Controllers
         public async Task<ActionResult> LoginUser(UserLog data)
         {
             var res = await _auth.CheckUser(data);
-            if (res == "OK")
+            if (res == "Valid")
             {
+                res = await _auth.CreateToken(data.UserId);
                 return Ok(res);
             }
             else
