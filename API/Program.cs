@@ -91,6 +91,9 @@ builder.Services.AddScoped<TemplateService>();
 builder.Services.AddScoped<IRepository<ReportFields>,Repository<ReportFields>>();
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
 
+//Login-------------------------------------------------------------------
+builder.Services.AddScoped<AuthServices>();
+
 
 builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
 
