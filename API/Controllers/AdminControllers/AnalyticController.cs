@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTO.AdminDto;
 using Services.AdminServices;
 
 namespace API.Controllers.AdminControllers
@@ -22,16 +23,20 @@ namespace API.Controllers.AdminControllers
         }
         // GET: api/Analytic/GetPatients
         [HttpGet("GetPatients")]
-        public async Task<ActionResult> GetPatients()
+        public async Task<ActionResult<A_Patient>> GetPatients()
         {
             try
             {
                 var result = await _analyticsService.GetAllPatientDetails();
-                var patientDOBs = result.PatientDOBs;
-                var appointmentDates = result.AppointmentDates;
 
-                // You can further process or return the data as needed
-                return Ok(new { PatientDOBs = patientDOBs, AppointmentDates = appointmentDates });
+                var patientDetailsDTO = new A_Patient
+                {
+                    PatientDOBs = result.PatientDOBs,
+                    AppointmentDates = result.AppointmentDates,
+                    // Add other details
+                };
+
+                return Ok(patientDetailsDTO);
             }
             catch (Exception ex)
             {
@@ -39,5 +44,6 @@ namespace API.Controllers.AdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
     }
 }

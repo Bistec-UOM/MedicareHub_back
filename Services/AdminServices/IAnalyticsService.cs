@@ -11,6 +11,6 @@ namespace Services.AdminServices
     public interface IAnalyticsService
     {
         Task<List<A_Income>> GetAllAmount();
-        Task<(List<string> PatientDOBs, List<DateTime> AppointmentDates)> GetAllPatientDetails();
+        Task<A_Patient> GetAllPatientDetails();
     }
 }

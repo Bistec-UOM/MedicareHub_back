@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Services.AdminServices
 {
+
     public class AnalyticsService : IAnalyticsService
     {
-        private readonly IRepository<Prescription> _presrepo; // Assuming IRepository<Prescription> is correct
+        private readonly IRepository<Prescription> _presrepo;
         private readonly ApplicationDbContext _dbcontext;
-        public AnalyticsService(IRepository<Prescription> presrepo,ApplicationDbContext dbContext)
+
+        public AnalyticsService(IRepository<Prescription> presrepo, ApplicationDbContext dbContext)
         {
             _presrepo = presrepo;
             _dbcontext = dbContext;
@@ -19,22 +21,32 @@ namespace Services.AdminServices
 
         public async Task<List<A_Income>> GetAllAmount()
         {
-            // Assuming IncomeMapper.MapToDTO is a method to map Prescription to Income
             var prescriptions = await _presrepo.GetAll();
             var incomes = prescriptions.Select(IncomeMapper.MapToDTO).ToList();
             return incomes;
         }
-        public async Task<(List<string> PatientDOBs, List<DateTime> AppointmentDates)> GetAllPatientDetails()
+
+        public async Task<A_Patient> GetAllPatientDetails()
         {
             var patients = await _dbcontext.patients
-                .Select(patients=>patients.DOB)
-                .ToListAsync();
-            var appointDate = await _dbcontext.appointments
-                .Select(appointDate=>appointDate.DateTime)
+                .Select(patient => patient.DOB)
                 .ToListAsync();
 
-            return (patients, appointDate);
+            var appointmentDates = await _dbcontext.appointments
+                .Select(appointment => appointment.DateTime)
+                .ToListAsync();
+
+            // Add more details as needed
+
+            var patientDetailsDTO = new A_Patient
+            {
+                PatientDOBs = patients,
+                AppointmentDates = appointmentDates,
+                // Add other details as needed
+            };
+
+            return patientDetailsDTO; // Corrected the return statement
         }
-        
     }
+
 }
