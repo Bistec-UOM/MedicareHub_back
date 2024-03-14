@@ -8,13 +8,10 @@ namespace Models.DTO.AdminDto
 {
     public class A_Patient
     {
-        public A_Patient() { }
-        public DateTime DateTime { get; set; }
-        public int child_male { get; set; }
-        public int child_female { get; set; }
-        public int adult_male { get; set; }
-        public int adult_female { get;set; }
-        public int old_male { get; set; }   
-        public int old_female { get; set; }
+        public List<string> PatientDOBs { get; set; }
+        public DateTime AppointmentDates { get; set; }
+        public int OtherDetail1 { get; set; }
+        public string OtherDetail2 { get; set; }
+        // Add other details as needed
     }
 }
