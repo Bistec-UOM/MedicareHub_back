@@ -41,7 +41,7 @@ namespace Services.AdminServices
             var patientDetailsDTO = new A_Patient
             {
                 PatientDOBs = patients,
-                AppointmentDates = appointmentDates,
+                //AppointmentDates = appointmentDates,
                 // Add other details as needed
             };
 

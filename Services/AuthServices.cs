@@ -45,12 +45,12 @@ namespace Services
                 }
                 else
                 {
-                    return "Invalid";
+                    return "Invalid Password";
                 }
             }
             else
             {
-                return "User doesn't Exist";
+                return "Invalid User Id";
             }
 
         }
