@@ -66,6 +66,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 
 //Receptionist-----------------------------------------------------------
 
+builder.Services.AddScoped<AppointmentService>();
+builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
+builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
+builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+
 //Doctor-----------------------------------------------------------------
 
 builder.Services.AddScoped<PrescriptionService>();
@@ -92,7 +97,7 @@ builder.Services.AddScoped<IRepository<ReportFields>,Repository<ReportFields>>()
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
 
 
-builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
+//builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
 
 //=================================================================================================================
 //=================================================================================================================

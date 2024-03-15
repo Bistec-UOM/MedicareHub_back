@@ -10,21 +10,28 @@ using System.Threading.Tasks;
 
 namespace Services.AppointmentService
 {
-    public class AppointmentService : IAppointmentRepository
+    public class AppointmentService 
     {
 
         private readonly ApplicationDbContext _dbcontext;
-        public AppointmentService(ApplicationDbContext dbcontext)
+        private readonly IRepository<Appointment> _appointment;
+        private readonly IRepository<Patient> _patient;
+        private readonly IRepository<User> _doctor;
+        
+        public AppointmentService(ApplicationDbContext dbcontext,IRepository<Appointment> appointment,IRepository<Patient> patient,IRepository<User> doctor)
         {
             _dbcontext = dbcontext;
+            _appointment = appointment;
+            _patient = patient;
+            _doctor = doctor;
+
 
 
         }
         
         public async Task AddAppointment(Appointment appointment)
         {
-            await _dbcontext.appointments.AddAsync(appointment);
-            await _dbcontext.SaveChangesAsync();
+            await _appointment.Add(appointment);
 
             var patientId=appointment.PatientId;
             var patient=await GetPatient(patientId);
@@ -93,7 +100,7 @@ namespace Services.AppointmentService
 
         public async Task<Patient> GetPatient(int id)
         {
-            var patient = _dbcontext.patients.FirstOrDefaultAsync(p => p.Id == id);
+            var patient = _patient.Get(id);
             return await patient;
         }
 
@@ -102,8 +109,7 @@ namespace Services.AppointmentService
             var appointmentk=await GetAppointment(id);
             if (appointmentk != null)
             {
-                _dbcontext.appointments.Remove(appointmentk);
-                _dbcontext.SaveChanges();
+               await _appointment.Delete(id);
                 return appointmentk;
 
             }
@@ -112,94 +118,7 @@ namespace Services.AppointmentService
                 throw new ArgumentException($"Appointment with id {id} not found.");
             }
 
-            //if (appointmentk != null)
-            //{
-            //    try
-            //    {
-            //        var targetPatient = await GetPatient(appointmentk.PatientId);
-
-            //var targetemail = targetpatient.email;
-            //var targetday = appointmentk.datetime.date;
-            //var targettime = appointmentk.datetime.timeofday;
-
-
-            //string emailsubject = "appointment update: cancellation notification";
-            //string username = targetpatient.fullname;
-            //string emailmessage = "dear " + targetpatient.name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on" + "fdsaf" + "at" + "fdsaf" + "has been cancelled. we apologize for any inconvenience this may cause you.";
-
-
-            //EmailSender emailsernder = new emailsender();
-            //await emailsernder.SendMail(emailsubject, targetemail, username, emailmessage);
-
-            //        _dbcontext.appointments.Remove(appointmentk);
-
-            //        await _dbcontext.SaveChangesAsync();
-
-
-
-
-
-
-            //    }
-            //    catch (DbUpdateConcurrencyException ex)
-            //    {
-            //        Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
-            //        throw;
-            //    }
-
-
-            //var pt = appointment.PatientId;
-            //var apatient = await GetPatient(pt);
-
-            //if (targetPatient != null)
-            //{
-
-
-            //    _dbcontext.appointments.Remove(appointment);
-            //    _dbcontext.SaveChanges();
-
-            //}
-
-
-
-
-            //var targetEmail = targetPatient.Email;
-            //var targetDay = appointment.DateTime.Date;
-            //var targetTime = appointment.DateTime.TimeOfDay;
-
-
-            //string emailSubject = "Appointment Update: Cancellation Notification";
-            //string userName = targetPatient.FullName;
-            //string emailMessage = "Dear " + targetPatient.Name + ",\n" + " We regret to inform you that your scheduled appointment with Medicare Hub on" + targetDay + "at" + targetTime + "has been cancelled. We apologize for any inconvenience this may cause you.";
-
-
-
-
-
-            //EmailSender emailSernder = new EmailSender();
-            //await emailSernder.SendMail(emailSubject, targetPatient.Email, userName, emailMessage);
-
-
-
-            //}
-            //else
-            //{
-            //    throw new ArgumentException($"Appointment with id {id} not found.");
-            //}
-
-            // var pt = appointment.PatientId;
-
-
-            //  var targetPatient =await GetPatient(pt);
-
-
-
-
-            //  _dbcontext.appointments.Remove(appointment);
-            //            _dbcontext.SaveChanges();
-
-
-
+          
 
 
         }
@@ -207,22 +126,22 @@ namespace Services.AppointmentService
         public async Task<List<Appointment>> GetAll()
         {
 
-            return  _dbcontext.appointments.ToList();
+            return await _appointment.GetAll();
 
             
         }
 
         public async Task<Appointment> GetAppointment(int id)
         {
-            var appointment =  _dbcontext.appointments.FirstOrDefault(a=>a.Id==id);
-            return appointment;
+            var appointment = _appointment.Get(id);
+            return await appointment;
         }
 
       
 
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)
         {
-            var doctorAppointments =  _dbcontext.appointments.Where(a => a.Id == doctorId);
+            var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
 
@@ -246,13 +165,12 @@ namespace Services.AppointmentService
         public async Task<List<Patient>> GetPatients()
         {
            
-            return  _dbcontext.patients.ToList();
+            return  await _patient.GetAll();
         }
 
         public async Task RegisterPatient(Patient patient)
         {
-           await _dbcontext.patients.AddAsync(patient);
-            await _dbcontext.SaveChangesAsync();
+             await _patient.Add(patient);
 
             string emailSubject = "Your Medicare Hub Membership: A Warm Welcome Awaits!";
             string userName = patient.FullName;
@@ -270,8 +188,7 @@ namespace Services.AppointmentService
 
 {
 
-            System.Diagnostics.Debug.WriteLine("inside update");
-            System.Diagnostics.Debug.WriteLine("newtime", appointment.DateTime.ToString(),appointment.DoctorId);
+          
             var oldAppointment = await GetAppointment(id);
 
     if (oldAppointment != null)
