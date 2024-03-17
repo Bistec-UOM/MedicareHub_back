@@ -26,5 +26,10 @@ namespace Services.LabService
             await _rep.Update(tmp);
         }
 
+
+        async public Task<IEnumerable<LabReport>> AcceptedSamplesList()
+        {
+            return await _rep.GetByProp("Status", "accepted");
+        }
     }
 }
