@@ -21,39 +21,62 @@ namespace DataAccessLayer
 
         public async Task Add(T item)
         {
-            await _dbSet.AddAsync(item);
-            await _dbContext.SaveChangesAsync();
+            try {
+                await _dbSet.AddAsync(item);
+                await _dbContext.SaveChangesAsync();
+            }catch (Exception){
+                throw new Exception("Error");
+            }
         }
 
         public async Task Delete(int id)
         {
-            var requiredObjectToDelete = await Get(id);
+            var obj = await Get(id);
 
-            if (requiredObjectToDelete != null)
+            if (obj != null)
             {
-                _dbSet.Remove(requiredObjectToDelete);
-                await _dbContext.SaveChangesAsync();
+                try{
+                    _dbSet.Remove(obj);
+                    await _dbContext.SaveChangesAsync();
+                }catch(Exception){
+                    throw new Exception("Error");
+                }
             }
             else
             {
-                Console.WriteLine($"Entity with id {id} not found. Delete operation aborted.");
+                throw new Exception("Doesn't Exixst");
             }
         }
 
         public async Task<List<T>> GetAll()
         {
-            return await _dbSet.ToListAsync();
+            try{
+                return await _dbSet.ToListAsync();
+            }
+            catch(Exception){
+                throw new Exception("Error");
+            }
         }
 
         public async Task<T> Get(int id)
         {
-            return await _dbSet.FindAsync(id);
+            try{
+                return await _dbSet.FindAsync(id);
+            }
+            catch (Exception){
+                throw new Exception("Error");
+            }
         }
 
-        public async Task<int> Update(T entity)
+        public async Task Update(T entity)
         {
-            _dbSet.Update(entity);
-            return await _dbContext.SaveChangesAsync();
+            try{
+                _dbSet.Update(entity);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception){
+                throw new Exception("Error");
+            }
         }
 
         public async Task<List<T>> GetByProp(string propName, object val)
@@ -64,9 +87,13 @@ namespace DataAccessLayer
             var equals = Expression.Equal(property, constant);
             var lambda = Expression.Lambda<Func<T, bool>>(equals, parameter);
 
-            return await _dbSet.Where(lambda).ToListAsync();
+            try{
+                return await _dbSet.Where(lambda).ToListAsync();
+            }
+            catch(Exception){
+                throw new Exception("Error");
+            }
         }
-
 
     }
 }
