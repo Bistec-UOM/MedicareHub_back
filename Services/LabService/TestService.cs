@@ -13,7 +13,7 @@ namespace Services.LabService
     {
         private readonly IRepository<Test> _test;
         private readonly IRepository<ReportFields> _tmplt;
-        public TestService(IRepository<Test> test, IRepository<ReportFields> tmplt)
+        public TestService(IRepository<Test> test,IRepository<ReportFields> tmplt)
         {
             _test = test;
             _tmplt = tmplt;
