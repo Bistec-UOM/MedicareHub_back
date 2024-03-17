@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services.LabService;
 
 namespace API.Controllers.LabControllers
@@ -19,6 +20,13 @@ namespace API.Controllers.LabControllers
         {
             await _vs.AcceptSample(id);
             return Ok();
+        }
+
+        [HttpGet("Accept")]
+        async public Task<ActionResult<IEnumerable<LabReport>>> AcceptedSamplesList()
+        {
+            var tmp=await _vs.AcceptedSamplesList();
+            return Ok(tmp);
         }
     }
 }
