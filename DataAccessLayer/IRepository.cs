@@ -8,12 +8,11 @@ namespace DataAccessLayer
 {
     public interface IRepository<T> where T : class
     {
- 
         Task Delete(int id);
         Task Add(T entity);
         Task<T> Get(int id);
         Task<List<T>> GetAll();
-        Task<int> Update(T entity);
+        Task Update(T entity);
         Task<List<T>> GetByProp(string propName,object val);
     }
 }
