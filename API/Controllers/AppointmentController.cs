@@ -36,9 +36,16 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task AddAppointment(Appointment appointment)
+        public async Task<ActionResult> AddAppointment(Appointment appointment)
         {
-            await _appointment.AddAppointment(appointment);
+            try
+            {
+               await _appointment.AddAppointment(appointment);
+               return Ok();
+            }catch(Exception ex)
+            {
+               return BadRequest(ex.Message);
+            }
         }
 
 

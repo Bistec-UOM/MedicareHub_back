@@ -31,18 +31,17 @@ namespace Services.AppointmentService
         
         public async Task AddAppointment(Appointment appointment)
         {
-            await _appointment.Add(appointment);
+              await _appointment.Add(appointment);  //adding an appointment using IRepository add function
+              var patientId = appointment.PatientId;  // sending an email for the patient
+              var patient = await GetPatient(patientId);
+              var targetEmail = patient.Email;
+              string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
+              string userName = patient.FullName;
+              string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
 
-            var patientId=appointment.PatientId;
-            var patient=await GetPatient(patientId);
-            var targetEmail=patient.Email;
-
-            string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
-            string userName = patient.FullName;
-            string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for "+appointment.DateTime;
-
-            EmailSender emailSernder = new EmailSender();
-            await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
+              EmailSender emailSernder = new EmailSender();
+              await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
+            
 
 
 
