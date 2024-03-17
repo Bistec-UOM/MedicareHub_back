@@ -50,9 +50,9 @@ namespace Services.AdminServices
             return _Repository.Get(id);
         }
 
-        public async Task<int> UpdateUser(User user)
+        public async Task UpdateUser(User user)
         {
-            return await _Repository.Update(user);
+            await _Repository.Update(user);
         }
     }
 }

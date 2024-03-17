@@ -13,6 +13,6 @@ namespace Services.AdminServices
         Task DeletePatient(int id);
         Task<Patient> GetPatient(int id);
         Task<List<Patient>> GetAllPatients();
-        Task<int> UpdatePatient(Patient patient);
+        Task UpdatePatient(Patient patient);
     }
 }
