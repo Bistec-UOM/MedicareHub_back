@@ -36,9 +36,9 @@ namespace Services.AdminServices
             return await _repository.GetAll();
         }
 
-        public async Task<int> UpdatePatient(Patient patient)
+        public async Task UpdatePatient(Patient patient)
         {
-            return await _repository.Update(patient);
+            await _repository.Update(patient);
         }
 
 

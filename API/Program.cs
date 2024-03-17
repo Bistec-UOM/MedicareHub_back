@@ -91,7 +91,6 @@ builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
 
 //Lab--------------------------------------------------------------------
 builder.Services.AddScoped<TestService>();
-builder.Services.AddScoped<TemplateService>();
 builder.Services.AddScoped<ValueService>();
 
 builder.Services.AddScoped<IRepository<ReportFields>,Repository<ReportFields>>();
