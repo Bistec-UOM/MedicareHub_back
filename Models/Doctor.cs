@@ -9,20 +9,13 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class Prescript_drug
+    public class Doctor
     {
-     
         public int Id { get; set; }
 
-
         [ForeignKey("Id")]
-        public int PrescriptionId { get; set; }
+        public int UserId { get; set; }
         [JsonIgnore]
-        public Prescription? Prescription { get; set; }
-
-        public int GenericN { get; set; }
-        public float Weight { get; set; }
-        public string? Unit {  get; set; }
-        public string? Period { get; set; }
+        public User? User { get; set; }
     }
 }

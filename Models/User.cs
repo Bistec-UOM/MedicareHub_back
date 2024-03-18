@@ -21,21 +21,20 @@ namespace Models
         public string? Qualifications { get; set; }
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
-        public string? DOB { get; set; }
-
-
-        [JsonIgnore]
-        public List<Appointment>? Appointment { get; set; }
-
+        public DateTime? DOB { get; set; }
 
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
 
-      
-        [JsonIgnore]
-        public List<LabReport>? LabReport { get; set; }
-        [JsonIgnore]
-        public List<Prescription>? Prescription { get; set; }
 
+
+        [JsonIgnore]
+        public Doctor? Doctor {  get; set; }
+        [JsonIgnore]
+        public Receptionist? Receptionist { get; set; }
+        [JsonIgnore]
+        public Cashier? Cashier { get; set; }
+        [JsonIgnore]
+        public LabAssistant? LabAssistant { get; set; }
     }
 }
