@@ -14,34 +14,17 @@ namespace API.Controllers.AdminControllers
         {
             _analyticsService = analyticsService;
         }
-        // GET: api/<AnalyticsController>
-        [HttpGet("GetAmounts")]
-        public async Task<ActionResult> GetAmounts()
-        {
-            var values = await _analyticsService.GetAllAmount();
-            return Ok(values);
-        }
-        // GET: api/Analytic/GetPatients
-        [HttpGet("GetPatients")]
-        public async Task<ActionResult<A_Patient>> GetPatients()
+        [HttpGet("male-female-patients-count")]
+        public async Task<IActionResult> GetMaleFemalePatientsCountAllDays()
         {
             try
             {
-                var result = await _analyticsService.GetAllPatientDetails();
-
-                var patientDetailsDTO = new A_Patient
-                {
-                    PatientDOBs = result.PatientDOBs,
-                    AppointmentDates = result.AppointmentDates,
-                    // Add other details
-                };
-
-                return Ok(patientDetailsDTO);
+                var result = await _analyticsService.GetMaleFemalePatientsCountAllDays();
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                // Handle exceptions appropriately, log, and return an error response
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

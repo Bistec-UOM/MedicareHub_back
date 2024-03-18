@@ -37,7 +37,7 @@ namespace DataAccessLayer.Migrations
                     NIC = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DOB = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DOB = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -93,7 +93,7 @@ namespace DataAccessLayer.Migrations
                     Qualifications = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContactNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DOB = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DOB = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -144,32 +144,79 @@ namespace DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "appointments",
+                name: "Cashier",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PatientId = table.Column<int>(type: "int", nullable: false),
-                    DoctorId = table.Column<int>(type: "int", nullable: false),
-                    RecepId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_appointments", x => x.Id);
+                    table.PrimaryKey("PK_Cashier", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_appointments_patients_PatientId",
-                        column: x => x.PatientId,
-                        principalTable: "patients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_appointments_users_UserId",
+                        name: "FK_Cashier_users_UserId",
                         column: x => x.UserId,
                         principalTable: "users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Doctor",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctor", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Doctor_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LabAssistant",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LabAssistant", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LabAssistant_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Receptionist",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Receptionist", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Receptionist_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -192,30 +239,66 @@ namespace DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "appointments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PatientId = table.Column<int>(type: "int", nullable: false),
+                    DoctorId = table.Column<int>(type: "int", nullable: false),
+                    RecepId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_appointments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_appointments_Doctor_DoctorId",
+                        column: x => x.DoctorId,
+                        principalTable: "Doctor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_appointments_Receptionist_RecepId",
+                        column: x => x.RecepId,
+                        principalTable: "Receptionist",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_appointments_patients_PatientId",
+                        column: x => x.PatientId,
+                        principalTable: "patients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "prescriptions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AppointmentID = table.Column<int>(type: "int", nullable: false),
                     Total = table.Column<float>(type: "real", nullable: false),
-                    CachierID = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    CashierId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_prescriptions", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_prescriptions_Cashier_CashierId",
+                        column: x => x.CashierId,
+                        principalTable: "Cashier",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_prescriptions_appointments_AppointmentID",
                         column: x => x.AppointmentID,
                         principalTable: "appointments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_prescriptions_users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "users",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -251,20 +334,27 @@ namespace DataAccessLayer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PrescriptID = table.Column<int>(type: "int", nullable: false),
-                    PrescriptionId = table.Column<int>(type: "int", nullable: true),
+                    PrescriptionID = table.Column<int>(type: "int", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TestId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LbAstID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_labReports", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_labReports_prescriptions_PrescriptionId",
-                        column: x => x.PrescriptionId,
+                        name: "FK_labReports_LabAssistant_LbAstID",
+                        column: x => x.LbAstID,
+                        principalTable: "LabAssistant",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_labReports_prescriptions_PrescriptionID",
+                        column: x => x.PrescriptionID,
                         principalTable: "prescriptions",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_labReports_tests_TestId",
                         column: x => x.TestId,
@@ -280,8 +370,9 @@ namespace DataAccessLayer.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PrescriptionId = table.Column<int>(type: "int", nullable: false),
-                    GenericN = table.Column<int>(type: "int", nullable: false),
+                    GenericN = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Weight = table.Column<float>(type: "real", nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Period = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -296,7 +387,7 @@ namespace DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Record",
+                name: "records",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -308,15 +399,15 @@ namespace DataAccessLayer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Record", x => x.Id);
+                    table.PrimaryKey("PK_records", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Record_labReports_LabReportId",
+                        name: "FK_records_labReports_LabReportId",
                         column: x => x.LabReportId,
                         principalTable: "labReports",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Record_reportFields_ReportFieldId",
+                        name: "FK_records_reportFields_ReportFieldId",
                         column: x => x.ReportFieldId,
                         principalTable: "reportFields",
                         principalColumn: "Id",
@@ -324,14 +415,19 @@ namespace DataAccessLayer.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_appointments_DoctorId",
+                table: "appointments",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_appointments_PatientId",
                 table: "appointments",
                 column: "PatientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_appointments_UserId",
+                name: "IX_appointments_RecepId",
                 table: "appointments",
-                column: "UserId");
+                column: "RecepId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_bill_Drugs_DrugID",
@@ -345,9 +441,32 @@ namespace DataAccessLayer.Migrations
                 column: "PrescriptionID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_labReports_PrescriptionId",
+                name: "IX_Cashier_UserId",
+                table: "Cashier",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Doctor_UserId",
+                table: "Doctor",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LabAssistant_UserId",
+                table: "LabAssistant",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_labReports_LbAstID",
                 table: "labReports",
-                column: "PrescriptionId");
+                column: "LbAstID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_labReports_PrescriptionID",
+                table: "labReports",
+                column: "PrescriptionID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_labReports_TestId",
@@ -371,18 +490,24 @@ namespace DataAccessLayer.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_prescriptions_UserId",
+                name: "IX_prescriptions_CashierId",
                 table: "prescriptions",
-                column: "UserId");
+                column: "CashierId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Record_LabReportId",
-                table: "Record",
+                name: "IX_Receptionist_UserId",
+                table: "Receptionist",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_records_LabReportId",
+                table: "records",
                 column: "LabReportId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Record_ReportFieldId",
-                table: "Record",
+                name: "IX_records_ReportFieldId",
+                table: "records",
                 column: "ReportFieldId");
 
             migrationBuilder.CreateIndex(
@@ -409,7 +534,7 @@ namespace DataAccessLayer.Migrations
                 name: "prescript_Drugs");
 
             migrationBuilder.DropTable(
-                name: "Record");
+                name: "records");
 
             migrationBuilder.DropTable(
                 name: "unable_Dates");
@@ -427,13 +552,25 @@ namespace DataAccessLayer.Migrations
                 name: "reportFields");
 
             migrationBuilder.DropTable(
+                name: "LabAssistant");
+
+            migrationBuilder.DropTable(
                 name: "prescriptions");
 
             migrationBuilder.DropTable(
                 name: "tests");
 
             migrationBuilder.DropTable(
+                name: "Cashier");
+
+            migrationBuilder.DropTable(
                 name: "appointments");
+
+            migrationBuilder.DropTable(
+                name: "Doctor");
+
+            migrationBuilder.DropTable(
+                name: "Receptionist");
 
             migrationBuilder.DropTable(
                 name: "patients");
