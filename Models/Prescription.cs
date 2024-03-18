@@ -36,7 +36,7 @@ namespace Models
         [ForeignKey("CashierId")]
         public int CashierId { get; set; }
         [JsonIgnore]
-        public User? Cashier { get; set; }
+        public Cashier? Cashier { get; set; }
 
 
 

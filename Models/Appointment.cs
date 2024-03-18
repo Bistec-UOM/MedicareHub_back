@@ -21,13 +21,13 @@ namespace Models
         [ForeignKey("DoctorId")]
         public int DoctorId { get; set; }
         [JsonIgnore]
-        public User? Doctor { get; set; }
+        public Doctor? Doctor { get; set; }
 
 
         [ForeignKey("RecepId")]
         public int RecepId { get; set; }
         [JsonIgnore]
-        public User? Recep { get; set; }
+        public Receptionist? Recep { get; set; }
 
 
         [JsonIgnore]
