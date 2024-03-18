@@ -19,6 +19,7 @@ namespace Models
 
         public string? GenericN { get; set; }
         public float Weight { get; set; }
+        public string? Unit {  get; set; }
         public string? Period { get; set; }
     }
 }

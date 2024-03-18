@@ -1,12 +1,8 @@
-﻿using BCrypt.Net;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Models;
-using Services.AdminServices;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using Models.DTO;
+using Services;
 
 namespace API.Controllers
 {
@@ -14,68 +10,32 @@ namespace API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        public static User user = new User(); // For demo purposes only, not recommended in real applications
-        private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
-
-        public AuthController(IConfiguration configuration,IUserService userService)
+        private readonly AuthServices _auth;
+        public AuthController(AuthServices authServices) 
         {
-            _configuration = configuration;
-            _userService = userService;
+            _auth = authServices;
         }
 
-        [HttpPost("Reg")]
-        public async Task<ActionResult<User>> RegUser(User req)
+        [HttpPost("reg")]
+        public async Task<ActionResult> RegUser(User data)
         {
-            string paswrdHash = BCrypt.Net.BCrypt.HashPassword(req.Password);
-            user = req;
-            user.Password = paswrdHash;
-            return Ok(user);
+            var res= await _auth.RegisterUser(data);
+            return Ok(res);
         }
 
-        [HttpPost("Log")]
-        public async Task<ActionResult<String>> LogUser(User req)
+        [HttpPost("log")]
+        public async Task<ActionResult> LoginUser(UserLog data)
         {
-            if (BCrypt.Net.BCrypt.Verify(req.Password, user.Password))
+            var res = await _auth.CheckUser(data);
+            if (res == "Valid")
             {
-                string token = CreateToken(user);
-                return Ok(token);
+                res = await _auth.CreateToken(data.UserId);
+                return Ok(res);
             }
             else
             {
-                return BadRequest("Invalid");
+                return BadRequest(res);
             }
         }
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, "Admin"),
-                new Claim(ClaimTypes.Role, "User"),
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value!.PadRight(64,'\0')));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var token = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.Now.AddDays(1),
-                    signingCredentials: creds
-                );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
-
-        [HttpGet,Authorize]
-        public async Task<ActionResult<string>> getVal()
-        {
-            return Ok("Result");
-        }
     }
-   
 }
