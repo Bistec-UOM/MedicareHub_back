@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240229102452_3")]
-    partial class _3
+    [Migration("20240318162121_1")]
+    partial class _1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,6 +86,44 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("bill_Drugs");
                 });
 
+            modelBuilder.Entity("Models.Cashier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Cashier");
+                });
+
+            modelBuilder.Entity("Models.Doctor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Doctor");
+                });
+
             modelBuilder.Entity("Models.Drug", b =>
                 {
                     b.Property<int>("Id")
@@ -116,6 +154,25 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("drugs");
                 });
 
+            modelBuilder.Entity("Models.LabAssistant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("LabAssistant");
+                });
+
             modelBuilder.Entity("Models.LabReport", b =>
                 {
                     b.Property<int>("Id")
@@ -126,6 +183,9 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("LbAstID")
+                        .HasColumnType("int");
 
                     b.Property<int>("PrescriptionID")
                         .HasColumnType("int");
@@ -138,6 +198,8 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LbAstID");
 
                     b.HasIndex("PrescriptionID");
 
@@ -160,8 +222,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DOB")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DOB")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -212,14 +274,17 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("GenericN")
-                        .HasColumnType("int");
+                    b.Property<string>("GenericN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Period")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PrescriptionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
@@ -242,17 +307,11 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("AppointmentID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CachierID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashierId")
+                    b.Property<int>("CashierId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("LbAstID")
-                        .HasColumnType("int");
 
                     b.Property<float>("Total")
                         .HasColumnType("real");
@@ -264,9 +323,26 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("CashierId");
 
-                    b.HasIndex("LbAstID");
-
                     b.ToTable("prescriptions");
+                });
+
+            modelBuilder.Entity("Models.Receptionist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Receptionist");
                 });
 
             modelBuilder.Entity("Models.Record", b =>
@@ -295,7 +371,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("ReportFieldId");
 
-                    b.ToTable("Record");
+                    b.ToTable("records");
                 });
 
             modelBuilder.Entity("Models.ReportFields", b =>
@@ -391,8 +467,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DOB")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DOB")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -446,7 +522,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Appointment", b =>
                 {
-                    b.HasOne("Models.User", "Doctor")
+                    b.HasOne("Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -458,8 +534,8 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.User", "Recep")
-                        .WithMany("Appointment")
+                    b.HasOne("Models.Receptionist", "Recep")
+                        .WithMany()
                         .HasForeignKey("RecepId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -490,8 +566,47 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Prescription");
                 });
 
+            modelBuilder.Entity("Models.Cashier", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Cashier")
+                        .HasForeignKey("Models.Cashier", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.Doctor", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Doctor")
+                        .HasForeignKey("Models.Doctor", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.LabAssistant", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("LabAssistant")
+                        .HasForeignKey("Models.LabAssistant", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.LabReport", b =>
                 {
+                    b.HasOne("Models.LabAssistant", "LbAst")
+                        .WithMany()
+                        .HasForeignKey("LbAstID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Models.Prescription", "Prescription")
                         .WithMany("LabReport")
                         .HasForeignKey("PrescriptionID")
@@ -503,6 +618,8 @@ namespace DataAccessLayer.Migrations
                         .HasForeignKey("TestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LbAst");
 
                     b.Navigation("Prescription");
 
@@ -537,21 +654,26 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.User", "Cashier")
+                    b.HasOne("Models.Cashier", "Cashier")
                         .WithMany()
-                        .HasForeignKey("CashierId");
-
-                    b.HasOne("Models.User", "LbAst")
-                        .WithMany()
-                        .HasForeignKey("LbAstID")
+                        .HasForeignKey("CashierId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Appointment");
 
                     b.Navigation("Cashier");
+                });
 
-                    b.Navigation("LbAst");
+            modelBuilder.Entity("Models.Receptionist", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Receptionist")
+                        .HasForeignKey("Models.Receptionist", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.Record", b =>
@@ -638,7 +760,13 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.User", b =>
                 {
-                    b.Navigation("Appointment");
+                    b.Navigation("Cashier");
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("LabAssistant");
+
+                    b.Navigation("Receptionist");
 
                     b.Navigation("User_Tele");
                 });

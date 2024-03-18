@@ -10,7 +10,6 @@ namespace Services.AdminServices
 {
     public interface IAnalyticsService
     {
-        Task<List<A_Income>> GetAllAmount();
-        Task<A_Patient> GetAllPatientDetails();
+        Task<object> GetMaleFemalePatientsCountAllDays();
     }
 }
