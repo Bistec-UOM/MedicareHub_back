@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Services.AdminServices
@@ -21,6 +22,40 @@ namespace Services.AdminServices
         public async Task AddUser(User user)
         {
             await _Repository.Add(user);
+
+            if (user.Role == "Doctor")
+            {
+                var doctor = new Doctor
+                {
+                    UserId = user.Id,
+                };
+                dbContext.doctors.Add(doctor);
+            }
+            if (user.Role == "Receptionist")
+            {
+                var receptionist = new Receptionist
+                {
+                    UserId = user.Id,
+                };
+                dbContext.receptionists.Add(receptionist);
+            }
+            if (user.Role == "Lab Assistant")
+            {
+                var labAssistant = new LabAssistant
+                {
+                    UserId = user.Id,
+                };
+                dbContext.labAssistants.Add(labAssistant);
+            }
+            if (user.Role == "Cashier")
+            {
+                var cashier = new Cashier
+                {
+                    UserId = user.Id,
+                };
+                dbContext.cashiers.Add(cashier);
+            }
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task DeleteUser(int id)
