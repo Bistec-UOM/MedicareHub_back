@@ -40,7 +40,7 @@ namespace Services.AdminServices
 
             var patientDetailsDTO = new A_Patient
             {
-                PatientDOBs = patients,
+                //PatientDOBs = patients,
                 //AppointmentDates = appointmentDates,
                 // Add other details as needed
             };

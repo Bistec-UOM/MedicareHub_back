@@ -15,6 +15,14 @@ namespace API.Controllers.LabControllers
             _vs = vs;
         }
 
+
+        [HttpGet("ReportRequest")]
+        public async Task<ActionResult<IEnumerable<object>>> GetPatientPrescriptionData()
+        {
+            var res = await _vs.RequestList();
+            return Ok(res);
+        }
+
         [HttpPost("Accept")]
         async public Task<ActionResult> AccceptSample(int id)
         {
@@ -28,5 +36,7 @@ namespace API.Controllers.LabControllers
             var tmp=await _vs.AcceptedSamplesList();
             return Ok(tmp);
         }
+
+
     }
 }
