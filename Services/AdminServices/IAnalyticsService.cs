@@ -1,5 +1,4 @@
 ﻿using Models;
-using Models.DTO.AdminDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,6 @@ namespace Services.AdminServices
 {
     public interface IAnalyticsService
     {
-        Task<List<A_Income>> GetAllAmount();
-        Task<A_Patient> GetAllPatientDetails();
+        Task<object> GetMaleFemalePatientsCountAllDays();
     }
 }

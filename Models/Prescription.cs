@@ -30,11 +30,11 @@ namespace Models
         public List<Bill_drug>? Bill_drug { get;set; }
 
 
-        public float Total { get; set; }
+        public float? Total { get; set; }
 
 
         [ForeignKey("CashierId")]
-        public int CashierId { get; set; }
+        public int? CashierId { get; set; }
         [JsonIgnore]
         public Cashier? Cashier { get; set; }
 

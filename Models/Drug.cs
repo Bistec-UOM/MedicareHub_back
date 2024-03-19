@@ -15,7 +15,7 @@ namespace Models
         public string BrandN { get; set; } = null!;
         public int Weight { get; set; }
         public float Price { get; set; }
-        public string? Avaliable { get; set; }
+        public int Avaliable { get; set; }
 
         [JsonIgnore]
         public Bill_drug? Bill_drug { get; set; }

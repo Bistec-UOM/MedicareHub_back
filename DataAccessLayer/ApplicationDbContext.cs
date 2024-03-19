@@ -33,6 +33,11 @@ namespace DataAccessLayer
         public DbSet<Patient_Teles> Patient_Teles { get; set; }
         public DbSet<User> users { get; set; }
         public DbSet<User_Tele> user_Teles { get; set; }
+        //----------------------------------------------
+        public DbSet<Doctor> doctors { get; set; }
+        public DbSet<Receptionist> receptionists { get; set; }
+        public DbSet<Cashier> cashiers { get; set; }
+        public DbSet<LabAssistant> labAssistants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

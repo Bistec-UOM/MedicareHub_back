@@ -83,6 +83,44 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("bill_Drugs");
                 });
 
+            modelBuilder.Entity("Models.Cashier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("cashiers");
+                });
+
+            modelBuilder.Entity("Models.Doctor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("doctors");
+                });
+
             modelBuilder.Entity("Models.Drug", b =>
                 {
                     b.Property<int>("Id")
@@ -91,8 +129,8 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Avaliable")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Avaliable")
+                        .HasColumnType("int");
 
                     b.Property<string>("BrandN")
                         .IsRequired()
@@ -111,6 +149,25 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("drugs");
+                });
+
+            modelBuilder.Entity("Models.LabAssistant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("labAssistants");
                 });
 
             modelBuilder.Entity("Models.LabReport", b =>
@@ -162,8 +219,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DOB")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DOB")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -214,14 +271,17 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("GenericN")
-                        .HasColumnType("int");
+                    b.Property<string>("GenericN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Period")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PrescriptionId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<float>("Weight")
                         .HasColumnType("real");
@@ -244,13 +304,13 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("AppointmentID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CashierId")
+                    b.Property<int?>("CashierId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<float>("Total")
+                    b.Property<float?>("Total")
                         .HasColumnType("real");
 
                     b.HasKey("Id");
@@ -261,6 +321,25 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("CashierId");
 
                     b.ToTable("prescriptions");
+                });
+
+            modelBuilder.Entity("Models.Receptionist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("receptionists");
                 });
 
             modelBuilder.Entity("Models.Record", b =>
@@ -385,8 +464,8 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DOB")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("DOB")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -440,7 +519,7 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.Appointment", b =>
                 {
-                    b.HasOne("Models.User", "Doctor")
+                    b.HasOne("Models.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -452,8 +531,8 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.User", "Recep")
-                        .WithMany("Appointment")
+                    b.HasOne("Models.Receptionist", "Recep")
+                        .WithMany()
                         .HasForeignKey("RecepId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -484,10 +563,43 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Prescription");
                 });
 
+            modelBuilder.Entity("Models.Cashier", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Cashier")
+                        .HasForeignKey("Models.Cashier", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.Doctor", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Doctor")
+                        .HasForeignKey("Models.Doctor", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.LabAssistant", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("LabAssistant")
+                        .HasForeignKey("Models.LabAssistant", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Models.LabReport", b =>
                 {
-                    b.HasOne("Models.User", "LbAst")
-                        .WithMany("LabReport")
+                    b.HasOne("Models.LabAssistant", "LbAst")
+                        .WithMany()
                         .HasForeignKey("LbAstID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -539,15 +651,24 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.User", "Cashier")
-                        .WithMany("Prescription")
-                        .HasForeignKey("CashierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Models.Cashier", "Cashier")
+                        .WithMany()
+                        .HasForeignKey("CashierId");
 
                     b.Navigation("Appointment");
 
                     b.Navigation("Cashier");
+                });
+
+            modelBuilder.Entity("Models.Receptionist", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithOne("Receptionist")
+                        .HasForeignKey("Models.Receptionist", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.Record", b =>
@@ -634,11 +755,13 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("Models.User", b =>
                 {
-                    b.Navigation("Appointment");
+                    b.Navigation("Cashier");
 
-                    b.Navigation("LabReport");
+                    b.Navigation("Doctor");
 
-                    b.Navigation("Prescription");
+                    b.Navigation("LabAssistant");
+
+                    b.Navigation("Receptionist");
 
                     b.Navigation("User_Tele");
                 });

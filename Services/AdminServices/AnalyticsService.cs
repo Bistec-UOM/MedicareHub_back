@@ -1,7 +1,6 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Models.DTO.AdminDto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,42 +9,34 @@ namespace Services.AdminServices
 
     public class AnalyticsService : IAnalyticsService
     {
-        private readonly IRepository<Prescription> _presrepo;
-        private readonly ApplicationDbContext _dbcontext;
+        private readonly ApplicationDbContext? _dbcontext;
 
-        public AnalyticsService(IRepository<Prescription> presrepo, ApplicationDbContext dbContext)
+        public async Task<object> GetMaleFemalePatientsCountAllDays()
         {
-            _presrepo = presrepo;
-            _dbcontext = dbContext;
-        }
-
-        public async Task<List<A_Income>> GetAllAmount()
-        {
-            var prescriptions = await _presrepo.GetAll();
-            var incomes = prescriptions.Select(IncomeMapper.MapToDTO).ToList();
-            return incomes;
-        }
-
-        public async Task<A_Patient> GetAllPatientDetails()
-        {
-            var patients = await _dbcontext.patients
-                .Select(patient => patient.DOB)
+            var Prescriptions = await _dbcontext.prescriptions
+                .Include(p => p.Appointment)
+                .ThenInclude(a => a.Patient)
                 .ToListAsync();
 
-            var appointmentDates = await _dbcontext.appointments
-                .Select(appointment => appointment.DateTime)
-                .ToListAsync();
+            var countsByDay = new List<object>();
 
-            // Add more details as needed
-
-            var patientDetailsDTO = new A_Patient
+            // Extract distinct dates
+            var distinctDates = Prescriptions.Select(p => p.DateTime.Date).Distinct();
+            foreach (var date in distinctDates) 
             {
-                //PatientDOBs = patients,
-                //AppointmentDates = appointmentDates,
-                // Add other details as needed
-            };
+                var maleCount = Prescriptions
+                   .Where(p => p.DateTime.Date == date)
+                   .Select(p => p.Appointment)
+                   .Count(a => a?.Patient?.Gender == "Male");
 
-            return patientDetailsDTO; // Corrected the return statement
+                var femaleCount = Prescriptions
+                    .Where(p => p.DateTime.Date == date)
+                    .Select(p => p.Appointment)
+                    .Count(a => a?.Patient?.Gender == "Female");
+                countsByDay.Add(new {Date=date,MaleCount=maleCount, FemaleCount=femaleCount});
+            }
+
+            return countsByDay;
         }
     }
 
