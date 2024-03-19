@@ -10,7 +10,7 @@ namespace Services.AdminServices
 
     public class AnalyticsService : IAnalyticsService
     {
-        private readonly ApplicationDbContext _dbcontext;
+        private readonly ApplicationDbContext? _dbcontext;
 
         public async Task<object> GetMaleFemalePatientsCountAllDays()
         {
