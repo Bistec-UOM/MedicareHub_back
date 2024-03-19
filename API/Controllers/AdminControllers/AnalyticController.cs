@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models.DTO.AdminDto;
 using Services.AdminServices;
 
 namespace API.Controllers.AdminControllers
