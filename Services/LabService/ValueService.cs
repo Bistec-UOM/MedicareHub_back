@@ -27,11 +27,26 @@ namespace Services.LabService
                .Where(p => p.Appointment.Any(a => a.Prescription != null)) // Filter out patients without appointments or prescriptions
                .SelectMany(p => p.Appointment.Where(a => a.Prescription != null).Select(a => new
                {
-                   Name = p.FullName,
+                   Name = p.Name,
+                   Gender=p.Gender,
+                   Age=CaluclateAge((DateTime)p.DOB),
+                   PrescriptionId = a.Prescription.Id,
+                   Lab= _cntx.labReports
+                        .Where(lr => lr.PrescriptionID == a.Prescription.Id && lr != null) 
+                        .Select(lr => new
+                            {
+                                    LabReportId = lr.Id,
+                                    TestName = _cntx.tests
+                                            .Where(t => t.Id == lr.TestId)
+                                            .Select(t => t.TestName)
+                                            .FirstOrDefault(),
+                                    Price = _cntx.tests
+                                            .Where(t => t.Id == lr.TestId)
+                                            .Select(t => t.Price)
+                                            .FirstOrDefault()
+                        }).ToList()
+                    })).ToListAsync();
 
-                   PrescriptionId = a.Prescription.Id
-               }))
-               .ToListAsync();
             return data;
              
         }
@@ -45,6 +60,17 @@ namespace Services.LabService
         async public Task<IEnumerable<LabReport>> AcceptedSamplesList()
         {
             return await _rep.GetByProp("Status", "accepted");
+        }
+
+        private static int CaluclateAge(DateTime dob)
+        {
+            DateTime now = DateTime.UtcNow;
+            int age = now.Year - dob.Year;
+            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            {
+                age--;
+            }
+            return age;
         }
     }
 }
