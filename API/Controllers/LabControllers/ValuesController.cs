@@ -37,6 +37,11 @@ namespace API.Controllers.LabControllers
             return Ok(tmp);
         }
 
-
+        [HttpPost("Result")]
+        async public Task<ActionResult> UploadResults(List<Record> data)
+        {
+            await _vs.UplaodResults(data);
+            return Ok("Uploaded Sucessfully!");
+        }
     }
 }
