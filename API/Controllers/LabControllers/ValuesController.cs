@@ -26,8 +26,15 @@ namespace API.Controllers.LabControllers
         [HttpPost("Accept")]
         async public Task<ActionResult> AccceptSample(int id)
         {
-            await _vs.AcceptSample(id);
-            return Ok();
+            var tmp= await _vs.AcceptSample(id);
+            if (tmp)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("Accept")]

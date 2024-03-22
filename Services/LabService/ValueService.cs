@@ -35,7 +35,7 @@ namespace Services.LabService
                    age=CaluclateAge((DateTime)p.DOB),
                    id = a.Prescription.Id,
                    load= _cntx.labReports
-                        .Where(lr => lr.PrescriptionID == a.Prescription.Id && lr != null) 
+                        .Where(lr => lr.PrescriptionID == a.Prescription.Id && lr != null && lr.Status=="pending") 
                         .Select(lr => new
                             {
                                     repId = lr.Id,
@@ -43,6 +43,10 @@ namespace Services.LabService
                                     test = _cntx.tests
                                             .Where(t => t.Id == lr.TestId)
                                             .Select(t => t.Abb)
+                                            .FirstOrDefault(),
+                                    testName = _cntx.tests
+                                            .Where(t => t.Id == lr.TestId)
+                                            .Select(t => t.TestName)
                                             .FirstOrDefault(),
                                     price = _cntx.tests
                                             .Where(t => t.Id == lr.TestId)
@@ -55,11 +59,16 @@ namespace Services.LabService
             return data;
              
         }
-        async public Task AcceptSample(int id)
+        async public Task<Boolean> AcceptSample(int id)
         {
             var tmp= await _rep.Get(id);
-            tmp.Status = "accepted";
-            await _rep.Update(tmp);
+            if (tmp != null)
+            {
+                tmp.Status = "accepted";
+                await _rep.Update(tmp);
+                return true;
+            }
+            return false;
         }
 
         async public Task<IEnumerable<LabReport>> AcceptedSamplesList()
