@@ -10,43 +10,48 @@ using System.Threading.Tasks;
 
 namespace Services.LabService
 {
-    public class ValueService
+    public class ValueService: IValueServices
     {
         private readonly IRepository<LabReport> _rep;
+        private readonly IRepository<Record> _rec;
         private readonly ApplicationDbContext _cntx;
-        public ValueService(IRepository<LabReport> rep,ApplicationDbContext contxt)
+        public ValueService(IRepository<LabReport> rep,IRepository<Record> rec,ApplicationDbContext contxt)
         {
             _rep = rep;
+            _rec = rec;
             _cntx = contxt;
         }
 
 
         async public Task<IEnumerable<Object>> RequestList()
         {
-            var data = await _cntx.patients
+            var data=await _cntx.patients
                .Where(p => p.Appointment.Any(a => a.Prescription != null)) // Filter out patients without appointments or prescriptions
                .SelectMany(p => p.Appointment.Where(a => a.Prescription != null).Select(a => new
                {
-                   Name = p.Name,
-                   Gender=p.Gender,
-                   Age=CaluclateAge((DateTime)p.DOB),
-                   PrescriptionId = a.Prescription.Id,
-                   Lab= _cntx.labReports
+                   date=1,
+                   name = p.Name,
+                   gender=p.Gender,
+                   age=CaluclateAge((DateTime)p.DOB),
+                   id = a.Prescription.Id,
+                   load= _cntx.labReports
                         .Where(lr => lr.PrescriptionID == a.Prescription.Id && lr != null) 
                         .Select(lr => new
                             {
-                                    LabReportId = lr.Id,
-                                    TestName = _cntx.tests
+                                    repId = lr.Id,
+                                    testId=lr.TestId,
+                                    test = _cntx.tests
                                             .Where(t => t.Id == lr.TestId)
-                                            .Select(t => t.TestName)
+                                            .Select(t => t.Abb)
                                             .FirstOrDefault(),
-                                    Price = _cntx.tests
+                                    price = _cntx.tests
                                             .Where(t => t.Id == lr.TestId)
                                             .Select(t => t.Price)
                                             .FirstOrDefault()
                         }).ToList()
                     })).ToListAsync();
 
+            data = data.Where(obj => obj.load.Count > 0).ToList();
             return data;
              
         }
@@ -71,6 +76,14 @@ namespace Services.LabService
                 age--;
             }
             return age;
+        }
+
+        async public Task UplaodResults(List<Record> data)
+        {
+            foreach (var i in data)
+            {
+                await _rec.Add(i);
+            }
         }
     }
 }
