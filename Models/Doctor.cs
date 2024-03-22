@@ -17,5 +17,7 @@ namespace Models
         public int UserId { get; set; }
         [JsonIgnore]
         public User? User { get; set; }
+        [JsonIgnore]
+        public List<Unable_Date>? unable_Date { get; set; }
     }
 }
