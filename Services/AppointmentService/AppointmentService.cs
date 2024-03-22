@@ -17,13 +17,15 @@ namespace Services.AppointmentService
         private readonly IRepository<Appointment> _appointment;
         private readonly IRepository<Patient> _patient;
         private readonly IRepository<User> _doctor;
+        private readonly IRepository<Unable_Date> _unable_date;
         
-        public AppointmentService(ApplicationDbContext dbcontext,IRepository<Appointment> appointment,IRepository<Patient> patient,IRepository<User> doctor)
+        public AppointmentService(ApplicationDbContext dbcontext,IRepository<Appointment> appointment,IRepository<Patient> patient,IRepository<User> doctor,IRepository<Unable_Date> unableDate)
         {
             _dbcontext = dbcontext;
             _appointment = appointment;
             _patient = patient;
             _doctor = doctor;
+            _unable_date = unableDate;
 
 
 
@@ -31,16 +33,26 @@ namespace Services.AppointmentService
         
         public async Task AddAppointment(Appointment appointment)
         {
-              await _appointment.Add(appointment);  //adding an appointment using IRepository add function
-              var patientId = appointment.PatientId;  // sending an email for the patient
+
+              //adding an appointment using IRepository add function
+
+              await _appointment.Add(appointment); 
+
+              // sending an email for the patient
+
+              var patientId = appointment.PatientId;  
               var patient = await GetPatient(patientId);
-              var targetEmail = patient.Email;
+             // var targetEmail = patient.Email;
               string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
               string userName = patient.FullName;
               string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
 
               EmailSender emailSernder = new EmailSender();
-              await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
+              await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);  
+
+              
+
+              
             
 
 
@@ -139,13 +151,18 @@ namespace Services.AppointmentService
       
 
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)
-        {
+        {   
+            //getting all the appointments of a specific doctor
+
             var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
 
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
         {
+
+            //getting all the appointments of a specific doctor of a specific date
+
             var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
             return doctorDayAppointments.ToList();  
             
@@ -154,8 +171,8 @@ namespace Services.AppointmentService
         public async Task<List<User>> GetDoctors()
         {
 
-            var doctors = _dbcontext.users.Where(d => d.Role == "Doctor");
-            return doctors.ToList();
+            var doctors =  _dbcontext.users.Where(d => d.Role == "Doctor");
+            return  doctors.ToList();
            
         }
 
@@ -175,52 +192,46 @@ namespace Services.AppointmentService
             string userName = patient.FullName;
             string emailMessage = "Dear " + patient.Name +"\n"+ "Thank you for choosing Medicare Hub. We're honored to be part of your healthcare journey. Please reach out if you need anything.";
 
+            //sending email after succeful registration of a patient
             EmailSender emailSernder= new EmailSender();
-           await emailSernder.SendMail(emailSubject,patient.Email,userName,emailMessage);
+            await emailSernder.SendMail(emailSubject,patient.Email,userName,emailMessage);
 
 
 
         }
 
         public async Task<Appointment> UpdateAppointment(int id, Appointment appointment)
-
-
-{
+        {
 
           
             var oldAppointment = await GetAppointment(id);
 
-    if (oldAppointment != null)
-    {
+            if (oldAppointment != null)
+            {
                 // Update properties of the existing appointment
+     
+                oldAppointment.DateTime = appointment.DateTime;
+                oldAppointment.Status = appointment.Status;
+                oldAppointment.PatientId = appointment.PatientId;
+                oldAppointment.DoctorId = appointment.DoctorId;
+                oldAppointment.RecepId = appointment.RecepId;
 
-                
-            oldAppointment.DateTime = appointment.DateTime;
-            oldAppointment.Status = appointment.Status;
-            oldAppointment.PatientId = appointment.PatientId;
-            oldAppointment.DoctorId = appointment.DoctorId;
-            oldAppointment.RecepId = appointment.RecepId;
-
-        try
-        {
-            await _dbcontext.SaveChangesAsync();
-            return oldAppointment;
+                 try
+                 {
+                      await _dbcontext.SaveChangesAsync();
+                      return oldAppointment;
+                 }
+                 catch (DbUpdateConcurrencyException ex)
+                 {
+                        
+                        throw new Exception("Error occured during the updation");
+                 }
+            }
+            else
+            {
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
         }
-        catch (DbUpdateConcurrencyException ex)
-        {
-            // Handle concurrency conflict
-            // You can implement custom logic here, such as merging changes or retrying the update
-            Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
-            throw;
-        }
-    }
-    else
-    {
-        // Handle case where appointment does not exist
-        // You can throw an exception or return null based on your requirement
-        throw new ArgumentException($"Appointment with id {id} not found.");
-    }
-}
 
         public async Task<Appointment> UpdateAppointmentStatus(int id, Appointment appointment)
         {
@@ -244,8 +255,8 @@ namespace Services.AppointmentService
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
-                    throw;
+                  
+                    throw new Exception("Error occured during the updation");
                 }
             }
             else
@@ -299,8 +310,8 @@ namespace Services.AppointmentService
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    Console.WriteLine($"Concurrency conflict occurred: {ex.Message}");
-                    throw;
+                    
+                    throw new Exception("Error occured during the updation");
                 }
             }
             else
@@ -315,6 +326,17 @@ namespace Services.AppointmentService
         {
             var targetAppointment=_dbcontext.appointments.Where(a=>a.DoctorId==doctorId && (a.DateTime.Month)-1==monthId).ToList();
             return targetAppointment;
+        }
+
+        public async Task AddUnableDate(Unable_Date uDate)
+        {
+            await _unable_date.Add(uDate);
+        }
+        public async Task<List<Unable_Date>> getUnableDates(int doctorId)
+        {
+            var uDates = _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId);
+            return  uDates.ToList();
+
         }
     }
 }

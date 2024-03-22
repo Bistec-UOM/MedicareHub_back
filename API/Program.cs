@@ -70,6 +70,7 @@ builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+builder.Services.AddScoped<IRepository<Unable_Date>,Repository<Unable_Date>>();
 
 //Doctor-----------------------------------------------------------------
 

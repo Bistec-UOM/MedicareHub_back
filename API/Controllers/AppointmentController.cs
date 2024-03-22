@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using Models;
 using Models.DTO;
 using Services.AppointmentService;
@@ -50,7 +51,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("{id}", Name = "GetaAppointment")]
+        [HttpGet("{id}", Name = "GetAppointment")]
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)
         {
@@ -69,6 +70,9 @@ namespace API.Controllers
 
             var deletedAppointment = await _appointment.DeleteAppointment(id);
             var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);
+
+            //sending an email for patient after succesfull appointment cancellation
+
             if (targetPatient != null)
             {
 
@@ -85,6 +89,7 @@ namespace API.Controllers
                 await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
 
             }
+            
 
 
 
@@ -106,7 +111,7 @@ namespace API.Controllers
             var doctorDayAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
             List<AppointmentWithPatientDetails> appointmentsWithDetails = new List<AppointmentWithPatientDetails>();
 
-
+            //returning the appointment details as well as patient details of the relevent appointment
             foreach (var appointment in doctorDayAppointments)
             {
                 var patientDetails = await _appointment.GetPatient(appointment.PatientId);
@@ -263,6 +268,20 @@ namespace API.Controllers
             }
             return NoContent();
 
+        }
+
+        [HttpPost("unableDates")]
+        public async Task AddUnableDate(Unable_Date uDate)
+        {
+           await _appointment.AddUnableDate(uDate);
+           
+        }
+
+        [HttpGet("BlockedDates")]
+        public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
+        {
+            var uDates= await _appointment.getUnableDates(doctorId);
+            return Ok(uDates);
         }
 
 

@@ -12,7 +12,7 @@ namespace Services.AppointmentService
     public class EmailSender
     {
 
-        string akey= "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";
+        string akey= "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";
 
 
 
@@ -26,8 +26,19 @@ namespace Services.AppointmentService
             var to = new EmailAddress(toEmail, userName);
             var plainTextContent = message;
             var htmlContent = "";
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            var response = await client.SendEmailAsync(msg);
+            try
+            {
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                var response = await client.SendEmailAsync(msg);
+
+
+            }catch (Exception ex)
+            {
+                throw new Exception("Email sending failed");
+            }
+
+
+
         }
 
 
