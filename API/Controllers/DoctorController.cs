@@ -14,11 +14,11 @@ namespace API.Controllers
             _appointments = appoinments;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllAppointments()
+        [HttpGet("AppointList")]
+        public async Task<ActionResult<List<Object>>> GetPatientNamesForApp()
         {
-            var appointments = await _appointments.GetAllAppointments();
-            return Ok(appointments);
+            var tmp=await _appointments.GetPatientNamesForApp();
+            return Ok(tmp);
         }
     }
 }
