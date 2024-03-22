@@ -73,8 +73,7 @@ builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 //Doctor-----------------------------------------------------------------
 
-builder.Services.AddScoped<PrescriptionService>();
-builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
+builder.Services.AddScoped<DoctorappoinmentService>();
 //Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
