@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO;
@@ -18,7 +19,7 @@ namespace API.Controllers
             _appointment = appointment;
 
         }
-
+        
         [HttpGet("patient/{id}", Name = "GetPatient")]
 
         public async Task<ActionResult<Patient>> GetPatient(int id)
