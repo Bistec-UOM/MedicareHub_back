@@ -96,6 +96,7 @@ builder.Services.AddScoped<ValueService>();
 builder.Services.AddScoped<IRepository<ReportFields>,Repository<ReportFields>>();
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
 builder.Services.AddScoped<IRepository<LabReport>, Repository<LabReport>>();
+builder.Services.AddScoped<IRepository<Record>, Repository<Record>>();
 
 //Login-------------------------------------------------------------------
 builder.Services.AddScoped<AuthServices>();
