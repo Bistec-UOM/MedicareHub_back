@@ -11,7 +11,7 @@ namespace Services.LabService
     {
         public Task<IEnumerable<Object>> RequestList();
 
-        public Task AcceptSample(int id);
+        public Task<Boolean> AcceptSample(int id);
 
         public Task<IEnumerable<LabReport>> AcceptedSamplesList();
 
