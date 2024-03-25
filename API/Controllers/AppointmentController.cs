@@ -69,10 +69,7 @@ namespace API.Controllers
             }
 
             var deletedAppointment = await _appointment.DeleteAppointment(id);
-            var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);
-
-            //sending an email for patient after succesfull appointment cancellation
-
+            var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);    //sending an email for patient after succesfull appointment cancellation
             if (targetPatient != null)
             {
 
@@ -89,11 +86,6 @@ namespace API.Controllers
                 await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
 
             }
-            
-
-
-
-
             return Ok(deletedAppointment);
         }
 
@@ -110,9 +102,7 @@ namespace API.Controllers
         {
             var doctorDayAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
             List<AppointmentWithPatientDetails> appointmentsWithDetails = new List<AppointmentWithPatientDetails>();
-
-            //returning the appointment details as well as patient details of the relevent appointment
-            foreach (var appointment in doctorDayAppointments)
+            foreach (var appointment in doctorDayAppointments)   //returning the appointment details as well as patient details of the relevent appointment
             {
                 var patientDetails = await _appointment.GetPatient(appointment.PatientId);
                 AppointmentWithPatientDetails newappointment = new AppointmentWithPatientDetails
@@ -123,21 +113,15 @@ namespace API.Controllers
                 };
 
                 appointmentsWithDetails.Add(newappointment);
-
             }
-
-
-
             return Ok(appointmentsWithDetails);
         }
-
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors()
         {
             var doctors = _appointment.GetDoctors();
             return Ok(doctors);
         }
-
         [HttpPost("patients")]
         public async Task RegisterPatient(Patient patient)
         {
@@ -145,11 +129,9 @@ namespace API.Controllers
             await _appointment.RegisterPatient(patient);
 
         }
-
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)
         {
-            // return Ok(await _repository.UpdateAppointment(id, appointment));
             var targetAppointment = await _appointment.UpdateAppointmentStatus(id, appointment);
             if (targetAppointment is null)
             {
@@ -159,36 +141,22 @@ namespace API.Controllers
             var targetPatient = await _appointment.GetPatient(targetAppointment.PatientId);
             if (targetPatient != null)
             {
-
                 var targetEmail = targetPatient.Email;
                 var targetday = targetAppointment.DateTime.Date;
                 var targettime = targetAppointment.DateTime;
 
-                string emailsubject = "appointment update: cancellation notification";
+                string emailsubject = "appointment update: cancellation notification"; //sending an email after cancelling the appointment by doctor
                 string username = targetPatient.FullName;
                 string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
-
-
                 EmailSender emailSernder = new EmailSender();
                 await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
 
             }
-
-
-
-
             return Ok(targetAppointment);
-
-
         }
-
-
-
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date)
         {
-
-
             var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
             foreach (var app in await targetCancelledAppointments)
             {
@@ -200,27 +168,22 @@ namespace API.Controllers
                     var targetday = app.DateTime.Date;
                     var targettime = app.DateTime;
 
-                    string emailsubject = "appointment update: cancellation notification";
+                    string emailsubject = "appointment update: cancellation notification"; //sending emails after cancelling all appointments by doctor
                     string username = targetPatient.FullName;
                     string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
-
-
                     EmailSender emailSernder = new EmailSender();
                     await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
 
                 }
-
             }
             return NoContent();
         }
-
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId)
         {
             var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
             return Ok(appointments);
         }
-
         [HttpGet("patients")]
         public async Task<ActionResult<ICollection<User>>> GetPatients()
         {
@@ -233,8 +196,6 @@ namespace API.Controllers
 
             return Ok(await _appointment.UpdateAppointment(id, appointment));
         }
-
-
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
         {
@@ -250,19 +211,15 @@ namespace API.Controllers
                 var targetPatient = await _appointment.GetPatient(app.PatientId);
                 if (targetPatient != null)
                 {
-
                     var targetEmail = targetPatient.Email;
                     var targetday = app.DateTime.Date;
                     var targettime = app.DateTime;
 
-                    string emailsubject = "appointment update: cancellation notification";
+                    string emailsubject = "appointment update: cancellation notification"; //sending emails after deleting prescheduled appointments by a receptionsist
                     string username = targetPatient.FullName;
                     string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
-
-
                     EmailSender emailSernder = new EmailSender();
                     await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
-
                 }
 
             }
