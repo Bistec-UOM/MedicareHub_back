@@ -25,9 +25,6 @@ namespace Models
 
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
-
-
-
         [JsonIgnore]
         public Doctor? Doctor {  get; set; }
         [JsonIgnore]
