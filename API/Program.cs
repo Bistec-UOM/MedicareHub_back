@@ -77,6 +77,7 @@ builder.Services.AddScoped<IRepository<Unable_Date>,Repository<Unable_Date>>();
 builder.Services.AddScoped<DoctorappoinmentService>();
 //Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
+builder.Services.AddScoped<BillService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
 
 //Admin------------------------------------------------------------------

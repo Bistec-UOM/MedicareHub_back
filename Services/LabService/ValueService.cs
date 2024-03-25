@@ -71,9 +71,17 @@ namespace Services.LabService
             return false;
         }
 
-        async public Task<IEnumerable<LabReport>> AcceptedSamplesList()
+        async public Task<IEnumerable<Object>> AcceptedSamplesList()
         {
-            return await _rep.GetByProp("Status", "accepted");
+            return await _cntx.labReports
+                .Select(l => new
+                    {
+                        Id = l.Id,
+                        TestId = l.TestId,
+                        TestName = l.Test.TestName,
+                        Abb= l.Test.Abb
+                     })
+                .ToListAsync<object>();
         }
 
         private static int CaluclateAge(DateTime dob)

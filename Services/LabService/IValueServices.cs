@@ -13,7 +13,7 @@ namespace Services.LabService
 
         public Task<Boolean> AcceptSample(int id);
 
-        public Task<IEnumerable<LabReport>> AcceptedSamplesList();
+        public Task<IEnumerable<Object>> AcceptedSamplesList();
 
         public Task UplaodResults(List<Record> data);
     }  
