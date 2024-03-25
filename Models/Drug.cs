@@ -18,6 +18,6 @@ namespace Models
         public int Avaliable { get; set; }
 
         [JsonIgnore]
-        public Bill_drug? Bill_drug { get; set; }
+        public List<Bill_drug>? Bill_drug { get; set; }
     }
 }

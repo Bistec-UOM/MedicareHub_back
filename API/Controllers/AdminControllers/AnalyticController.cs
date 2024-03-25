@@ -26,6 +26,20 @@ namespace API.Controllers.AdminControllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("total-Income")]
+        public async Task<IActionResult> GetTotalAmount()
+        {
+            var res = await _analyticsService.GetTotalAmount();
+            return Ok(res);
+        }
+        [HttpGet("available-count")]
+        public async Task<IActionResult> GetAvailableCount()
+        {
+            var result = await (_analyticsService.GetAvailableCount());
+            return Ok(result);
+        }
+
+
 
     }
 }

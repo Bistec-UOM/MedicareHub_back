@@ -10,5 +10,8 @@ namespace Services.AdminServices
     public interface IAnalyticsService
     {
         Task<object> GetMaleFemalePatientsCountAllDays();
+        Task<object> GetTotalAmount();
+        Task<object> GetAvailableCount();
+        
     }
 }
