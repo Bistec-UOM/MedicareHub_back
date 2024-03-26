@@ -110,6 +110,10 @@ namespace Services.LabService
 
                 await _rec.Add(record);
             }
+
+            LabReport tmp =await _rep.Get(data.ReportId);
+            tmp.Status = "done";
+            await _rep.Update(tmp);
             return true;
         }
     }
