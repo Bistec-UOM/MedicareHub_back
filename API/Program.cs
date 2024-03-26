@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
+using Models.DTO.Doctor;
 using Services;
 using Services.AdminServices;
 using Services.AppointmentService;
@@ -75,6 +76,11 @@ builder.Services.AddScoped<IRepository<Unable_Date>,Repository<Unable_Date>>();
 //Doctor-----------------------------------------------------------------
 
 builder.Services.AddScoped<DoctorappoinmentService>();
+builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
+builder.Services.AddScoped<IRepository<AddDrugs>, Repository<AddDrugs>>();
+builder.Services.AddScoped<IRepository<Prescript_drug>, Repository<Prescript_drug>>();
+
+
 //Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<BillService>();
