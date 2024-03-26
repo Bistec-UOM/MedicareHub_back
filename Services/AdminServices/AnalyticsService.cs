@@ -1,5 +1,6 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -57,26 +58,15 @@ namespace Services.AdminServices
                     .Count(a => a?.Patient?.Gender == "Female" && CalculateAge(a.Patient.DOB) > 45);
 
 
-                //remove this after completion of this part
-                var Name = Prescriptions
-                    .Where(p => p.DateTime.Date == date)
-                    .Select(p => p.Appointment)
-                    .Select(p => p.Patient)
-                    .Select(p => new
-                    {
-                        name = p.Name,
-                        dob = p.DOB
-                    });
                 countsByDay.Add(new
                 {
-                    Date = date,
+                    datefor = date,
                     child_male = child_male,
                     child_female = child_female,
                     adult_male = adult_male,
                     adult_female = adult_female,
                     old_male = old_male,
                     old_female = old_female,
-                    Name = Name
                 });
             }
 
@@ -122,7 +112,7 @@ namespace Services.AdminServices
                     totalAmount += prescript.Bill_drug.Sum(bd => bd.Amount);
                 }
                 // Add the date and total amount to the result list
-                totalByDay.Add(new { Date = date, TotalAmount = totalAmount });
+                totalByDay.Add(new { datefor = date, income = totalAmount });
             }
             return totalByDay;
         }
@@ -140,8 +130,47 @@ namespace Services.AdminServices
             return drugAvailability;
 
         }
+        public async Task<object> GetTotalDrugUsage()
+        {
+            var totalDrugUsage = new List<object>();
 
+            // Retrieve all prescriptions with their associated bill_drug records
+            var prescriptions = await _dbcontext.prescriptions
+                .Include(p => p.Bill_drug)
+                .ThenInclude(bd => bd.Drug)
+                .ToListAsync();
 
+            // Group bill_drug records by Date
+            var billDrugGroupsByDate = prescriptions
+                .SelectMany(p => p.Bill_drug)
+                .GroupBy(bd => bd.Prescription.DateTime.Date);
+
+            // Calculate total drug usage for each drug on each date
+            foreach (var group in billDrugGroupsByDate)
+            {
+                var date = group.Key.Date;
+                var drugUsageForDate = new List<object>();
+
+                // Group drug usage for this date by DrugID and DrugName
+                var drugUsageByDrug = group
+                    .GroupBy(bd => new { bd.DrugID, bd.Drug.GenericN,bd.Drug.Weight });
+
+                // Calculate total drug usage for each drug on this date
+                foreach (var drugGroup in drugUsageByDrug)
+                {
+                    var drugID = drugGroup.Key.DrugID;
+                    var namefor = drugGroup.Key.GenericN+"("+ drugGroup.Key.Weight+ "mg)";
+                    var amount = drugGroup.Sum(bd => bd.Amount);
+
+                    drugUsageForDate.Add(new { name = namefor, quantity = amount });
+                }
+
+                // Add drug usage for this date to the output list
+                totalDrugUsage.Add(new { datefor = date.Date, drugType = drugUsageForDate });
+            }
+
+            return totalDrugUsage;
+        }
     }
 }
 
