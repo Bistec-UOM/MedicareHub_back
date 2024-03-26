@@ -23,12 +23,15 @@ namespace Services
         }
         public async Task<List<Object>> GetPatientNamesForApp()
         {
-            return _context.appointments
+            var tmp= _context.appointments
+              
+            .Where(a => a.Status == "new") // Filter appointments with status "new"                
             .Select(a => new
             {
                 id = a.Id,
-                date = a.DateTime,
-                status = a.Status,
+                date = a.DateTime.Date,
+                time = a.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                status = "pending",
                 Patient = new
                 {
                     name = a.Patient.Name,
@@ -38,6 +41,9 @@ namespace Services
             })
             .ToList<object>();
 
+
+
+            return tmp;
         }
 
         private static int CaluclateAge(DateTime dob)

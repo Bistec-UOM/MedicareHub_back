@@ -20,5 +20,7 @@ namespace API.Controllers
             var tmp=await _appointments.GetPatientNamesForApp();
             return Ok(tmp);
         }
+
+        
     }
 }
