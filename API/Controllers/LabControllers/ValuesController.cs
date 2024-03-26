@@ -48,8 +48,15 @@ namespace API.Controllers.LabControllers
         [HttpPost("Result")]
         async public Task<ActionResult> UploadResults(Result data)
         {
-            //await _vs.UplaodResults(data);
-            return Ok(data);
+            var tmp=await _vs.UplaodResults(data);
+            if (tmp)
+            {
+                return Ok(data);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

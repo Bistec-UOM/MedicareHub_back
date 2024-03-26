@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.DTO.Lab;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
@@ -95,12 +96,21 @@ namespace Services.LabService
             return age;
         }
 
-        async public Task UplaodResults(List<Record> data)
+        async public Task<Boolean> UplaodResults(Result data)
         {
-            foreach (var i in data)
+            foreach (var i in data.Results)
             {
-                await _rec.Add(i);
+                Record record = new Record
+                {
+                    LabReportId = data.ReportId,
+                    ReportFieldId = i.Fieldid,
+                    Result = i.Result,
+                    Status = i.Status
+                };
+
+                await _rec.Add(record);
             }
+            return true;
         }
     }
 }

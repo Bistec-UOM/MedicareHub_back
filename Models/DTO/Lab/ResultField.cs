@@ -9,7 +9,7 @@ namespace Models.DTO.Lab
     public class ResultField
     {
         public int Fieldid { get; set; }
-        public decimal Result {  get; set; }
+        public float Result {  get; set; }
         public string Status {  get; set; }
 
     }
