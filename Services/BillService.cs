@@ -19,34 +19,39 @@ namespace Services
 
         public async Task<IEnumerable<object>> RequestList()
         {
-            var prescriptions = await _cntx.prescriptions.ToListAsync();
-
-            var prescriptionData = prescriptions
+            var prescriptionData = await _cntx.prescriptions
+                .Include(p => p.Appointment)
+                    .ThenInclude(a => a.Patient)
                 .Select(p => new
                 {
-                    Prescription = p,
-                    Drugs = _cntx.prescript_Drugs
+                    id = p.Id,
+                    time = p.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                    Total = p.Total,
+                    CashierId = p.CashierId,
+                    name = p.Appointment.Patient.Name,
+                    age = CalculateAge(p.Appointment.Patient.DOB ?? DateTime.MinValue),
+                    gender = p.Appointment.Patient.Gender,
+                    medicine = _cntx.prescript_Drugs
                         .Where(d => d.PrescriptionId == p.Id)
                         .Select(d => new
                         {
                             DrugId = d.Id,
-                            GenericName = d.GenericN,
-                            Weight = d.Weight,
-                            Period = d.Period
+                            name = d.GenericN,
+                            quantity = d.Weight,
+                            hour = d.Period
                         }).ToList()
-                });
+                })
+                .ToListAsync();
 
-            var formattedData = prescriptionData.Select(p => new
-            {
-                PrescriptionId = p.Prescription.Id,
-                DateTime = p.Prescription.DateTime,
-                AppointmentId = p.Prescription.AppointmentID,
-                Total = p.Prescription.Total,
-                CashierId = p.Prescription.CashierId,
-                Drugs = p.Drugs
-            });
-
-            return formattedData;
+            return prescriptionData;
+        }
+        private int CalculateAge(DateTime dateOfBirth)
+        {
+            var today = DateTime.Today;
+            var age = today.Year - dateOfBirth.Year;
+            if (dateOfBirth.Date > today.AddYears(-age))
+                age--;
+            return age;
         }
 
 
