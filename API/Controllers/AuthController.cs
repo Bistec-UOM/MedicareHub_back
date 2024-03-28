@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost("reg")]
-        public async Task<ActionResult> RegUser(User data)
+        public async Task<ActionResult> RegUser(String data)
         {
             var res= await _auth.RegisterUser(data);
             return Ok(res);
