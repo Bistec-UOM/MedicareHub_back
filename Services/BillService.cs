@@ -29,7 +29,7 @@ namespace Services
                     Total = p.Total,
                     CashierId = p.CashierId,
                     name = p.Appointment.Patient.Name,
-                    age = CalculateAge(p.Appointment.Patient.DOB ?? DateTime.MinValue),
+                    age = CaluclateAge((DateTime)p.Appointment.Patient.DOB),
                     gender = p.Appointment.Patient.Gender,
                     medicine = _cntx.prescript_Drugs
                         .Where(d => d.PrescriptionId == p.Id)
@@ -45,12 +45,14 @@ namespace Services
 
             return prescriptionData;
         }
-        private int CalculateAge(DateTime dateOfBirth)
+        private static int CaluclateAge(DateTime dob)
         {
-            var today = DateTime.Today;
-            var age = today.Year - dateOfBirth.Year;
-            if (dateOfBirth.Date > today.AddYears(-age))
+            DateTime now = DateTime.UtcNow;
+            int age = now.Year - dob.Year;
+            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            {
                 age--;
+            }
             return age;
         }
 
