@@ -1,34 +1,42 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.DTO.Doctor;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Services
 {
     public class DoctorappoinmentService
     {
         private readonly IRepository<Appointment> _appoinments;
-        private readonly IRepository<Patient> _patients;
         private readonly ApplicationDbContext _context;
-        public DoctorappoinmentService(IRepository<Appointment> appoinments, IRepository<Patient> patients, ApplicationDbContext context)
+        private readonly IRepository<Prescription> _pres;
+        private readonly IRepository<Prescript_drug> _drug;
+        public DoctorappoinmentService(IRepository<Appointment> appoinments, ApplicationDbContext context,
+                                        IRepository<Prescription> pres,IRepository<Prescript_drug> psrdrg)
         {
+           _drug = psrdrg;
             _appoinments = appoinments;
-            _patients = patients;
             _context = context;
+                _pres = pres;
         }
-        public async Task<List<Object>> GetPatientNamesForApp()
+        public async Task<List<object>> GetPatientNamesForApp()
         {
-            return _context.appointments
+            var tmp = _context.appointments
+
+            .Where(a => a.Status == "new") // Filter appointments with status "new"                
             .Select(a => new
             {
                 id = a.Id,
-                date = a.DateTime,
-                status = a.Status,
+                date = a.DateTime.Date,
+                time = a.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                status = "pending",
                 Patient = new
                 {
                     name = a.Patient.Name,
@@ -38,6 +46,9 @@ namespace Services
             })
             .ToList<object>();
 
+
+
+            return tmp;
         }
 
         private static int CaluclateAge(DateTime dob)
@@ -50,5 +61,40 @@ namespace Services
             }
             return age;
         }
+
+        // for prescription
+        public async Task<Prescription> AddPrescription(AddDrugs data)
+        {
+            
+            var x = new Prescription
+            {
+                DateTime = DateTime.Now,
+                AppointmentID = data.Id,
+                Total = 0,
+                CashierId = 1
+            };
+
+            await _pres.Add(x);
+            int pId = x.Id;
+
+            foreach (var i in data.Drugs)
+            {
+                var Obj= new Prescript_drug
+                {
+                    PrescriptionId = pId,
+                    GenericN=i.GenericN,
+                    Weight = i.Weight,
+                    Unit = i.Unit,
+                    Period = i.Period
+                };
+           
+                await _drug.Add(Obj);
+            }
+           
+            return x;
+
+        }
+
+        }
+    
     }
-}

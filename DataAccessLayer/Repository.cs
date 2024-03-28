@@ -21,12 +21,8 @@ namespace DataAccessLayer
 
         public async Task Add(T item)
         {
-            try {
-                await _dbSet.AddAsync(item);
-                await _dbContext.SaveChangesAsync();
-            }catch (Exception){
-                throw new Exception("Error");
-            }
+            await _dbSet.AddAsync(item);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
