@@ -24,11 +24,11 @@ namespace Services
             _configuration = configuration;
         }
 
-        public async Task<User> RegisterUser(User data)
+        public async Task<String> RegisterUser(String data)
         {
-            string paswrdHash = BCrypt.Net.BCrypt.HashPassword(data.Password);
-            data.Password = paswrdHash;
-            await _user.Add(data);
+            string paswrdHash = BCrypt.Net.BCrypt.HashPassword(data);
+            data= paswrdHash;
+            //await _user.Add(data);
             return data;
         }
 
@@ -62,9 +62,10 @@ namespace Services
             var tmp = await _user.Get(UserId);
 
             List<Claim> claims = new List<Claim> {
-                new Claim("UserId",UserId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier,tmp.Id.ToString()),
                 new Claim(ClaimTypes.Name, tmp.Name),
                 new Claim(ClaimTypes.Role, tmp.Role),
+                new Claim("IssuedAt", DateTime.UtcNow.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

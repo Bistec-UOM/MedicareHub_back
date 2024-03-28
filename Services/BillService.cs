@@ -19,34 +19,41 @@ namespace Services
 
         public async Task<IEnumerable<object>> RequestList()
         {
-            var prescriptions = await _cntx.prescriptions.ToListAsync();
-
-            var prescriptionData = prescriptions
+            var prescriptionData = await _cntx.prescriptions
+                .Include(p => p.Appointment)
+                    .ThenInclude(a => a.Patient)
                 .Select(p => new
                 {
-                    Prescription = p,
-                    Drugs = _cntx.prescript_Drugs
+                    id = p.Id,
+                    time = p.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                    Total = p.Total,
+                    CashierId = p.CashierId,
+                    name = p.Appointment.Patient.Name,
+                    age = CaluclateAge((DateTime)p.Appointment.Patient.DOB),
+                    gender = p.Appointment.Patient.Gender,
+                    medicine = _cntx.prescript_Drugs
                         .Where(d => d.PrescriptionId == p.Id)
                         .Select(d => new
                         {
                             DrugId = d.Id,
-                            GenericName = d.GenericN,
-                            Weight = d.Weight,
-                            Period = d.Period
+                            name = d.GenericN,
+                            quantity = d.Weight,
+                            hour = d.Period
                         }).ToList()
-                });
+                })
+                .ToListAsync();
 
-            var formattedData = prescriptionData.Select(p => new
+            return prescriptionData;
+        }
+        private static int CaluclateAge(DateTime dob)
+        {
+            DateTime now = DateTime.UtcNow;
+            int age = now.Year - dob.Year;
+            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
             {
-                PrescriptionId = p.Prescription.Id,
-                DateTime = p.Prescription.DateTime,
-                AppointmentId = p.Prescription.AppointmentID,
-                Total = p.Prescription.Total,
-                CashierId = p.Prescription.CashierId,
-                Drugs = p.Drugs
-            });
-
-            return formattedData;
+                age--;
+            }
+            return age;
         }
 
 

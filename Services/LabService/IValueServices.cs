@@ -1,4 +1,5 @@
 ﻿using Models;
+using Models.DTO.Lab;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace Services.LabService
 
         public Task<IEnumerable<Object>> AcceptedSamplesList();
 
-        public Task UplaodResults(List<Record> data);
+        public Task<Boolean> UplaodResults(Result data);
     }  
 }
