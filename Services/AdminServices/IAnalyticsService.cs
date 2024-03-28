@@ -11,6 +11,7 @@ namespace Services.AdminServices
     {
         Task<object> GetMaleFemalePatientsCountAllDays();
         Task<object> GetTotalAmount();
+        Task<object> GetAttendance();
         Task<object> GetAvailableCount();
         Task<object> GetTotalDrugUsage();
     }

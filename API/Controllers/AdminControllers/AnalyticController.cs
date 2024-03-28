@@ -46,6 +46,12 @@ namespace API.Controllers.AdminControllers
             var res = await (_analyticsService.GetTotalDrugUsage());
             return Ok(res);
         }
+        [HttpGet("attendance-for-cashier")]
+        public async Task<IActionResult> GetAttendance()
+        {
+            var res = await _analyticsService.GetAttendance();
+            return Ok(res);
+        }
 
 
 

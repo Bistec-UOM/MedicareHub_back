@@ -159,7 +159,7 @@ namespace Services.AdminServices
                 foreach (var drugGroup in drugUsageByDrug)
                 {
                     var drugID = drugGroup.Key.DrugID;
-                    var namefor = drugGroup.Key.GenericN+"("+ drugGroup.Key.Weight+ "mg)";
+                    var namefor = drugGroup.Key.GenericN+"("+ drugGroup.Key.Weight+ " mg)";
                     var amount = drugGroup.Sum(bd => bd.Amount);
 
                     drugUsageForDate.Add(new { name = namefor, quantity = amount });
@@ -171,6 +171,60 @@ namespace Services.AdminServices
 
             return totalDrugUsage;
         }
+        public async Task<object> GetAttendance()
+        {
+            var total_attendance = new List<object>();
+
+            var cashier_attendance = await _dbcontext.prescriptions
+                .Include(p => p.Cashier)
+                .ThenInclude(c => c.User)
+                // Grouping by CashierId and extracting month from DateTime
+                .GroupBy(p => new { p.CashierId, Month = p.DateTime.Month })
+                .Select(g => new
+                {
+                    cashierId = g.Key.CashierId,
+                    cashierName = g.First().Cashier.User.Name,
+                    cashierMonth = g.Key.Month,
+                    Count = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var recep_attendance = await _dbcontext.appointments
+                .Include(ap => ap.Recep)
+                .ThenInclude(r => r.User)
+                // Grouping by RecepId and extracting month from DateTime
+                .GroupBy(ap => new { ap.RecepId, Month = ap.DateTime.Month })
+                .Select(g => new
+                {
+                    recepId = g.Key.RecepId,
+                    recepName = g.First().Recep.User.Name,
+                    recepMonth = g.Key.Month,
+                    Count = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var labrep_attendance = await _dbcontext.labReports
+                .Include(lr => lr.LbAst)
+                .ThenInclude(la => la.User)
+                // Grouping by LbAstID and extracting month from DateTime
+                .GroupBy(lr => new { lr.LbAstID, Month = lr.DateTime.HasValue ? lr.DateTime.Value.Month : (int?)null })
+                .Select(g => new
+                {
+                    labAstId = g.Key.LbAstID,
+                    labAstName = g.First().LbAst.User.Name,
+                    labAstMonth = g.Key.Month,
+                    // Changed to extract date instead of month for counting
+                    Count = g.Select(p => p.DateTime).Where(d => d.HasValue).Select(d => d.Value.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+
+
+            total_attendance.Add(new { c_at = cashier_attendance, r_at = recep_attendance, l_at = labrep_attendance });
+
+            return total_attendance;
+        }
+
     }
 }
 
