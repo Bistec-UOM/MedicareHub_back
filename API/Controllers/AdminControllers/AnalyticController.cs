@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services.AdminServices;
+using System.Collections.Generic;
 
 namespace API.Controllers.AdminControllers
 {
@@ -38,6 +40,20 @@ namespace API.Controllers.AdminControllers
             var result = await (_analyticsService.GetAvailableCount());
             return Ok(result);
         }
+        [HttpGet("daily-drug-usage")]
+        public async Task<IActionResult> GetTotalDrugUsage()
+        {
+            var res = await (_analyticsService.GetTotalDrugUsage());
+            return Ok(res);
+        }
+        [HttpGet("attendance-for-cashier")]
+        public async Task<IActionResult> GetAttendance()
+        {
+            var res = await _analyticsService.GetAttendance();
+            return Ok(res);
+        }
+
+
 
 
 
