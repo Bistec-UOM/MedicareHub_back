@@ -42,8 +42,9 @@ namespace API.Controllers
         {
             try
             {
-               await _appointment.AddAppointment(appointment);
-               return Ok();
+              var result= await _appointment.AddAppointment(appointment);
+              return Ok(result);
+             
             }catch(Exception ex)
             {
                return BadRequest(ex.Message);

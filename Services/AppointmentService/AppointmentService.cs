@@ -27,17 +27,37 @@ namespace Services.AppointmentService
             _doctor = doctor;
             _unable_date = unableDate;
         }     
-        public async Task AddAppointment(Appointment appointment)
-        { 
-              await _appointment.Add(appointment);    //adding an appointment using IRepository add function
-              var patientId = appointment.PatientId;   // sending an email for the patient
-              var patient = await GetPatient(patientId);
-              string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
-              string userName = patient?.FullName;
-              string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
+        public async Task<int> AddAppointment(Appointment appointment)
+        {
+            bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
+            bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && a.DateTime == appointment.DateTime);
+            if ((appointmentExists))
+            {
+                return 1;
 
-              EmailSender emailSernder = new EmailSender();
-              await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);  
+            }
+            else if(timeBooked)
+            {
+                return 2;
+            }
+            else
+            {
+                await _appointment.Add(appointment);    //adding an appointment using IRepository add function
+                var patientId = appointment.PatientId;   // sending an email for the patient
+                var patient = await GetPatient(patientId);
+                string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
+                string userName = patient?.FullName;
+                string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
+
+                EmailSender emailSernder = new EmailSender();
+                await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
+
+                return 0;
+               
+
+            }
+
+           
         }
         public async Task<List<Appointment>> CancelAllAppointments(int doctorId, DateTime date)  //services function for cancelling the all appointments by a doctor
         {
