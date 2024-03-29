@@ -39,5 +39,10 @@ namespace Models
         public int LbAstID { get; set; }
         [JsonIgnore]
         public LabAssistant? LbAst { get; set; }
+
+        public static object Select(Func<object, object> value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.DTO.Lab;
 using Services.LabService;
 
 namespace API.Controllers.LabControllers
@@ -38,17 +39,24 @@ namespace API.Controllers.LabControllers
         }
 
         [HttpGet("Accept")]
-        async public Task<ActionResult<IEnumerable<LabReport>>> AcceptedSamplesList()
+        async public Task<ActionResult<IEnumerable<Object>>> AcceptedSamplesList()
         {
             var tmp=await _vs.AcceptedSamplesList();
             return Ok(tmp);
         }
 
         [HttpPost("Result")]
-        async public Task<ActionResult> UploadResults(List<Record> data)
+        async public Task<ActionResult> UploadResults(Result data)
         {
-            await _vs.UplaodResults(data);
-            return Ok("Uploaded Sucessfully!");
+            var tmp=await _vs.UplaodResults(data);
+            if (tmp)
+            {
+                return Ok(data);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.DTO.Lab;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
@@ -71,9 +72,17 @@ namespace Services.LabService
             return false;
         }
 
-        async public Task<IEnumerable<LabReport>> AcceptedSamplesList()
+        async public Task<IEnumerable<Object>> AcceptedSamplesList()
         {
-            return await _rep.GetByProp("Status", "accepted");
+            return await _cntx.labReports
+                .Select(l => new
+                    {
+                        Id = l.Id,
+                        TestId = l.TestId,
+                        TestName = l.Test.TestName,
+                        Abb= l.Test.Abb
+                     })
+                .ToListAsync<object>();
         }
 
         private static int CaluclateAge(DateTime dob)
@@ -87,12 +96,25 @@ namespace Services.LabService
             return age;
         }
 
-        async public Task UplaodResults(List<Record> data)
+        async public Task<Boolean> UplaodResults(Result data)
         {
-            foreach (var i in data)
+            foreach (var i in data.Results)
             {
-                await _rec.Add(i);
+                Record record = new Record
+                {
+                    LabReportId = data.ReportId,
+                    ReportFieldId = i.Fieldid,
+                    Result = i.Result,
+                    Status = i.Status
+                };
+
+                await _rec.Add(record);
             }
+
+            LabReport tmp =await _rep.Get(data.ReportId);
+            tmp.Status = "done";
+            await _rep.Update(tmp);
+            return true;
         }
     }
 }

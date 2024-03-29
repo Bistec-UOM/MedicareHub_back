@@ -8,6 +8,8 @@ namespace Models.DTO.Lab
 {
     public class Result
     {
-        public List<Record>? Results { get; set; }
+        public int ReportId { get; set; }
+        public DateTime DateTime {  get; set; }
+        public List<ResultField>? Results { get; set; }
     }
 }

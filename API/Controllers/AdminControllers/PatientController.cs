@@ -55,9 +55,6 @@ namespace API.Controllers.AdminControllers
             await _patientService.UpdatePatient(value);
             return Ok(value);
         }
-
-
-
         // DELETE api/<PatientController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
