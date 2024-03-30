@@ -11,5 +11,6 @@ namespace Models.DTO.Doctor
         public int Id { get; set; }
 
         public List<Drugs> Drugs { get; set; }
+        public List<Labs> Labs { get; set; }
     }
 }

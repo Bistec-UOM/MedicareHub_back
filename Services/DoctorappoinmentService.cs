@@ -18,13 +18,15 @@ namespace Services
         private readonly ApplicationDbContext _context;
         private readonly IRepository<Prescription> _pres;
         private readonly IRepository<Prescript_drug> _drug;
+        private readonly IRepository<LabReport> _labs;
         public DoctorappoinmentService(IRepository<Appointment> appoinments, ApplicationDbContext context,
-                                        IRepository<Prescription> pres,IRepository<Prescript_drug> psrdrg)
+                                        IRepository<Prescription> pres,IRepository<Prescript_drug> psrdrg, IRepository<LabReport> labs)
         {
            _drug = psrdrg;
             _appoinments = appoinments;
             _context = context;
                 _pres = pres;
+            _labs = labs;
         }
         public async Task<List<object>> GetPatientNamesForApp()
         {
@@ -91,8 +93,22 @@ namespace Services
                 await _drug.Add(Obj);
             }
            
-            return x;
 
+            foreach (var d in data.Labs)
+            {
+                var Obj2 = new LabReport
+                {
+                    PrescriptionID = pId,
+                    DateTime = DateTime.Now,    
+                    TestId = 3,
+                    Status = "New",
+                    LbAstID = 1
+                };
+                await _labs.Add(Obj2);
+
+            }
+
+            return x;
         }
 
         }
