@@ -13,5 +13,6 @@ namespace Models.DTO.Doctor
         public string Unit { get; set; }
 
         public string Period { get; set; }
+
     }
 }
