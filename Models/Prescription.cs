@@ -12,7 +12,7 @@ namespace Models
     {
         public int Id { get; set; }
         public DateTime DateTime { get; set; }
-
+        public string? description { get; set; }
 
         [ForeignKey("Id")]
         public int AppointmentID { get; set; }

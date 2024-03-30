@@ -46,10 +46,22 @@ namespace API.Controllers.AdminControllers
             var res = await (_analyticsService.GetTotalDrugUsage());
             return Ok(res);
         }
-        [HttpGet("attendance-for-cashier")]
+        [HttpGet("attendance")]
         public async Task<IActionResult> GetAttendance()
         {
             var res = await _analyticsService.GetAttendance();
+            return Ok(res);
+        }
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var res = await _analyticsService.GetUsers();
+            return Ok(res);
+        }
+        [HttpGet("userCheck{date}")]
+        public async Task<IActionResult> CheckAttendance(DateTime date)
+        {
+            var res = await _analyticsService.CheckAttendance(date);
             return Ok(res);
         }
 

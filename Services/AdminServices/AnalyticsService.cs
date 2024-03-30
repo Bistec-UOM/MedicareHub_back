@@ -179,12 +179,12 @@ namespace Services.AdminServices
                 .Include(p => p.Cashier)
                 .ThenInclude(c => c.User)
                 // Grouping by CashierId and extracting month from DateTime
-                .GroupBy(p => new { p.CashierId, Month = p.DateTime.Month })
+                .GroupBy(p => new { p.CashierId, Month = p.DateTime.Month,Year=p.DateTime.Year })
                 .Select(g => new
                 {
                     cashierId = g.Key.CashierId,
                     cashierName = g.First().Cashier.User.Name,
-                    cashierMonth = g.Key.Month,
+                    cashierMonth = g.Key.Year.ToString() + "-" + g.Key.Month.ToString(),
                     Count = g.Select(p => p.DateTime.Date).Distinct().Count()
                 })
                 .ToListAsync();
@@ -193,12 +193,12 @@ namespace Services.AdminServices
                 .Include(ap => ap.Recep)
                 .ThenInclude(r => r.User)
                 // Grouping by RecepId and extracting month from DateTime
-                .GroupBy(ap => new { ap.RecepId, Month = ap.DateTime.Month })
+                .GroupBy(ap => new { ap.RecepId, Month = ap.DateTime.Month , Year = ap.DateTime.Year})
                 .Select(g => new
                 {
                     recepId = g.Key.RecepId,
                     recepName = g.First().Recep.User.Name,
-                    recepMonth = g.Key.Month,
+                    recepMonth = g.Key.Year.ToString()+"-"+g.Key.Month.ToString(),
                     Count = g.Select(p => p.DateTime.Date).Distinct().Count()
                 })
                 .ToListAsync();
@@ -207,23 +207,117 @@ namespace Services.AdminServices
                 .Include(lr => lr.LbAst)
                 .ThenInclude(la => la.User)
                 // Grouping by LbAstID and extracting month from DateTime
-                .GroupBy(lr => new { lr.LbAstID, Month = lr.DateTime.HasValue ? lr.DateTime.Value.Month : (int?)null })
+                .GroupBy(lr => new { lr.LbAstID, Month = lr.DateTime.HasValue ? lr.DateTime.Value.Month : (int?)null, Year = lr.DateTime.HasValue ? lr.DateTime.Value.Year : (int?)null })
                 .Select(g => new
                 {
                     labAstId = g.Key.LbAstID,
                     labAstName = g.First().LbAst.User.Name,
-                    labAstMonth = g.Key.Month,
+                    labAstDate = g.Key.Year.ToString()+"-"+g.Key.Month.ToString(),
                     // Changed to extract date instead of month for counting
                     Count = g.Select(p => p.DateTime).Where(d => d.HasValue).Select(d => d.Value.Date).Distinct().Count()
+                })
+                .ToListAsync();
+            var doct_attendance = await _dbcontext.prescriptions
+                .Include(p => p.Appointment)
+                    .ThenInclude(ap => ap.Doctor)
+                        .ThenInclude(d => d.User)
+                .Where(p => p.Appointment.Status == "Completed")
+                .GroupBy(p => new { p.Appointment.DoctorId, Year = p.DateTime.Year, Month = p.DateTime.Month })
+                .Select(g => new
+                {
+                    doctId = g.Key.DoctorId,
+                    doctName = g.First().Appointment.Doctor.User.Name,
+                    // Concatenate year and month as a string
+                    doctDate = g.Key.Year.ToString() + "-" + g.Key.Month.ToString(),
+                    count = g.Select(p => p.DateTime.Date).Distinct().Count()
                 })
                 .ToListAsync();
 
 
 
-            total_attendance.Add(new { c_at = cashier_attendance, r_at = recep_attendance, l_at = labrep_attendance });
+            total_attendance.Add(new { c_at = cashier_attendance, r_at = recep_attendance, l_at = labrep_attendance,d_at= doct_attendance });
 
             return total_attendance;
         }
+        public async Task<object> GetUsers()
+        {
+            var users = await _dbcontext.users
+                .Select(u => new { u.Id, u.Name,u.Role })
+                .ToListAsync();
+
+            return users.Select(u => new { id = u.Id, name = u.Name ,role=u.Role }).ToList();
+
+        }
+        public async Task<object> CheckAttendance(DateTime date)
+        {
+            var total_attendance = new List<object>();
+
+            var cashier_attendance = await _dbcontext.prescriptions
+                .Include(p => p.Cashier)
+                .ThenInclude(c => c.User)
+                .Where(p => p.DateTime.Year == date.Year && p.DateTime.Month == date.Month)
+                .GroupBy(p => new { p.CashierId })
+                .Select(g => new
+                {
+                    Id = g.First().Cashier.User.Id,
+                    Name = g.First().Cashier.User.Name,
+                    Role = "Cashier",
+                    Count = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var recep_attendance = await _dbcontext.appointments
+                .Include(ap => ap.Recep)
+                .ThenInclude(r => r.User)
+                .Where(p => p.DateTime.Year == date.Year && p.DateTime.Month == date.Month)
+                .GroupBy(ap => new { ap.RecepId })
+                .Select(g => new
+                {
+                    Id = g.First().Recep.User.Id,
+                    Name = g.First().Recep.User.Name,
+                    Role = "Receptionist",
+                    Count = g.Select(ap => ap.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var labrep_attendance = await _dbcontext.labReports
+                .Include(lr => lr.LbAst)
+                .ThenInclude(la => la.User)
+                .Where(p => p.DateTime.Value.Year == date.Year && p.DateTime.Value.Month == date.Month)
+                .GroupBy(lr => new { lr.LbAstID })
+                .Select(g => new
+                {
+                    Id = g.First().LbAst.User.Id,
+                    Name = g.First().LbAst.User.Name,
+                    Role = "Lab Assistant",
+                    Count = g.Select(p => p.DateTime).Where(d => d.HasValue).Select(d => d.Value.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var doct_attendance = await _dbcontext.prescriptions
+                .Include(p => p.Appointment)
+                .ThenInclude(ap => ap.Doctor)
+                .ThenInclude(d => d.User)
+                .Where(p => p.Appointment.Status == "Completed" && p.Appointment.DateTime.Year == date.Year && p.Appointment.DateTime.Month == date.Month)
+                .GroupBy(p => new { p.Appointment.DoctorId })
+                .Select(g => new
+                {
+                    Id = g.First().Appointment.Doctor.User.Id,
+                    Name = g.First().Appointment.Doctor.User.Name,
+                    Role = "Doctor",
+                    Count = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            total_attendance.AddRange(cashier_attendance);
+            total_attendance.AddRange(recep_attendance);
+            total_attendance.AddRange(labrep_attendance);
+            total_attendance.AddRange(doct_attendance);
+
+            return total_attendance;
+        }
+
+
 
     }
 }

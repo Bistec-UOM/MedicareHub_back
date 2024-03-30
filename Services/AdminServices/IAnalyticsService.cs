@@ -14,5 +14,7 @@ namespace Services.AdminServices
         Task<object> GetAttendance();
         Task<object> GetAvailableCount();
         Task<object> GetTotalDrugUsage();
+        Task<object> GetUsers();
+        Task<object> CheckAttendance(DateTime date);
     }
 }
