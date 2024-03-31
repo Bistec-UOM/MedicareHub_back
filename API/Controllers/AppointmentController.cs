@@ -74,12 +74,12 @@ namespace API.Controllers
             if (targetPatient != null)
             {
 
-                var targetEmail = targetPatient.Email;
+                var targetEmail = targetPatient.Email??"default@gmail.com" ;
                 var targetday = deletedAppointment.DateTime.Date;
                 var targettime = deletedAppointment.DateTime;
 
                 string emailsubject = "appointment update: cancellation notification";
-                string username = targetPatient.FullName;
+                string username = targetPatient.FullName ?? "Patient";
                 string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
 
 
@@ -120,7 +120,7 @@ namespace API.Controllers
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors()
         {
-            var doctors = _appointment.GetDoctors();
+            var doctors =  _appointment.GetDoctors();
             return Ok(doctors);
         }
         [HttpPost("patients")]
@@ -142,12 +142,12 @@ namespace API.Controllers
             var targetPatient = await _appointment.GetPatient(targetAppointment.PatientId);
             if (targetPatient != null)
             {
-                var targetEmail = targetPatient.Email;
+                var targetEmail = targetPatient.Email ??"default@gmail.com";
                 var targetday = targetAppointment.DateTime.Date;
                 var targettime = targetAppointment.DateTime;
 
                 string emailsubject = "appointment update: cancellation notification"; //sending an email after cancelling the appointment by doctor
-                string username = targetPatient.FullName;
+                string username = targetPatient.FullName ?? "Patient" ;
                 string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
                 EmailSender emailSernder = new EmailSender();
                 await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
@@ -165,12 +165,12 @@ namespace API.Controllers
                 if (targetPatient != null)
                 {
 
-                    var targetEmail = targetPatient.Email;
+                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
                     var targetday = app.DateTime.Date;
                     var targettime = app.DateTime;
 
                     string emailsubject = "appointment update: cancellation notification"; //sending emails after cancelling all appointments by doctor
-                    string username = targetPatient.FullName;
+                    string username = targetPatient.FullName ?? "Patient";
                     string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
                     EmailSender emailSernder = new EmailSender();
                     await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
@@ -212,12 +212,12 @@ namespace API.Controllers
                 var targetPatient = await _appointment.GetPatient(app.PatientId);
                 if (targetPatient != null)
                 {
-                    var targetEmail = targetPatient.Email;
+                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
                     var targetday = app.DateTime.Date;
                     var targettime = app.DateTime;
 
                     string emailsubject = "appointment update: cancellation notification"; //sending emails after deleting prescheduled appointments by a receptionsist
-                    string username = targetPatient.FullName;
+                    string username = targetPatient.FullName ?? "Patient";
                     string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
                     EmailSender emailSernder = new EmailSender();
                     await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);

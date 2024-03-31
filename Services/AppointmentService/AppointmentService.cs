@@ -30,7 +30,7 @@ namespace Services.AppointmentService
         public async Task<int> AddAppointment(Appointment appointment)
         {
             bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
-            bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && a.DateTime == appointment.DateTime);
+            bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && a.DateTime == appointment.DateTime); //check are there any other appointments for that doctor
             if ((appointmentExists))
             {
                 return 1;
@@ -48,23 +48,19 @@ namespace Services.AppointmentService
                 string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
                 string userName = patient?.FullName;
                 string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
-
                 EmailSender emailSernder = new EmailSender();
                 await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
-
-                return 0;
-               
+                return 0;   
 
             }
-
-           
+   
         }
         public async Task<List<Appointment>> CancelAllAppointments(int doctorId, DateTime date)  //services function for cancelling the all appointments by a doctor
         {
             var appointments = await GetDoctorAppointmentsByDate(doctorId, date);
             List<Appointment> updatedResults = new List<Appointment>();
 
-            foreach (Appointment app in appointments)  //filter new appointmetns and add them to the updatedResults list
+            foreach (Appointment app in appointments)  //filter new appointmetns and change the status and add them to the updatedResults list
             {
                 if (app.Status == "new") // check the status of an appointment.because cancel is allowed only for new appointments
                 {
@@ -94,7 +90,7 @@ namespace Services.AppointmentService
             }
             else
             {
-                return new List<Appointment>();
+                return new List<Appointment>();  //return emply list if there are no any app to delete
             }
         }
 
@@ -121,10 +117,7 @@ namespace Services.AppointmentService
 
         public async Task<List<Appointment>> GetAll()
         {
-
-            return await _appointment.GetAll();
-
-            
+            return await _appointment.GetAll();     
         }
         public async Task<Appointment> GetAppointment(int id)
         {
@@ -133,7 +126,7 @@ namespace Services.AppointmentService
         }
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)   //getting all the appointments of a specific doctor
         {   
-            var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
+            var doctorAppointments =     _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)   //getting all the appointments of a specific doctor of a specific date
