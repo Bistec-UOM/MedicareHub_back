@@ -8,9 +8,9 @@ namespace Models.DTO.Doctor
 {
     public class AddDrugs
     {
-        public int Id { get; set; }
-
+        public int Id { get; set; } //appoinment id
         public List<Drugs> Drugs { get; set; }
         public List<Labs> Labs { get; set; }
+        public string? Description { get; set; }
     }
 }

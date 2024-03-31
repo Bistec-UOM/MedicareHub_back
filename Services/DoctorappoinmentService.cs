@@ -28,6 +28,7 @@ namespace Services
                 _pres = pres;
             _labs = labs;
         }
+       // get appoinment list from database
         public async Task<List<object>> GetPatientNamesForApp()
         {
             var tmp = _context.appointments
@@ -47,12 +48,9 @@ namespace Services
                 }
             })
             .ToList<object>();
-
-
-
             return tmp;
         }
-
+        //funtion for calculate the age from DOB
         private static int CaluclateAge(DateTime dob)
         {
             DateTime now = DateTime.UtcNow;
@@ -72,12 +70,13 @@ namespace Services
             {
                 DateTime = DateTime.Now,
                 AppointmentID = data.Id,
+                description=data.Description,
                 Total = 0,
                 CashierId = 1
             };
 
             await _pres.Add(x);
-            int pId = x.Id;
+            int pId = x.Id; //prescription id
 
             foreach (var i in data.Drugs)
             {
@@ -96,18 +95,29 @@ namespace Services
 
             foreach (var d in data.Labs)
             {
-                var Obj2 = new LabReport
+                var Obj = new LabReport
                 {
                     PrescriptionID = pId,
-                    DateTime = DateTime.Now,    
+                    DateTime = null,    
                     TestId = 3,
                     Status = "New",
                     LbAstID = 1
                 };
-                await _labs.Add(Obj2);
+                await _labs.Add(Obj);
+
+                var appointment = await _appoinments.Get(data.Id);
+                if (appointment != null)
+                {
+                    appointment.Status = "completed";
+                    await _appoinments.Update(appointment);
+                }
+                else
+                {
+                    // Handle the case when the appointment with the given ID is not found
+                    throw new ArgumentException("Appointment not found");
+                }               
 
             }
-
             return x;
         }
 
