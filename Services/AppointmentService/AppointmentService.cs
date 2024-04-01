@@ -27,7 +27,7 @@ namespace Services.AppointmentService
             _doctor = doctor;
             _unable_date = unableDate;
         }     
-        public async Task<int> AddAppointment(Appointment appointment)
+        public async Task<int> AddAppointment(Appointment appointment)  //Add an appointment
         {
             bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
             bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && a.DateTime == appointment.DateTime); //check are there any other appointments for that doctor
@@ -94,13 +94,13 @@ namespace Services.AppointmentService
             }
         }
 
-        public async Task<Patient> GetPatient(int id)
+        public async Task<Patient> GetPatient(int id)  //Get patient by id
         {
             var patient = _patient.Get(id);
             return await patient;
         }
 
-        public async Task<Appointment> DeleteAppointment(int id)
+        public async Task<Appointment> DeleteAppointment(int id)  //delete appointment by id
         {
             var appointmentk=await GetAppointment(id);
             if (appointmentk != null)
@@ -115,11 +115,11 @@ namespace Services.AppointmentService
             }
         }
 
-        public async Task<List<Appointment>> GetAll()
+        public async Task<List<Appointment>> GetAll()  //get all appointments
         {
             return await _appointment.GetAll();     
         }
-        public async Task<Appointment> GetAppointment(int id)
+        public async Task<Appointment> GetAppointment(int id)  //get one appointment by id
         {
             var appointment = _appointment.Get(id);
             return await appointment;
@@ -129,22 +129,46 @@ namespace Services.AppointmentService
             var doctorAppointments =     _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
+
+       
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)   //getting all the appointments of a specific doctor of a specific date
         {
             var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
             return doctorDayAppointments.ToList();   
         }
-        public async Task<List<User>> GetDoctors()
+
+        public async Task<List<AppointmentWithPatientDetails>> GetDoctorAppointmentsByDateWithPatientDetails(int doctorId, DateTime date)  //getting doctor apps of a date with patient details
+        {
+            var doctorDayAppointments = await GetDoctorAppointmentsByDate(doctorId, date);
+            List<AppointmentWithPatientDetails> appointmentsWithDetails = new List<AppointmentWithPatientDetails>();
+            foreach (var appointment in doctorDayAppointments)   //returning the appointment details as well as patient details of the relevent appointment
+            {
+                var patientDetails = await GetPatient(appointment.PatientId);
+                AppointmentWithPatientDetails newappointment = new AppointmentWithPatientDetails
+                {
+                    Appointment = appointment,
+                    patient = patientDetails
+
+                };
+
+                appointmentsWithDetails.Add(newappointment);
+            }
+            return appointmentsWithDetails;
+        }
+
+
+
+        public async Task<List<User>> GetDoctors()  //getting the doctors list
         {
             var doctors =  _dbcontext.users.Where(d => d.Role == "Doctor");
             return  doctors.ToList();      
         }
-        public async Task<List<Patient>> GetPatients()
+        public async Task<List<Patient>> GetPatients()  //getting the patient list
         {
            
             return  await _patient.GetAll();
         }
-        public async Task RegisterPatient(Patient patient)
+        public async Task RegisterPatient(Patient patient)  //registering a patient
         {
             await _patient.Add(patient);  //adding the patient to the table
             string emailSubject = "Your Medicare Hub Membership: A Warm Welcome Awaits!";
@@ -153,34 +177,46 @@ namespace Services.AppointmentService
             EmailSender emailSernder= new EmailSender();  //sending email after succeful registration of a patient
             await emailSernder.SendMail(emailSubject,patient.Email,userName,emailMessage);
         }
-       public async Task<Appointment> UpdateAppointment(int id, Appointment appointment)  //just update appointment
+       public async Task<int> UpdateAppointment(int id, Appointment appointment)  //just update appointment(time)
         {   
             var oldAppointment = await GetAppointment(id);
+
              
             if (oldAppointment != null)
             {
+                bool timeBooked = _dbcontext.appointments.Any(a => a.DoctorId == appointment.DoctorId && a.DateTime == appointment.DateTime); //check are there any other appointments for that doctor
+
                 oldAppointment.DateTime = appointment.DateTime;    // Update properties of the existing appointment
                 oldAppointment.Status = appointment.Status;
                 oldAppointment.PatientId = appointment.PatientId;
                 oldAppointment.DoctorId = appointment.DoctorId;
                 oldAppointment.RecepId = appointment.RecepId;
-                 try
-                 {
-                      await _dbcontext.SaveChangesAsync();
-                      return oldAppointment;
-                 }
-                 catch (Exception ex)
-                 {
-                        
+                if(timeBooked)
+                {
+                    return 1;
+                }
+                else
+                {
+                    try
+                    {
+                        await _dbcontext.SaveChangesAsync();
+                        return 0;
+                    }
+                    catch (Exception ex)
+                    {
+
                         throw new Exception("Error occured during the updation");
-                 }
+                    }
+
+                }
+                 
             }
             else
             {
                 throw new ArgumentException($"Appointment with id {id} not found.");  //throw an exception if the appointment does not exist
             }
         }
-        public async Task<Appointment> UpdateAppointmentStatus(int id, Appointment appointment)  //update  appointment
+        public async Task<Appointment> UpdateAppointmentStatus(int id, Appointment appointment)  //update  appointment status
         {
             var oldAppointment = await GetAppointment(id);
             if (oldAppointment != null)
@@ -255,16 +291,16 @@ namespace Services.AppointmentService
             }
 
         }
-        public async Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId)  //get monthly appointment count of a doctor for progress bar
+        public async Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId)  //get monthly appointments  of a doctor for progress bar
         {
             var targetAppointment=_dbcontext.appointments.Where(a=>a.DoctorId==doctorId && (a.DateTime.Month)-1==monthId).ToList();
             return targetAppointment;
         }
-        public async Task AddUnableDate(Unable_Date uDate)
+        public async Task AddUnableDate(Unable_Date uDate) //adding blocking dates
         {
             await _unable_date.Add(uDate);
         }
-        public async Task<List<Unable_Date>> getUnableDates(int doctorId)
+        public async Task<List<Unable_Date>> getUnableDates(int doctorId)  //getting blocking dates of a specific doctor
         {
             var uDates = _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId);
             return  uDates.ToList();
