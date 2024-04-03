@@ -27,7 +27,7 @@ namespace API.Controllers
 
 
         [HttpPost("Prescription")]
-        public async Task<ActionResult<Prescription>> AddPrescription(AddDrugs data)
+        public async Task<ActionResult<Appointment>> AddPrescription(AddDrugs data)
         {
             var tmp=await _prescription.AddPrescription(data);
             return Ok(tmp);
