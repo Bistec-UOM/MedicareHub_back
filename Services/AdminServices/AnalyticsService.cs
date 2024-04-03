@@ -23,6 +23,9 @@ namespace Services.AdminServices
                 .Include(ap => ap.Appointment)
                 .ThenInclude(a => a.Patient)
                 .ToListAsync();
+            var check = await _dbcontext.users
+                .Include(u => u.User_Tele)
+                .ToListAsync();
 
             var countsByDay = new List<object>();
 
@@ -316,6 +319,25 @@ namespace Services.AdminServices
 
             return total_attendance;
         }
+        public async Task<object> GetLabReports()
+        {
+            var LabReports = await _dbcontext.labReports
+                .Include(lr => lr.Test)
+                .Where(lr => lr.DateTime.HasValue) // Filter out null DateTime values
+                .GroupBy(lr => new { Date = lr.DateTime.Value.Date, lr.TestId }) // Access DateTime.Value.Date
+                .Select(g => new
+                {
+                    Date = g.Key.Date,
+                    ID = g.Key.TestId,
+                    TestName = g.First().Test.TestName,
+                    TestCount = g.Count()
+                })
+                .ToListAsync();
+
+            return LabReports;
+        }
+
+
 
 
 
