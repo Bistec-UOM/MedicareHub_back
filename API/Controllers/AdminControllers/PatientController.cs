@@ -26,7 +26,7 @@ namespace API.Controllers.AdminControllers
             return Ok(patients);
         }
 
-        // GET api/<PatientController>/5
+        // GET api/<PatientController>
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
