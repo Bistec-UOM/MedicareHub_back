@@ -57,7 +57,7 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
-    option.UseSqlServer(builder.Configuration.GetConnectionString("newshsh"));
+    option.UseSqlServer(builder.Configuration.GetConnectionString("AzureDB"));
 });
 
 
