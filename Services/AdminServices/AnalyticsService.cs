@@ -321,20 +321,32 @@ namespace Services.AdminServices
         }
         public async Task<object> GetLabReports()
         {
+            var TotalLabReports = new List<object>();
             var LabReports = await _dbcontext.labReports
+                .Include(lr => lr.Prescription)
                 .Include(lr => lr.Test)
-                .Where(lr => lr.DateTime.HasValue) // Filter out null DateTime values
-                .GroupBy(lr => new { Date = lr.DateTime.Value.Date, lr.TestId }) // Access DateTime.Value.Date
-                .Select(g => new
-                {
-                    Date = g.Key.Date,
-                    ID = g.Key.TestId,
-                    TestName = g.First().Test.TestName,
-                    TestCount = g.Count()
-                })
+                .GroupBy(lr => lr.Prescription.DateTime.Date)
                 .ToListAsync();
+            foreach(var group in LabReports)
+            {
+                var LabReportsForDay = new List<object>();
+                var Date = group.Key.Date;
+                var LabReportsByType = new List<object>();
+                var ReportsByType = group
+                    .GroupBy(g => g.TestId);
+                foreach (var sub in ReportsByType)
+                {
+                    var TypeId = sub.First().Id;
+                    var TypeName = sub.First().Test.TestName;
+                    var count = sub.Count();
 
-            return LabReports;
+                    LabReportsForDay.Add(new { Id = TypeId, name = TypeName, count = count });
+                }
+                TotalLabReports.Add(new { date = Date, reports = LabReportsForDay });
+            }
+
+
+            return TotalLabReports;
         }
 
 
