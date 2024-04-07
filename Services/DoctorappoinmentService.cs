@@ -63,7 +63,7 @@ namespace Services
         }
 
         // for prescription
-        public async Task<Prescription> AddPrescription(AddDrugs data)
+        public async Task<Appointment> AddPrescription(AddDrugs data)
         {
             
             var x = new Prescription
@@ -104,21 +104,14 @@ namespace Services
                     LbAstID = 1
                 };
                 await _labs.Add(Obj);
-
-                var appointment = await _appoinments.Get(data.Id);
-                if (appointment != null)
-                {
-                    appointment.Status = "completed";
-                    await _appoinments.Update(appointment);
-                }
-                else
-                {
-                    // Handle the case when the appointment with the given ID is not found
-                    throw new ArgumentException("Appointment not found");
-                }               
-
             }
-            return x;
+
+            // update appoinment patient status
+            var appointment = await _appoinments.Get(data.Id);
+            appointment.Status = "completed";
+            await _appoinments.Update(appointment);
+
+            return appointment;
         }
 
         }

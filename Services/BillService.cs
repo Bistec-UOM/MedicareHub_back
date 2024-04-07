@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,24 @@ namespace Services
                 .ToListAsync();
 
             return prescriptionData;
+        }
+        public async Task<IDictionary<string, List<Drug>>> GetMedicineDetails(List<string> medicineNames)
+        {
+            var medicineDetails = new Dictionary<string, List<Drug>>();
+
+            foreach (var name in medicineNames)
+            {
+                var medicines = await _cntx.drugs
+                    .Where(m => m.GenericN == name)
+                    .ToListAsync();
+
+                if (medicines != null && medicines.Any())
+                {
+                    medicineDetails.Add(name, medicines);
+                }
+            }
+
+            return medicineDetails;
         }
         private static int CaluclateAge(DateTime dob)
         {
