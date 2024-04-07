@@ -184,7 +184,7 @@ namespace Services.AppointmentService
              
             if (oldAppointment != null)
             {
-                bool timeBooked = _dbcontext.appointments.Any(a => a.DoctorId == appointment.DoctorId && a.DateTime == appointment.DateTime); //check are there any other appointments for that doctor
+                bool timeBooked = _dbcontext.appointments.Any(a => a.DoctorId == appointment.DoctorId &&  ((a.DateTime.AddMinutes(-20) <= appointment.DateTime) && (a.DateTime.AddMinutes(20) >= appointment.DateTime))); //check are there any other appointments for that doctor
 
                 oldAppointment.DateTime = appointment.DateTime;    // Update properties of the existing appointment
                 oldAppointment.Status = appointment.Status;
