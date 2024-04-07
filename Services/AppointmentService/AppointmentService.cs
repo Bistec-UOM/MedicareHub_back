@@ -30,7 +30,7 @@ namespace Services.AppointmentService
         public async Task<int> AddAppointment(Appointment appointment)  //Add an appointment
         {
             bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
-            bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && a.DateTime == appointment.DateTime); //check are there any other appointments for that doctor
+            bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && ((a.DateTime.AddMinutes(-20)<= appointment.DateTime) && (a.DateTime.AddMinutes(20) >= appointment.DateTime))); //check are there any other appointments for that doctor
             if ((appointmentExists))
             {
                 return 1;
