@@ -23,14 +23,14 @@ namespace API.Controllers
         
         [HttpGet("patient/{id}", Name = "GetPatient")]
 
-        public async Task<ActionResult<Patient>> GetPatient(int id)
+        public async Task<ActionResult<Patient>> GetPatient(int id)  //get patient by id
         {
             return Ok(await _appointment.GetPatient(id));
         }
 
         [HttpGet]
 
-        public async Task<ActionResult<ICollection<Appointment>>> GetAllAppointments()
+        public async Task<ActionResult<ICollection<Appointment>>> GetAllAppointments()   //getting all appointments
         {
             var appointments = await _appointment.GetAll();
 
@@ -38,7 +38,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddAppointment(Appointment appointment)
+        public async Task<ActionResult> AddAppointment(Appointment appointment)  //Adding an appointment
         {
             try
             {
@@ -54,22 +54,22 @@ namespace API.Controllers
 
         [HttpGet("{id}", Name = "GetAppointment")]
 
-        public async Task<ActionResult<Appointment>> GetAppointment(int id)
+        public async Task<ActionResult<Appointment>> GetAppointment(int id)  //getting an appointment by id
         {
             var appointment = await _appointment.GetAppointment(id);
             return Ok(appointment);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
+        public async Task<ActionResult<Appointment>> DeleteAppointment(int id)  
         {
-            var targetAppointment = await _appointment.GetAppointment(id);
+            var targetAppointment = await _appointment.GetAppointment(id);  //get the sepecific appointment and check whether it exists
             if (targetAppointment is null)
             {
                 return NotFound();
             }
 
-            var deletedAppointment = await _appointment.DeleteAppointment(id);
+            var deletedAppointment = await _appointment.DeleteAppointment(id);  //deleting the appointment
             var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);    //sending an email for patient after succesfull appointment cancellation
             if (targetPatient != null)
             {
@@ -91,7 +91,7 @@ namespace API.Controllers
         }
 
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
-        public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)
+        public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)  //getting all the appointments of a specific doctor
         {
             var doctorAppointments = await _appointment.GetDoctorAppointments(doctorId);
             return Ok(doctorAppointments);
@@ -99,42 +99,29 @@ namespace API.Controllers
 
 
         [HttpGet("doctor/{doctorId}/day/{date}")]
-        public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)
+        public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
         {
-            var doctorDayAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
-            List<AppointmentWithPatientDetails> appointmentsWithDetails = new List<AppointmentWithPatientDetails>();
-            foreach (var appointment in doctorDayAppointments)   //returning the appointment details as well as patient details of the relevent appointment
-            {
-                var patientDetails = await _appointment.GetPatient(appointment.PatientId);
-                AppointmentWithPatientDetails newappointment = new AppointmentWithPatientDetails
-                {
-                    Appointment = appointment,
-                    patient = patientDetails
-
-                };
-
-                appointmentsWithDetails.Add(newappointment);
-            }
-            return Ok(appointmentsWithDetails);
+           
+            return Ok(await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId,date));
         }
         [HttpGet("doctors")]
-        public async Task<ActionResult<ICollection<User>>> GetDoctors()
+        public async Task<ActionResult<ICollection<User>>> GetDoctors() //getting the doctors list
         {
             var doctors =  _appointment.GetDoctors();
             return Ok(doctors);
         }
         [HttpPost("patients")]
-        public async Task RegisterPatient(Patient patient)
+        public async Task RegisterPatient(Patient patient)  //registering a patient
         {
 
             await _appointment.RegisterPatient(patient);
 
         }
         [HttpPut("/updateStatus/{id}")]
-        public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)
+        public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)  //cancel the appointment by doctor
         {
-            var targetAppointment = await _appointment.UpdateAppointmentStatus(id, appointment);
-            if (targetAppointment is null)
+            var targetAppointment = await _appointment.UpdateAppointmentStatus(id, appointment);  
+            if (targetAppointment is null)  //check updated object exists in the table
             {
                 return NotFound();
             }
@@ -156,7 +143,7 @@ namespace API.Controllers
             return Ok(targetAppointment);
         }
         [HttpPut("doctor/{doctorId}/day/{date}")]
-        public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date)
+        public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date) //cancel all apps of a day by doctor
         {
             var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
             foreach (var app in await targetCancelledAppointments)
@@ -180,19 +167,19 @@ namespace API.Controllers
             return NoContent();
         }
         [HttpGet("doctor/{doctorId}/month/{mId}")]
-        public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId)
+        public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
         {
             var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
             return Ok(appointments);
         }
         [HttpGet("patients")]
-        public async Task<ActionResult<ICollection<User>>> GetPatients()
+        public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
         {
             var patients = await _appointment.GetPatients();
             return Ok(patients);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment)
+        public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment
         {
 
             return Ok(await _appointment.UpdateAppointment(id, appointment));
@@ -206,7 +193,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);
+            var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);  //appointment list of a day real deleting by receptionist
             foreach (var app in await targetDeletedAppointments)
             {
                 var targetPatient = await _appointment.GetPatient(app.PatientId);
@@ -229,14 +216,14 @@ namespace API.Controllers
         }
 
         [HttpPost("unableDates")]
-        public async Task AddUnableDate(Unable_Date uDate)
+        public async Task AddUnableDate(Unable_Date uDate)  //adding unable dates
         {
            await _appointment.AddUnableDate(uDate);
            
         }
 
         [HttpGet("BlockedDates/{doctorId}")]
-        public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
+        public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)  //getting unable dates of a specific doctor
         {
             var uDates= await _appointment.getUnableDates(doctorId);
             return Ok(uDates);
