@@ -23,6 +23,9 @@ namespace Services.AdminServices
                 .Include(ap => ap.Appointment)
                 .ThenInclude(a => a.Patient)
                 .ToListAsync();
+            var check = await _dbcontext.users
+                .Include(u => u.User_Tele)
+                .ToListAsync();
 
             var countsByDay = new List<object>();
 
@@ -316,6 +319,37 @@ namespace Services.AdminServices
 
             return total_attendance;
         }
+        public async Task<object> GetLabReports()
+        {
+            var TotalLabReports = new List<object>();
+            var LabReports = await _dbcontext.labReports
+                .Include(lr => lr.Prescription)
+                .Include(lr => lr.Test)
+                .GroupBy(lr => lr.Prescription.DateTime.Date)
+                .ToListAsync();
+            foreach(var group in LabReports)
+            {
+                var LabReportsForDay = new List<object>();
+                var Date = group.Key.Date;
+                var LabReportsByType = new List<object>();
+                var ReportsByType = group
+                    .GroupBy(g => g.TestId);
+                foreach (var sub in ReportsByType)
+                {
+                    var TypeId = sub.First().Id;
+                    var TypeName = sub.First().Test.TestName;
+                    var count = sub.Count();
+
+                    LabReportsForDay.Add(new { Id = TypeId, name = TypeName, count = count });
+                }
+                TotalLabReports.Add(new { date = Date, reports = LabReportsForDay });
+            }
+
+
+            return TotalLabReports;
+        }
+
+
 
 
 
