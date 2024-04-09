@@ -24,6 +24,7 @@ namespace Services.LabService
             return await _test.GetAll();
         }
 
+
         public async Task<Test> GetTest(int id)
         {
             return await _test.Get(id);
