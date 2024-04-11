@@ -48,7 +48,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
 //for enable cores in react.js in below code for front end admin
 builder.Services.AddCors(options => {
     options.AddPolicy("ReactJSDomain",
-        policy => policy.WithOrigins("*")
+        policy => policy
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowAnyOrigin()
