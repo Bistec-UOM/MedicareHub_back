@@ -57,7 +57,7 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
 {
-    option.UseSqlServer(builder.Configuration.GetConnectionString("AzureDB"));
+    option.UseSqlServer(builder.Configuration.GetConnectionString("defaultString"));
 });
 
 
@@ -117,11 +117,11 @@ builder.Services.AddScoped<AuthServices>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
+//}
     app.UseSwagger();
     app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 
