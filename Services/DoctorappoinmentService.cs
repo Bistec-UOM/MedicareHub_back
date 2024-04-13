@@ -99,7 +99,7 @@ namespace Services
                 {
                     PrescriptionID = pId,
                     DateTime = null,    
-                    TestId = 3,
+                    TestId = d.TestId,
                     Status = "New",
                     LbAstID = 1
                 };
