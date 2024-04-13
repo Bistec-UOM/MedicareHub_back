@@ -64,6 +64,12 @@ namespace API.Controllers.AdminControllers
             var res = await _analyticsService.CheckAttendance(date);
             return Ok(res);
         }
+        [HttpGet("lab-report-Count")]
+        public async Task<IActionResult> GetLabReports()
+        {
+            var res = await _analyticsService.GetLabReports();
+            return Ok(res);
+        }
 
 
 

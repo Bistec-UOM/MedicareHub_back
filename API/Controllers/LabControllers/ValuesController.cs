@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO.Lab;
 using Services.LabService;
+using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
 {
@@ -18,8 +19,11 @@ namespace API.Controllers.LabControllers
 
 
         [HttpGet("ReportRequest")]
-        public async Task<ActionResult<IEnumerable<object>>> GetPatientPrescriptionData()
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<object>> GetPatientPrescriptionData()
         {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var userRole = identity.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
             var res = await _vs.RequestList();
             return Ok(res);
         }
