@@ -8,7 +8,7 @@ namespace Models.DTO.Doctor
 {
     public class Labs
     {
-        public string DateTime { get; set; }
+        public string? DateTime { get; set; }
         public int TestId { get; set; }
         public string Status { get; set; }
 
