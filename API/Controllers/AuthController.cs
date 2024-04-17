@@ -34,7 +34,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest(res);
+                return Unauthorized(res);
             }
         }
     }

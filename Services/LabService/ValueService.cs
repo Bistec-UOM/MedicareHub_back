@@ -35,6 +35,7 @@ namespace Services.LabService
                    gender=p.Gender,
                    age=CaluclateAge((DateTime)p.DOB),
                    id = a.Prescription.Id,
+                   dateTime = a.Prescription.DateTime,
                    load= _cntx.labReports
                         .Where(lr => lr.PrescriptionID == a.Prescription.Id && lr != null && lr.Status=="new") 
                         .Select(lr => new
