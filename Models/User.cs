@@ -22,6 +22,7 @@ namespace Models
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
         public DateTime? DOB { get; set; }
+        public string? ImageUrl { get; set; }
 
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
