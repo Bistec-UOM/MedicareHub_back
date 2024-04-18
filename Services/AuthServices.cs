@@ -62,9 +62,8 @@ namespace Services
             var tmp = await _user.Get(UserId);
 
             List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.NameIdentifier,tmp.Id.ToString()),
-                new Claim(ClaimTypes.Name, tmp.Name),
-                new Claim(ClaimTypes.Role, tmp.Role),
+                new Claim("Id",tmp.Id.ToString()),
+                new Claim("Role", tmp.Role),
                 new Claim("IssuedAt", DateTime.UtcNow.ToString())
             };
 
