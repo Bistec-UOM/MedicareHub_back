@@ -47,7 +47,8 @@ namespace DataAccessLayer
                 .HasForeignKey(a => a.DoctorId)
                 .OnDelete(DeleteBehavior.Restrict); // Adjust delete behavior as needed
 
-            // Configure other entity relationships
+            modelBuilder.Entity<Test>().Property(t => t.Price).HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Drug>().Property(t => t.Price).HasColumnType("decimal(18,2)");
 
             base.OnModelCreating(modelBuilder);
         }

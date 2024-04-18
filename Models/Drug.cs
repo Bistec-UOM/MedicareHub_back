@@ -14,7 +14,7 @@ namespace Models
         public string GenericN { get; set; } = null!;
         public string BrandN { get; set; } = null!;
         public int Weight { get; set; }
-        public float Price { get; set; }
+        public decimal Price { get; set; }
         public int Avaliable { get; set; }
 
         [JsonIgnore]
