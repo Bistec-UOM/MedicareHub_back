@@ -238,6 +238,7 @@ namespace Services.AdminServices
 
 
 
+
             total_attendance.Add(new { c_at = cashier_attendance, r_at = recep_attendance, l_at = labrep_attendance,d_at= doct_attendance });
 
             return total_attendance;
