@@ -114,6 +114,46 @@ namespace Services
             return appointment;
         }
 
+
+        //get the patient history according to thier patient ids
+        public async Task<List<PrescriptionWithDrugs>> PrescriptionByPatientId(int patientId)
+        {
+            var appointmentIds = await _context.appointments
+                .Where(a => a.PatientId == patientId)
+                .Select(a => a.Id)
+                .ToListAsync();     // give that appoinment ids list of given patient id
+
+            var prescriptions = await _context.prescriptions
+                .Where(p => appointmentIds.Contains(p.AppointmentID))
+                .ToListAsync();    // give the precription data for that appoinment ids
+
+            var prescriptionIds = prescriptions.Select(p => p.Id).ToList();
+            // get the prescription ids list according to the appoinment ids
+
+            var prescriptionWithDrugsList = new List<PrescriptionWithDrugs>();
+
+            foreach (var x in prescriptionIds)
+            {
+                var prescription = await _context.prescriptions
+                    .FirstOrDefaultAsync(p => p.Id == x);
+
+                var prescriptionDrugs = await _context.prescript_Drugs
+                    .Where(pd => pd.PrescriptionId == x)
+                    .ToListAsync();
+
+                var prescriptDrugs = new PrescriptionWithDrugs
+                {
+                    Prescription = prescription,
+                   Drugs = prescriptionDrugs
+                };
+
+                prescriptionWithDrugsList.Add(prescriptDrugs);
+            }
+
+            return prescriptionWithDrugsList;
         }
-    
+
+
     }
+
+}

@@ -11,7 +11,6 @@ namespace Models.DTO.Doctor
         public string? DateTime { get; set; }
         public int TestId { get; set; }
         public string Status { get; set; }
-
         public int LbAstID { get; set; }
     }
 }
