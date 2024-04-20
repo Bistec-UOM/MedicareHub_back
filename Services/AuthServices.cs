@@ -65,7 +65,8 @@ namespace Services
                 new Claim("Id",tmp.Id.ToString()),
                 new Claim("Name", tmp.Name),
                 new Claim("Role", tmp.Role),
-                new Claim("IssuedAt", DateTime.UtcNow.ToString())
+                new Claim("IssuedAt", DateTime.UtcNow.ToString()),
+                new Claim("Profile",tmp.ImageUrl)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(

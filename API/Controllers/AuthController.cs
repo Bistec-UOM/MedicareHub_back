@@ -37,5 +37,12 @@ namespace API.Controllers
                 return Unauthorized(res);
             }
         }
+
+        [HttpPost("reset")]
+        async public Task<ActionResult> ResetPassword()
+        {
+            return Ok();
+        }
+        
     }
 }
