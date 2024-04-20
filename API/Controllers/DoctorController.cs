@@ -34,5 +34,13 @@ namespace API.Controllers
         }
 
 
+        [HttpGet("prescription/{patientId}")]
+        public async Task<ActionResult> PrescriptionByPatientId(int patientId)
+        {
+           var prescriptionDrugs = await _appointments.PrescriptionByPatientId(patientId);
+           return Ok(prescriptionDrugs);           
+          
+        }
+
     }
 }
