@@ -23,9 +23,6 @@ namespace Services.AdminServices
                 .Include(ap => ap.Appointment)
                 .ThenInclude(a => a.Patient)
                 .ToListAsync();
-            var check = await _dbcontext.users
-                .Include(u => u.User_Tele)
-                .ToListAsync();
 
             var countsByDay = new List<object>();
 
@@ -82,13 +79,6 @@ namespace Services.AdminServices
                 DateTime now = DateTime.Today;
                 int age = now.Year - dob.Value.Year;
 
-                // If the current date is before the birth date of this year's birthday, decrement the age
-                // This adjustment is necessary because if the birthday hasn't occurred yet this year,
-                // the age should be one less than the difference in years between birth and current date
-                if (now < dob.Value.AddYears(age))
-                {
-                    age--;
-                }
                 return age;
             }
             return 0; // Return 0 if date of birth is not valid
@@ -139,8 +129,8 @@ namespace Services.AdminServices
 
             // Retrieve all prescriptions with their associated bill_drug records
             var prescriptions = await _dbcontext.prescriptions
-                .Include(p => p.Bill_drug)
-                .ThenInclude(bd => bd.Drug)
+                .Include(p => p.Bill_drug)//taking amount of drugusage
+                .ThenInclude(bd => bd.Drug)//taking drug name
                 .ToListAsync();
 
             // Group bill_drug records by Date
@@ -161,7 +151,6 @@ namespace Services.AdminServices
                 // Calculate total drug usage for each drug on this date
                 foreach (var drugGroup in drugUsageByDrug)
                 {
-                    var drugID = drugGroup.Key.DrugID;
                     var namefor = drugGroup.Key.GenericN + "(" + drugGroup.Key.Weight + " mg)";
                     var amount = drugGroup.Sum(bd => bd.Amount);
 
@@ -174,6 +163,7 @@ namespace Services.AdminServices
 
             return totalDrugUsage;
         }
+        //this is a test code
         public async Task<object> GetAttendance()
         {
             var total_attendance = new List<object>();
@@ -243,6 +233,7 @@ namespace Services.AdminServices
 
             return total_attendance;
         }
+        //this also a test
         public async Task<object> GetUsers()
         {
             var users = await _dbcontext.users
@@ -252,6 +243,8 @@ namespace Services.AdminServices
             return users.Select(u => new { id = u.Id, name = u.Name, role = u.Role }).ToList();
 
         }
+        
+
         public async Task<object> CheckAttendance(DateTime date)
         {
             var total_attendance = new List<object>();
@@ -313,28 +306,46 @@ namespace Services.AdminServices
                 })
                 .ToListAsync();
 
+            //take all business days
+            var total_days = await _dbcontext.appointments
+                .Where(p => p.DateTime.Year == date.Year && p.DateTime.Month == date.Month)
+                .GroupBy(p => new { p.DateTime.Month})
+                .Select(g => new
+                {
+                    WorkingDayCount = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            // Cast each int to object before adding to total_attendance
+            total_attendance.AddRange(total_days);
             total_attendance.AddRange(cashier_attendance);
             total_attendance.AddRange(recep_attendance);
             total_attendance.AddRange(labrep_attendance);
             total_attendance.AddRange(doct_attendance);
 
+
             return total_attendance;
         }
         public async Task<object> GetLabReports()
         {
+            //taking full data about lab reports
             var TotalLabReports = new List<object>();
+            //create object connecting prescription and test for labreports which grouped by date
             var LabReports = await _dbcontext.labReports
                 .Include(lr => lr.Prescription)
                 .Include(lr => lr.Test)
                 .GroupBy(lr => lr.Prescription.DateTime.Date)
                 .ToListAsync();
+            //send data for each date
             foreach (var group in LabReports)
             {
+                //create list to take lab reports for each day
                 var LabReportsForDay = new List<object>();
                 var Date = group.Key.Date;
-                var LabReportsByType = new List<object>();
+                //LabReports grouped each type
                 var ReportsByType = group
                     .GroupBy(g => g.TestId);
+
                 foreach (var sub in ReportsByType)
                 {
                     var TypeId = sub.First().Id;
