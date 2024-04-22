@@ -313,10 +313,23 @@ namespace Services.AdminServices
                 })
                 .ToListAsync();
 
+            //take all business days
+            var total_days = await _dbcontext.appointments
+                .Where(p => p.DateTime.Year == date.Year && p.DateTime.Month == date.Month)
+                .GroupBy(p => new { p.DateTime.Month})
+                .Select(g => new
+                {
+                    WorkingDayCount = g.Select(p => p.DateTime.Date).Distinct().Count()
+                })
+                .ToListAsync();
+
+            // Cast each int to object before adding to total_attendance
+            total_attendance.AddRange(total_days);
             total_attendance.AddRange(cashier_attendance);
             total_attendance.AddRange(recep_attendance);
             total_attendance.AddRange(labrep_attendance);
             total_attendance.AddRange(doct_attendance);
+
 
             return total_attendance;
         }
