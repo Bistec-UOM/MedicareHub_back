@@ -64,6 +64,25 @@ namespace Services
 
             return medicineDetails;
         }
+        public async Task AddBillDrugs(IEnumerable<Bill_drug> billDrugs)
+        {
+            try
+            {
+                // Iterate through each bill drug in the request and add it to the database
+                foreach (var billDrug in billDrugs)
+                {
+                    // Add the new bill drug to the database
+                    _cntx.bill_Drugs.Add(billDrug);
+                }
+
+                // Save changes to the database
+                await _cntx.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while adding bill drugs: " + ex.Message);
+            }
+        }
         private static int CaluclateAge(DateTime dob)
         {
             DateTime now = DateTime.UtcNow;
