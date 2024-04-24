@@ -32,6 +32,20 @@ namespace API.Controllers
             }
             return Ok(medicineDetails);
         }
+        [HttpPost("AddBillDrugs")]
+        public async Task<IActionResult> AddBillDrugs(IEnumerable<Bill_drug> billDrugs)
+        {
+            try
+            {
+                // Call the service method to add bill drugs to the database
+                await _billService.AddBillDrugs(billDrugs);
+                return Ok("Bill drugs added successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while adding bill drugs: " + ex.Message);
+            }
+        }
 
     }
 }
