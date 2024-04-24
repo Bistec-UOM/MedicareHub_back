@@ -22,7 +22,8 @@ namespace Services
         {
             var prescriptionData = await _cntx.prescriptions
                 .Include(p => p.Appointment)
-                    .ThenInclude(a => a.Patient)
+                .ThenInclude(a => a.Patient)
+                .Where(p => p.Appointment.Status=="completed")
                 .Select(p => new
                 {
                     id = p.Id,
@@ -33,7 +34,7 @@ namespace Services
                     age = CaluclateAge((DateTime)p.Appointment.Patient.DOB),
                     gender = p.Appointment.Patient.Gender,
                     medicine = _cntx.prescript_Drugs
-                        .Where(d => d.PrescriptionId == p.Id)
+                        .Where(d => d.PrescriptionId == p.Id && p.Appointment.Status=="completed")
                         .Select(d => new
                         {
                             DrugId = d.Id,

@@ -22,7 +22,7 @@ namespace API.Controllers.LabControllers
             Cnt = cnt;
         }
 
-        [HttpPost]
+        [HttpGet]
         async public Task<ActionResult<Object>> RequestAnalyticData(int Id)
         {
             //Checking if the patient has ever arrived
