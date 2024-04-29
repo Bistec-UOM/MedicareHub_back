@@ -12,7 +12,7 @@ namespace Services.AppointmentService
     public class EmailSender
     {
 
-        //string akey= "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";
+        string akey= "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";
 
 
 
