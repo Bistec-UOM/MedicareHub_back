@@ -28,6 +28,7 @@ namespace Services.AdminServices
 
             // Extract distinct dates
             var distinctDates = Prescriptions.Select(p => p.DateTime.Date).Distinct();
+
             foreach (var date in distinctDates)
             {
                 var child_male = Prescriptions
