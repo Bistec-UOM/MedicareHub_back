@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.AdminServices;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System;
+using System.Threading.Tasks;
 
 namespace API.Controllers.AdminControllers
 {
@@ -11,6 +11,7 @@ namespace API.Controllers.AdminControllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -20,48 +21,84 @@ namespace API.Controllers.AdminControllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var users = await _userService.GetAllUsers();
-            return Ok(users);
+            try
+            {
+                var users = await _userService.GetAllUsers();
+                return Ok(users);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var user = await _userService.GetUser(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _userService.GetUser(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return Ok(user);
             }
-            return Ok(user);
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST api/<UserController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] User value)
         {
-            await _userService.AddUser(value);
-            return Ok();
+            try
+            {
+                await _userService.AddUser(value);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] User value)
         {
-            await _userService.UpdateUser(value);
-            return Ok();
+            try
+            {
+                await _userService.UpdateUser(value);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (await _userService.GetUser(id) == null)
+            try
             {
-                return NotFound();
+                var existingUser = await _userService.GetUser(id);
+                if (existingUser == null)
+                {
+                    return NotFound();
+                }
+                await _userService.DeleteUser(id);
+                return Ok();
             }
-            await _userService.DeleteUser(id);
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
