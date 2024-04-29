@@ -38,6 +38,7 @@ namespace DataAccessLayer
         public DbSet<Receptionist> receptionists { get; set; }
         public DbSet<Cashier> cashiers { get; set; }
         public DbSet<LabAssistant> labAssistants { get; set; }
+        public DbSet<Otp> otps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
