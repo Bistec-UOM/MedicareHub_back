@@ -31,6 +31,7 @@ namespace Services.AppointmentService
         {
             bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
             bool timeBooked=_dbcontext.appointments.Any(a=>a.DoctorId==appointment.DoctorId && ((a.DateTime.AddMinutes(-20)<= appointment.DateTime) && (a.DateTime.AddMinutes(20) >= appointment.DateTime))); //check are there any other appointments for that doctor
+            bool timeBlocked = _dbcontext.unable_Dates.Any(a => a.doctorId == appointment.DoctorId && ((appointment.DateTime >= a.StartTime.AddMinutes(-20) && appointment.DateTime<=a.EndTime)));  //checking if the time slot has been blocked by the doctor
             if ((appointmentExists))
             {
                 return 1;
@@ -39,6 +40,10 @@ namespace Services.AppointmentService
             else if(timeBooked)
             {
                 return 2;
+            }
+            else if(timeBlocked)
+            {
+                return 3;
             }
             else
             {
@@ -185,6 +190,7 @@ namespace Services.AppointmentService
             if (oldAppointment != null)
             {
                 bool timeBooked = _dbcontext.appointments.Any(a => a.DoctorId == appointment.DoctorId &&  ((a.DateTime.AddMinutes(-20) <= appointment.DateTime) && (a.DateTime.AddMinutes(20) >= appointment.DateTime))); //check are there any other appointments for that doctor
+                bool timeBlocked = _dbcontext.unable_Dates.Any(a => a.doctorId == appointment.DoctorId && ((appointment.DateTime >= a.StartTime.AddMinutes(-20) && appointment.DateTime <= a.EndTime)));  //check the selected time slot has been blocked
 
                 oldAppointment.DateTime = appointment.DateTime;    // Update properties of the existing appointment
                 oldAppointment.Status = appointment.Status;
@@ -194,6 +200,10 @@ namespace Services.AppointmentService
                 if(timeBooked)
                 {
                     return 1;
+                }
+                else if(timeBlocked)
+                {
+                    return 2;
                 }
                 else
                 {
@@ -302,8 +312,10 @@ namespace Services.AppointmentService
         }
         public async Task<List<Unable_Date>> getUnableDates(int doctorId)  //getting blocking dates of a specific doctor
         {
-            var uDates = _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId);
+            var uDates = _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId && u.StartTime.Hour==00 && u.StartTime.Minute==00&& u.EndTime.Hour==23 && u.EndTime.Minute==59);
             return  uDates.ToList();
         }
+
+        
     }
 }

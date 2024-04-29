@@ -1,4 +1,5 @@
-﻿using DataAccessLayer;
+﻿using BCrypt.Net;
+using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using System.Collections.Generic;
@@ -21,8 +22,13 @@ namespace Services.AdminServices
 
         public async Task AddUser(User user)
         {
+            // Hash the password asynchronously before adding the user
+            user.Password = await HashPassword(user.Password);
+
+            // Add the user to the repository
             await _Repository.Add(user);
 
+            // Based on user role, perform additional actions
             if (user.Role == "Doctor")
             {
                 var doctor = new Doctor
@@ -31,7 +37,7 @@ namespace Services.AdminServices
                 };
                 dbContext.doctors.Add(doctor);
             }
-            if (user.Role == "Receptionist")
+            else if (user.Role == "Receptionist")
             {
                 var receptionist = new Receptionist
                 {
@@ -39,7 +45,7 @@ namespace Services.AdminServices
                 };
                 dbContext.receptionists.Add(receptionist);
             }
-            if (user.Role == "Lab Assistant")
+            else if (user.Role == "Lab Assistant")
             {
                 var labAssistant = new LabAssistant
                 {
@@ -47,7 +53,7 @@ namespace Services.AdminServices
                 };
                 dbContext.labAssistants.Add(labAssistant);
             }
-            if (user.Role == "Cashier")
+            else if (user.Role == "Cashier")
             {
                 var cashier = new Cashier
                 {
@@ -55,7 +61,16 @@ namespace Services.AdminServices
                 };
                 dbContext.cashiers.Add(cashier);
             }
+
+            // Save changes to the database
             await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<string> HashPassword(string data)
+        {
+            // Hash the password using BCrypt.Net and return the hashed string
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(data);
+            return hashedPassword;
         }
 
         public async Task DeleteUser(int id)
@@ -87,6 +102,7 @@ namespace Services.AdminServices
 
         public async Task UpdateUser(User user)
         {
+            user.Password = await HashPassword(user.Password);
             await _Repository.Update(user);
         }
     }

@@ -14,7 +14,7 @@ namespace API.Controllers
     {
 
         private readonly AppointmentService _appointment;
-        public AppointmentController( AppointmentService appointment)
+        public AppointmentController(AppointmentService appointment)
         {
             
             _appointment = appointment;
