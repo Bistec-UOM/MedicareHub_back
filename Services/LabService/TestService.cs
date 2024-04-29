@@ -13,10 +13,12 @@ namespace Services.LabService
     {
         private readonly IRepository<Test> _test;
         private readonly IRepository<ReportFields> _tmplt;
-        public TestService(IRepository<Test> test,IRepository<ReportFields> tmplt)
+        private readonly ApplicationDbContext _cntx;
+        public TestService(IRepository<Test> test,IRepository<ReportFields> tmplt, ApplicationDbContext cntx)
         {
             _test = test;
             _tmplt = tmplt;
+            _cntx = cntx;
         }
 
         public async Task<IEnumerable<Test>> GetAllTests()
@@ -72,13 +74,13 @@ namespace Services.LabService
                 Price = data.Price,
                 Provider = data.Provider,
             };
-            await _test.Add(x);
+            await _cntx.tests.AddAsync(x);
 
             var Id = x.Id;
 
             foreach (var i in data.ReportFields)
             {
-                await _tmplt.Add(new ReportFields
+                await _cntx.reportFields.AddAsync(new ReportFields
                 {
                     Fieldname = i.Fieldname,
                     Index = i.Index,
@@ -88,6 +90,8 @@ namespace Services.LabService
                     TestId = Id
                 });
             }
+
+            await _cntx.SaveChangesAsync();
         }
 
         public async Task EditField(ReportFields item)

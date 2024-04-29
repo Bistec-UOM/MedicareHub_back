@@ -81,7 +81,7 @@ namespace Services.LabService
                     {
                         Id = l.Id,
                         TestId = l.TestId,
-                        TestName = l.Test.TestName,
+                        TestName = l.Test!.TestName,
                         Abb= l.Test.Abb
                      })
                 .ToListAsync<object>();
@@ -100,7 +100,7 @@ namespace Services.LabService
 
         async public Task<Boolean> UplaodResults(Result data)
         {
-            foreach (var i in data.Results)
+            foreach (var i in data.Results!)
             {
                 Record record = new Record
                 {
@@ -110,13 +110,20 @@ namespace Services.LabService
                     Status = i.Status
                 };
 
-                await _rec.Add(record);
+                await _cntx.AddAsync(record);
             }
 
-            LabReport tmp =await _rep.Get(data.ReportId);
+            LabReport? tmp = await _cntx.labReports.FindAsync(data.ReportId);
+
+            if (tmp == null)
+            {
+                throw new NullReferenceException("");
+            }
+
             tmp.DateTime=DateTime.UtcNow;
             tmp.Status = "done";
-            await _rep.Update(tmp);
+            _cntx.labReports.Update(tmp);
+            await _cntx.SaveChangesAsync();
             return true;
         }
     }

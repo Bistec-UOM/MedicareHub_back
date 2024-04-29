@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Services.LabService
 {
-    public class DoctorAnalyticService
+    public class DoctorAnalyticService: IDoctorAnalyticService
     {
         private readonly ApplicationDbContext _cnt;
         public DoctorAnalyticService(ApplicationDbContext context) { 
@@ -43,6 +43,34 @@ namespace Services.LabService
             }
 
             return categorizedDrugs;
+        }
+
+        public async Task<List<object>> TrackReportList(int id)
+        {
+            var prescriptions = await _cnt.prescriptions
+             .Where(p => p.Appointment.PatientId == id)
+             .OrderBy(p => p.DateTime)
+             .ToListAsync();
+            
+            var categorizedReps = new List<object>();
+
+            foreach (var i in prescriptions)
+            {
+                var lb =_cnt.labReports
+                    .Where(l => l.PrescriptionID == i.Id)
+                    .Include(l => l.Test)
+                    .Select(l => new {
+                            Id = l.Id,
+                            LabRepDateTime = l.DateTime,
+                            TestName = l.Test.TestName
+                    })
+                    .FirstOrDefault();
+
+                categorizedReps.Add(lb);
+            }
+
+            return categorizedReps;
+
         }
     }
 }
