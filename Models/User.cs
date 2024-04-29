@@ -21,6 +21,7 @@ namespace Models
         public string? Qualifications { get; set; }
         public string? ContactNumber { get; set; }
         public string? Email { get; set; }
+        public Boolean IsDeleted {  get; set; }
         public string? ImageUrl { get; set; }
         public DateTime? DOB { get; set; }
 
