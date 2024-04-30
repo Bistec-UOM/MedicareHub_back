@@ -37,9 +37,8 @@ namespace API.Controllers
         {
             try
             {
-                // Call the service method to add bill drugs to the database
                 await _billService.AddBillDrugs(billDrugs);
-                return Ok("Bill drugs added successfully");
+                return Ok(" successfully and appointment status updated to 'paid'");
             }
             catch (Exception ex)
             {
