@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.DTO.Lab;
+using Models.DTO.Lab.UploadResults;
 using Services.LabService;
 using System.Security.Claims;
 
@@ -52,15 +52,29 @@ namespace API.Controllers.LabControllers
         [HttpPost("Result")]
         async public Task<ActionResult> UploadResults(Result data)
         {
-            var tmp=await _vs.UplaodResults(data);
-            if (tmp)
+            if (data != null && data.Results!=null)
             {
-                return Ok(data);
+                var tmp = await _vs.UplaodResults(data);
+                if (tmp)
+                {
+                    return Ok(data);
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
             else
             {
-                return BadRequest();
+                return BadRequest("Empty");
             }
+
+        }
+
+        [HttpGet("Result")]
+        public async Task<ActionResult> ViewResult(int id)
+        {
+            return Ok(await _vs.ViewResult(id));
         }
     }
 }
