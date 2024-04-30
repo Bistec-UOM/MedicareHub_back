@@ -69,8 +69,7 @@ namespace Services
         {
             try
             {
-                _cntx.bill_Drugs.AddRange(billDrugs);
-                await _cntx.SaveChangesAsync();
+                await _cntx.bill_Drugs.AddRangeAsync(billDrugs);
 
                 foreach (var billDrug in billDrugs)
                 {
