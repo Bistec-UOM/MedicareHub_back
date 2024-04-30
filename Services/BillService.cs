@@ -68,14 +68,21 @@ namespace Services
         {
             try
             {
-                // Iterate through each bill drug in the request and add it to the database
+                _cntx.bill_Drugs.AddRange(billDrugs);
+                await _cntx.SaveChangesAsync();
+
                 foreach (var billDrug in billDrugs)
                 {
-                    // Add the new bill drug to the database
-                    _cntx.bill_Drugs.Add(billDrug);
+                    var prescription = await _cntx.prescriptions
+                        .Include(p => p.Appointment)
+                        .FirstOrDefaultAsync(p => p.Id == billDrug.PrescriptionID);
+
+                    if (prescription != null && prescription.Appointment != null)
+                    {
+                        prescription.Appointment.Status = "paid";
+                    }
                 }
 
-                // Save changes to the database
                 await _cntx.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -83,6 +90,7 @@ namespace Services
                 throw new Exception("An error occurred while adding bill drugs: " + ex.Message);
             }
         }
+
         private static int CaluclateAge(DateTime dob)
         {
             DateTime now = DateTime.UtcNow;
