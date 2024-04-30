@@ -12,6 +12,7 @@ namespace Models
         public string? Status { get; set; } 
         [ForeignKey("Id")]
         public int PatientId { get; set; }
+        public DateTime CreatedAt { get; set; }
         [JsonIgnore]
         public Patient? Patient { get; set; }
         [ForeignKey("DoctorId")]
