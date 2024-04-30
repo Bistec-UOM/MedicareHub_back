@@ -44,7 +44,8 @@ namespace Services
                 {
                     name = a.Patient.Name,
                     age = CaluclateAge((DateTime)a.Patient.DOB),
-                    gender = a.Patient.Gender
+                    gender = a.Patient.Gender,
+                    id=a.Patient.Id
                 }
             })
             .ToList<object>();

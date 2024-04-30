@@ -17,9 +17,9 @@ namespace API.Controllers
         }
 
         [HttpPost("reg")]
-        public async Task<ActionResult> RegUser(String data)
+        public ActionResult RegUser(String data)
         {
-            var res= await _auth.RegisterUser(data);
+            var res= _auth.RegisterUser(data);
             return Ok(res);
         }
 
@@ -37,5 +37,26 @@ namespace API.Controllers
                 return Unauthorized(res);
             }
         }
+
+        [HttpPost("reset/OTP")]
+        async public Task<ActionResult> VerifyOTP(int id)
+        {
+            string tmp=await _auth.VerifyCode(id);
+            if (tmp != null)
+            {
+                return Ok(tmp);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("reset/password")]
+        async public Task<ActionResult> NewPassword(UserLog data)
+        {
+            return Ok();
+        }
+        
     }
 }

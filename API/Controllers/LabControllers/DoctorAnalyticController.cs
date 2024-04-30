@@ -22,8 +22,8 @@ namespace API.Controllers.LabControllers
             Cnt = cnt;
         }
 
-        [HttpPost]
-        async public Task<ActionResult<Object>> RequestAnalyticData(int Id)
+        [HttpGet]
+        public async Task<ActionResult<Object>> RequestAnalyticData(int Id)
         {
             //Checking if the patient has ever arrived
 
@@ -40,6 +40,23 @@ namespace API.Controllers.LabControllers
                 return Ok("");
             }
             
+        }
+
+        [HttpGet("lab")]
+        public async Task<ActionResult<Object>> RequestLabAnalyticData(int Id)
+        {
+            var tmp = await Cnt.prescriptions
+            .AnyAsync(p => p.Appointment.PatientId == Id &&
+                      Cnt.prescript_Drugs.Any(d => d.PrescriptionId == p.Id));
+
+            if (tmp)
+            {
+                return Ok(await Ans.TrackReportList(Id));
+            }
+            else
+            {
+                return Ok("");
+            }
         }
     }
 }

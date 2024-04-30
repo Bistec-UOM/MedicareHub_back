@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.AdminServices;
-using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 
 namespace API.Controllers.AdminControllers
 {
@@ -11,10 +12,12 @@ namespace API.Controllers.AdminControllers
     public class AnalyticController : ControllerBase
     {
         private readonly IAnalyticsService _analyticsService;
-        public AnalyticController (IAnalyticsService analyticsService)
+
+        public AnalyticController(IAnalyticsService analyticsService)
         {
             _analyticsService = analyticsService;
         }
+
         [HttpGet("male-female-patients-count")]
         public async Task<IActionResult> GetMaleFemalePatientsCountAllDays()
         {
@@ -28,52 +31,103 @@ namespace API.Controllers.AdminControllers
                 return BadRequest(ex.Message);
             }
         }
+
         [HttpGet("total-Income")]
         public async Task<IActionResult> GetTotalAmount()
         {
-            var res = await _analyticsService.GetTotalAmount();
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.GetTotalAmount();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("available-count")]
         public async Task<IActionResult> GetAvailableCount()
         {
-            var result = await (_analyticsService.GetAvailableCount());
-            return Ok(result);
+            try
+            {
+                var result = await _analyticsService.GetAvailableCount();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("daily-drug-usage")]
         public async Task<IActionResult> GetTotalDrugUsage()
         {
-            var res = await (_analyticsService.GetTotalDrugUsage());
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.GetTotalDrugUsage();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("attendance")]
         public async Task<IActionResult> GetAttendance()
         {
-            var res = await _analyticsService.GetAttendance();
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.GetAttendance();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("users")]
         public async Task<IActionResult> GetUsers()
         {
-            var res = await _analyticsService.GetUsers();
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.GetUsers();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("userCheck{date}")]
         public async Task<IActionResult> CheckAttendance(DateTime date)
         {
-            var res = await _analyticsService.CheckAttendance(date);
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.CheckAttendance(date);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         [HttpGet("lab-report-Count")]
         public async Task<IActionResult> GetLabReports()
         {
-            var res = await _analyticsService.GetLabReports();
-            return Ok(res);
+            try
+            {
+                var res = await _analyticsService.GetLabReports();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
-
-
-
-
-
     }
 }

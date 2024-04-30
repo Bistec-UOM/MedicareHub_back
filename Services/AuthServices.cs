@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTO;
+using Services.AppointmentService;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,7 +25,7 @@ namespace Services
             _configuration = configuration;
         }
 
-        public async Task<String> RegisterUser(String data)
+        public String RegisterUser(String data)
         {
             string paswrdHash = BCrypt.Net.BCrypt.HashPassword(data);
             data= paswrdHash;
@@ -63,9 +64,10 @@ namespace Services
 
             List<Claim> claims = new List<Claim> {
                 new Claim("Id",tmp.Id.ToString()),
-                new Claim("Name", tmp.Name),
-                new Claim("Role", tmp.Role),
-                new Claim("IssuedAt", DateTime.UtcNow.ToString())
+                new Claim("Name", tmp.Name !),
+                new Claim("Role", tmp.Role !),
+                new Claim("IssuedAt", DateTime.UtcNow.ToString()),
+                new Claim("Profile",tmp.ImageUrl)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -82,6 +84,16 @@ namespace Services
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
+        }
+
+        public async Task<string> VerifyCode(int id)
+        {
+            var tmp = await _user.Get(id);
+            Random RndNm = new Random();
+            string msg = RndNm.Next(100000, 999999)+ " is your verification code. Please use this to verify your identity before reset the password.";
+            var sendMail = new EmailSender();
+            await sendMail.SendMail("Reset password","kwalskinick@gmail.com",tmp.Name,msg);
+            return ("Check out your Email, A verification code is sent to "+tmp.Email);
         }
     }
 }

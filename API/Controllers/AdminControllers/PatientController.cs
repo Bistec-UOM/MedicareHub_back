@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.AdminServices;
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace API.Controllers.AdminControllers
@@ -22,51 +22,87 @@ namespace API.Controllers.AdminControllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var patients = await _patientService.GetAllPatients();
-            return Ok(patients);
+            try
+            {
+                var patients = await _patientService.GetAllPatients();
+                return Ok(patients);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET api/<PatientController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var patient = await _patientService.GetPatient(id);
-
-            if (patient == null)
+            try
             {
-                return NotFound();
-            }
+                var patient = await _patientService.GetPatient(id);
 
-            return Ok(patient);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(patient);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
 
         // POST api/<PatientController>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Patient value)
         {
-            await _patientService.AddPatient(value);
-            return Ok(); // Assuming a successful operation
+            try
+            {
+                await _patientService.AddPatient(value);
+                return Ok(); // Assuming a successful operation
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
 
         // PUT api/<PatientController>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Patient value)
         {
-            await _patientService.UpdatePatient(value);
-            return Ok(value);
+            try
+            {
+                await _patientService.UpdatePatient(value);
+                return Ok(value);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
+
         // DELETE api/<PatientController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // Assuming you want to return a 404 if the patient doesn't exist
-            if (await _patientService.GetPatient(id) == null)
+            try
             {
-                return NotFound();
-            }
+                // Assuming you want to return a 404 if the patient doesn't exist
+                if (await _patientService.GetPatient(id) == null)
+                {
+                    return NotFound();
+                }
 
-            await _patientService.DeletePatient(id);
-            return Ok(); // Assuming a successful operation
+                await _patientService.DeletePatient(id);
+                return Ok(); // Assuming a successful operation
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
