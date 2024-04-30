@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.DTO.Lab;
+using Models.DTO.Lab.UploadResults;
 using Services.LabService;
 using System.Security.Claims;
 
@@ -69,6 +69,12 @@ namespace API.Controllers.LabControllers
                 return BadRequest("Empty");
             }
 
+        }
+
+        [HttpGet("Result")]
+        public async Task<ActionResult> ViewResult(int id)
+        {
+            return Ok(await _vs.ViewResult(id));
         }
     }
 }

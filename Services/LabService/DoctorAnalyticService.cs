@@ -57,7 +57,7 @@ namespace Services.LabService
             foreach (var i in prescriptions)
             {
                 var lb =_cnt.labReports
-                    .Where(l => l.PrescriptionID == i.Id)
+                    .Where(l => l.PrescriptionID == i.Id && l.Status=="done")
                     .Include(l => l.Test)
                     .Select(l => new {
                             Id = l.Id,

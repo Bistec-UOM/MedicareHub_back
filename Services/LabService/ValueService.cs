@@ -1,7 +1,8 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Models.DTO.Lab;
+using Models.DTO.Lab.UploadResults;
+using Models.DTO.Lab.ViewResults;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,13 @@ namespace Services.LabService
     {
         private readonly IRepository<LabReport> _rep;
         private readonly IRepository<Record> _rec;
+        private readonly IRepository<Test> _tst;
         private readonly ApplicationDbContext _cntx;
-        public ValueService(IRepository<LabReport> rep,IRepository<Record> rec,ApplicationDbContext contxt)
+        public ValueService(IRepository<LabReport> rep,IRepository<Record> rec, IRepository<Test> tst, ApplicationDbContext contxt)
         {
             _rep = rep;
             _rec = rec;
+            _tst = tst;
             _cntx = contxt;
         }
 
@@ -125,6 +128,50 @@ namespace Services.LabService
             _cntx.labReports.Update(tmp);
             await _cntx.SaveChangesAsync();
             return true;
+        }
+
+        //view result of a particular lab report
+        public async Task<VResult> ViewResult(int id)
+        {
+            var labRep = await _rep.Get(id);
+            var obj = new VResult();
+
+            if (labRep.Status == "done")
+            {
+                var tst = await _tst.Get(labRep.TestId);
+
+                var records = await _cntx.records
+                    .Where(p => p.LabReportId == id)
+                    .ToListAsync();
+
+                var fields = await _cntx.reportFields
+                    .Where(p => p.TestId == labRep.TestId)
+                    .ToListAsync();
+
+                var resultList = fields
+                 .Join(records, field => field.Id, record => record.ReportFieldId,
+                        (field, record) => new VResultField
+                        {
+                            Fieldname = field.Fieldname,
+                            MinRef = field.MinRef,
+                            MaxRef = field.MaxRef,
+                            Value = record.Result,
+                            Unit = field.Unit,
+                            Status = record.Status
+                        }
+                        ).ToList();
+
+                obj.ReportId = id;
+                obj.TestName = tst.TestName;
+                obj.DateTime = (DateTime)labRep.DateTime;
+                obj.Results = resultList;
+
+                return obj;
+            }
+            else
+            {
+                return obj;
+            }
         }
     }
 }
