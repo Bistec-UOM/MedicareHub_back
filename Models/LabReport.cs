@@ -40,6 +40,5 @@ namespace Models
         [JsonIgnore]
         public LabAssistant? LbAst { get; set; }
 
-        public string? DoctorStatus { get; set; }
     }
 }
