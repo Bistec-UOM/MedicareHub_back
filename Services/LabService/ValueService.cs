@@ -131,47 +131,40 @@ namespace Services.LabService
         }
 
         //view result of a lab report when labReport Id is given
-        public async Task<VResult> ViewResult(int id)
+        private async Task<VResult> ViewResult(int id)
         {
-            var labRep = await _rep.Get(id);
+            var labRep = await _cntx.labReports.FindAsync(id);
             var obj = new VResult();
 
-            if (labRep.Status == "done")
-            {
-                var tst = await _tst.Get(labRep.TestId);
-
-                var records = await _cntx.records
-                    .Where(p => p.LabReportId == id)
-                    .ToListAsync();
-
-                var fields = await _cntx.reportFields
-                    .Where(p => p.TestId == labRep.TestId)
-                    .ToListAsync();
-
-                var resultList = fields
-                 .Join(records, field => field.Id, record => record.ReportFieldId,
-                        (field, record) => new VResultField
-                        {
-                            Fieldname = field.Fieldname,
-                            MinRef = field.MinRef,
-                            MaxRef = field.MaxRef,
-                            Value = record.Result,
-                            Unit = field.Unit,
-                            Status = record.Status
-                        }
-                        ).ToList();
-
-                obj.ReportId = id;
-                obj.TestName = tst.TestName;
-                obj.DateTime = (DateTime)labRep.DateTime;
-                obj.Results = resultList;
-
-                return obj;
-            }
-            else
-            {
-                return obj;
-            }
+            var tst = await _tst.Get(labRep.TestId);
+    
+            var records = await _cntx.records
+                .Where(p => p.LabReportId == id)
+                .ToListAsync();
+    
+            var fields = await _cntx.reportFields
+                .Where(p => p.TestId == labRep.TestId)
+                .ToListAsync();
+    
+            var resultList = fields
+             .Join(records, field => field.Id, record => record.ReportFieldId,
+                    (field, record) => new VResultField
+                    {
+                        Fieldname = field.Fieldname,
+                        MinRef = field.MinRef,
+                        MaxRef = field.MaxRef,
+                        Value = record.Result,
+                        Unit = field.Unit,
+                        Status = record.Status
+                    }
+                    ).ToList();
+    
+            obj.ReportId = id;
+            obj.TestName = tst.TestName;
+            obj.DateTime = (DateTime)labRep.DateTime;
+            obj.Results = resultList;
+    
+            return obj;
         }
 
         public async Task<List<VResult>> CheckResult(int Pid)
@@ -194,6 +187,23 @@ namespace Services.LabService
             }
 
             return labReports;
+        }
+
+
+        public async Task<Boolean> MarkCheck(int id)
+        {
+            var tmp = await _rep.Get(id);
+            if(tmp.Status == "done" ) 
+            {
+                tmp.Status = "checked";
+                await _rep.Update(tmp);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
     }
 }

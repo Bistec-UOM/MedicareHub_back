@@ -19,9 +19,8 @@ namespace Services.LabService
 
         public Task<Boolean> UplaodResults(Result data);
 
-        public Task<VResult> ViewResult(int id);
-
         public Task<List<VResult>> CheckResult(int Pid);
 
+        public Task<Boolean> MarkCheck(int id);
     }
 }

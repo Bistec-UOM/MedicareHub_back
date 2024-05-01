@@ -73,10 +73,24 @@ namespace API.Controllers.LabControllers
 
 
         //check the results of the report doctor requested
-        [HttpGet("result")]
+        [HttpGet("Result")]
         public async Task<ActionResult> CheckResult(int Pid)
         {
             return Ok(await _vs.CheckResult(Pid));
+        }
+
+        [HttpPost("Mark")]
+        public async Task<ActionResult> MarkCheck(int id)
+        {
+            Boolean tmp=await _vs.MarkCheck(id);
+            if (tmp)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
