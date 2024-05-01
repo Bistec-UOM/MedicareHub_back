@@ -195,5 +195,21 @@ namespace Services.LabService
 
             return labReports;
         }
+
+        public async Task<Boolean> MarkCheck(int id)
+        {
+            var tmp = await _rep.Get(id);
+            if(tmp.Status == "done" ) 
+            {
+                tmp.Status = "checked";
+                await _rep.Update(tmp);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
     }
 }
