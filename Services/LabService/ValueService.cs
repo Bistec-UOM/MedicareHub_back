@@ -130,7 +130,7 @@ namespace Services.LabService
             return true;
         }
 
-        //view result of a particular lab report
+        //view result of a lab report when labReport Id is given
         public async Task<VResult> ViewResult(int id)
         {
             var labRep = await _rep.Get(id);
@@ -172,6 +172,28 @@ namespace Services.LabService
             {
                 return obj;
             }
+        }
+
+        public async Task<List<VResult>> CheckResult(int Pid)
+        {
+            var appointmentIds = _cntx.appointments
+                .Where(a => a.PatientId == Pid)
+                .Select(a => a.Id)
+                .ToList();
+
+            var labReportIds = _cntx.labReports
+                .Where(l => appointmentIds.Contains(l.Prescription.AppointmentID) && l.Status == "done")
+                .Select(l => l.Id)
+                .ToList();
+
+            var labReports=new List<VResult>();
+
+            foreach (var item in labReportIds)
+            {
+                labReports.Add(await ViewResult(item));
+            }
+
+            return labReports;
         }
     }
 }
