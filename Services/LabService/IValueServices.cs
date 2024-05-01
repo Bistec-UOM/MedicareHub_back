@@ -21,5 +21,7 @@ namespace Services.LabService
 
         public Task<VResult> ViewResult(int id);
 
+        public Task<List<VResult>> CheckResult(int Pid);
+
     }
 }

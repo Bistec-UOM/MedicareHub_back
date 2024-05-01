@@ -71,10 +71,12 @@ namespace API.Controllers.LabControllers
 
         }
 
-        [HttpGet("Result")]
-        public async Task<ActionResult> ViewResult(int id)
+
+        //check the results of the report doctor requested
+        [HttpGet("result")]
+        public async Task<ActionResult> CheckResult(int Pid)
         {
-            return Ok(await _vs.ViewResult(id));
+            return Ok(await _vs.CheckResult(Pid));
         }
     }
 }
