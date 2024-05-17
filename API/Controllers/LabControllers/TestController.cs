@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO.Lab;
+using Models.DTO.Lab.EditTemplate;
 using Services.LabService;
 
 namespace API.Controllers.LabControllers
@@ -42,7 +43,7 @@ namespace API.Controllers.LabControllers
         }
 
         //Get all fields of a Test====================================
-        [HttpGet("template{id}")]
+        [HttpGet("Template{id}")]
         public async Task<ActionResult<IEnumerable<ReportFields>>> GetFieldsByTest(int id)
         {
             return Ok(await _tst.GetFieldByTest(id));
@@ -50,7 +51,7 @@ namespace API.Controllers.LabControllers
 
 
         //Add new test (with templates)====================================
-        [HttpPost("template")]
+        [HttpPost("Template")]
         public async Task<ActionResult> Addtmp(TemplateObj item)
         {
             await _tst.AddTemplate(item);
@@ -58,7 +59,7 @@ namespace API.Controllers.LabControllers
         }
 
         //edit existing template=============================================
-        [HttpPut("template")]
+        [HttpPut("Template")]
         public async Task<ActionResult> Edittmplt(EdittemplateObj data)
         {
             await _tst.EditTemplate(data);

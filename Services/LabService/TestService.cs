@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Models;
 using Models.DTO.Lab;
+using Models.DTO.Lab.EditTemplate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,31 +68,39 @@ namespace Services.LabService
 
         public async Task AddTemplate(TemplateObj data)
         {
-            var x = new Test
+            using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                TestName = data.TestName,
-                Abb = data.Abb,
-                Price = data.Price,
-                Provider = data.Provider,
-            };
-            await _cntx.tests.AddAsync(x);
 
-            var Id = x.Id;
-
-            foreach (var i in data.ReportFields)
-            {
-                await _cntx.reportFields.AddAsync(new ReportFields
+                var tst = new Test
                 {
-                    Fieldname = i.Fieldname,
-                    Index = i.Index,
-                    MinRef = i.MinRef,
-                    MaxRef = i.MaxRef,
-                    Unit = i.Unit,
-                    TestId = Id
-                });
-            }
+                    TestName = data.TestName,
+                    Abb = data.Abb,
+                    Price = data.Price,
+                    Provider = data.Provider,
+                };
+                
+                await _cntx.tests.AddAsync(tst);
+                await _cntx.SaveChangesAsync();
 
-            await _cntx.SaveChangesAsync();
+                int tstId = tst.Id;
+
+                foreach (var i in data.ReportFields)
+                {
+                    await _cntx.reportFields.AddAsync(new ReportFields
+                    {
+                        Fieldname = i.Fieldname,
+                        Index = i.Index,
+                        MinRef = i.MinRef,
+                        MaxRef = i.MaxRef,
+                        Unit = i.Unit,
+                        TestId = tstId
+                    });
+                }
+
+                await _cntx.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+            }
         }
 
         public async Task EditField(ReportFields item)
