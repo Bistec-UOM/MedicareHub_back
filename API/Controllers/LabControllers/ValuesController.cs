@@ -72,14 +72,14 @@ namespace API.Controllers.LabControllers
         }
 
 
-        //check the results of the report doctor requested
+        //check the results of the report doctor requested is available
         [HttpGet("Result")]
         public async Task<ActionResult> CheckResult(int Pid)
         {
             return Ok(await _vs.CheckResult(Pid));
         }
 
-        [HttpPost("Mark")]
+        [HttpPost("Mark")]//mark a labreport as visited as it is opened
         public async Task<ActionResult> MarkCheck(int id)
         {
             Boolean tmp=await _vs.MarkCheck(id);

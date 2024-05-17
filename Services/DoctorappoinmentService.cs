@@ -101,7 +101,7 @@ namespace Services
                     PrescriptionID = pId,
                     DateTime = null,    
                     TestId = d.TestId,
-                    Status = "New",
+                    Status = "new",
                     LbAstID = 1
                 };
                 await _labs.Add(Obj);
