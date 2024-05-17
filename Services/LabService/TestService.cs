@@ -144,6 +144,20 @@ namespace Services.LabService
                         };
                         await _cntx.reportFields.AddAsync(x);
                     }
+                    else if(item.Stat == "deleted") 
+                    {
+                        ReportFields x = new ReportFields
+                        {
+                            Id = item.Id,
+                            Fieldname = item.Fieldname,
+                            Index = item.Index,
+                            MinRef = item.MinRef,
+                            MaxRef = item.MaxRef,
+                            Unit = item.Unit,
+                            TestId = data.TestId
+                        };
+                        _cntx.reportFields.Remove(x);
+                    }
                 }
                 await _cntx.SaveChangesAsync();
                 await transaction.CommitAsync();
