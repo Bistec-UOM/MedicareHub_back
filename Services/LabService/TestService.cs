@@ -110,26 +110,44 @@ namespace Services.LabService
 
         public async Task EditTemplate(EdittemplateObj data)
         {
-            var existingF = await _tmplt.GetByProp("TestId", data.TestId);
-
-            //delete all existing fields
-            foreach (var item in existingF)
+            using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                await _tmplt.Delete(item.Id);
-            }
-
-            //Add all sent fields
-            foreach (var item in data.Fields)
-            {
-                await _tmplt.Add(new ReportFields
+                foreach (var item in data.Fields)
                 {
-                    Fieldname = item.Fieldname,
-                    Index = item.Index,
-                    MinRef = item.MinRef,
-                    MaxRef = item.MaxRef,
-                    Unit = item.Unit,
-                    TestId = data.TestId
-                });
+
+                    if (item.Stat == "exist")//update existing, protecting the Id
+                    {
+                        var existingField = await _cntx.reportFields.FindAsync(item.Id);
+                        if (existingField != null)
+                        {
+                            existingField.Fieldname = item.Fieldname;
+                            existingField.Index = item.Index;
+                            existingField.MinRef = item.MinRef;
+                            existingField.MaxRef = item.MaxRef;
+                            existingField.Unit = item.Unit;
+                            existingField.TestId = data.TestId;
+
+                            _cntx.reportFields.Update(existingField);
+                        }
+                    }
+                    else if (item.Stat == "new")//add new fields
+                    {
+                        ReportFields x = new ReportFields
+                        {
+                            Id = 0,
+                            Fieldname = item.Fieldname,
+                            Index = item.Index,
+                            MinRef = item.MinRef,
+                            MaxRef = item.MaxRef,
+                            Unit = item.Unit,
+                            TestId = data.TestId
+                        };
+                        await _cntx.reportFields.AddAsync(x);
+                    }
+                }
+                await _cntx.SaveChangesAsync();
+                await transaction.CommitAsync();
+
             }
         }
 

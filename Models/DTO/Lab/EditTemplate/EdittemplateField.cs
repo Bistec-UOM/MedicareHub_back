@@ -16,5 +16,6 @@ namespace Models.DTO.Lab.EditTemplate
         public float MaxRef { get; set; }
         public string Unit { get; set; } = null!;
         public int TestId { get; set; }
+        public String? Stat { get; set; }
     }
 }
