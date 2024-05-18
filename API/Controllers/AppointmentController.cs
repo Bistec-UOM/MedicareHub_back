@@ -223,7 +223,7 @@ namespace API.Controllers
         }
 
         [HttpGet("BlockedDates/{doctorId}")]
-        public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)  //getting unable dates of a specific doctor
+        public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {
             var uDates= await _appointment.getUnableDates(doctorId);
             return Ok(uDates);
