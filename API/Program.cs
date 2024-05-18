@@ -108,7 +108,7 @@ builder.Services.AddScoped<IRepository<Record>, Repository<Record>>();
 
 //Login-------------------------------------------------------------------
 builder.Services.AddScoped<AuthServices>();
-
+builder.Services.AddScoped<IRepository<Otp>, Repository<Otp>>();
 
 //builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
 

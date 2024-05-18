@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
@@ -18,11 +19,15 @@ namespace Services
     {
         private readonly IRepository<User> _user;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<Otp> _otp;
+        private readonly ApplicationDbContext _cnt;
 
-        public AuthServices(IRepository<User> user, IConfiguration configuration)
+        public AuthServices(IRepository<User> user, IConfiguration configuration, IRepository<Otp> otp, ApplicationDbContext cnt)
         {
             _user = user;
             _configuration = configuration;
+            _otp = otp;
+            _cnt = cnt;
         }
 
         public String RegisterUser(String data)
@@ -89,11 +94,32 @@ namespace Services
         public async Task<string> VerifyCode(int id)
         {
             var tmp = await _user.Get(id);
+            Otp obj = new Otp();
+
             Random RndNm = new Random();
-            string msg = RndNm.Next(100000, 999999)+ " is your verification code. Please use this to verify your identity before reset the password.";
+            obj.code = RndNm.Next(100000, 999999);
+            obj.status = "ready";
+            obj.userId = id;
+
+            await _otp.Add(obj);
+
+            string msg = obj.code+ " is your verification code. Please use this to verify your identity before reset the password.";
             var sendMail = new EmailSender();
             await sendMail.SendMail("Reset password","kwalskinick@gmail.com",tmp.Name,msg);
             return ("Check out your Email, A verification code is sent to "+tmp.Email);
+        }
+
+        public async Task<Boolean> ConfirmCode(int Uid,int code)
+        {
+            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == Uid && o.status == "ready");
+            if (code == otp.code)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
