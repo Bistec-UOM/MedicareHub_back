@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.DTO.Lab;
+using Models.DTO.Lab.UploadResults;
 using Services.LabService;
 using System.Security.Claims;
 
@@ -52,10 +52,40 @@ namespace API.Controllers.LabControllers
         [HttpPost("Result")]
         async public Task<ActionResult> UploadResults(Result data)
         {
-            var tmp=await _vs.UplaodResults(data);
+            if (data != null && data.Results!=null)
+            {
+                var tmp = await _vs.UplaodResults(data);
+                if (tmp)
+                {
+                    return Ok(data);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return BadRequest("Empty");
+            }
+
+        }
+
+
+        //check the results of the report doctor requested is available
+        [HttpGet("Result")]
+        public async Task<ActionResult> CheckResult(int Pid)
+        {
+            return Ok(await _vs.CheckResult(Pid));
+        }
+
+        [HttpPost("Mark")]//mark a labreport as visited as it is opened
+        public async Task<ActionResult> MarkCheck(int id)
+        {
+            Boolean tmp=await _vs.MarkCheck(id);
             if (tmp)
             {
-                return Ok(data);
+                return Ok();
             }
             else
             {

@@ -1,8 +1,11 @@
 ﻿using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTO;
+using SendGrid.Helpers.Mail;
+using Services.AppointmentService;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,14 +20,18 @@ namespace Services
     {
         private readonly IRepository<User> _user;
         private readonly IConfiguration _configuration;
+        private readonly IRepository<Otp> _otp;
+        private readonly ApplicationDbContext _cnt;
 
-        public AuthServices(IRepository<User> user, IConfiguration configuration)
+        public AuthServices(IRepository<User> user, IConfiguration configuration, IRepository<Otp> otp, ApplicationDbContext cnt)
         {
             _user = user;
             _configuration = configuration;
+            _otp = otp;
+            _cnt = cnt;
         }
 
-        public async Task<String> RegisterUser(String data)
+        public String RegisterUser(String data)
         {
             string paswrdHash = BCrypt.Net.BCrypt.HashPassword(data);
             data= paswrdHash;
@@ -60,11 +67,25 @@ namespace Services
         public async Task<string> CreateToken(int UserId)
         {
             var tmp = await _user.Get(UserId);
+            int? RoleId = null;
+
+            if (tmp.Role == "Doctor") {
+                RoleId = _cnt.doctors.SingleOrDefault(d => d.UserId == UserId)?.Id;
+            }else if (tmp.Role == "LabAssistant") {
+                RoleId = _cnt.labAssistants.SingleOrDefault(l => l.UserId == UserId)?.Id;
+            }else if (tmp.Role == "Cashier") {
+                RoleId = _cnt.cashiers.SingleOrDefault(c => c.UserId == UserId)?.Id;
+            }else if (tmp.Role == "Receptionist") {
+                RoleId = _cnt.receptionists.SingleOrDefault(r => r.UserId == UserId)?.Id;
+            }else {
+                RoleId = 0;//Admin ID
+            }
 
             List<Claim> claims = new List<Claim> {
                 new Claim("Id",tmp.Id.ToString()),
-                new Claim("Name", tmp.Name),
-                new Claim("Role", tmp.Role),
+                new Claim("Name", tmp.Name !),
+                new Claim("Role", tmp.Role !),
+                new Claim("RoleId",RoleId.ToString()),
                 new Claim("IssuedAt", DateTime.UtcNow.ToString()),
                 new Claim("Profile",tmp.ImageUrl)
             };
@@ -83,6 +104,37 @@ namespace Services
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
             return jwt;
+        }
+
+        public async Task<string> VerifyCode(int id)
+        {
+            var tmp = await _user.Get(id);
+            Otp obj = new Otp();
+
+            Random RndNm = new Random();
+            obj.code = RndNm.Next(100000, 999999);
+            obj.status = "ready";
+            obj.userId = id;
+
+            await _otp.Add(obj);
+
+            string msg = obj.code+ " is your verification code. Please use this to verify your identity before reset the password.";
+            var sendMail = new EmailSender();
+            await sendMail.SendMail("Reset password","kwalskinick@gmail.com",tmp.Name,msg);
+            return ("Check out your Email, A verification code is sent to "+tmp.Email);
+        }
+
+        public async Task<Boolean> ConfirmCode(int Uid,int code)
+        {
+            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == Uid && o.status == "ready");
+            if (code == otp.code)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

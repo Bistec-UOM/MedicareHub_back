@@ -1,5 +1,6 @@
 ﻿using Models;
-using Models.DTO.Lab;
+using Models.DTO.Lab.UploadResults;
+using Models.DTO.Lab.ViewResults;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,9 @@ namespace Services.LabService
         public Task<IEnumerable<Object>> AcceptedSamplesList();
 
         public Task<Boolean> UplaodResults(Result data);
-    }  
+
+        public Task<List<VResult>> CheckResult(int Pid);
+
+        public Task<Boolean> MarkCheck(int id);
+    }
 }

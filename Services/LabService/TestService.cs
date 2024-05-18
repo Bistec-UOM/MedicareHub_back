@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer;
 using Models;
 using Models.DTO.Lab;
+using Models.DTO.Lab.EditTemplate;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace Services.LabService
     {
         private readonly IRepository<Test> _test;
         private readonly IRepository<ReportFields> _tmplt;
-        public TestService(IRepository<Test> test,IRepository<ReportFields> tmplt)
+        private readonly ApplicationDbContext _cntx;
+        public TestService(IRepository<Test> test,IRepository<ReportFields> tmplt, ApplicationDbContext cntx)
         {
             _test = test;
             _tmplt = tmplt;
+            _cntx = cntx;
         }
 
         public async Task<IEnumerable<Test>> GetAllTests()
@@ -65,28 +68,38 @@ namespace Services.LabService
 
         public async Task AddTemplate(TemplateObj data)
         {
-            var x = new Test
+            using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                TestName = data.TestName,
-                Abb = data.Abb,
-                Price = data.Price,
-                Provider = data.Provider,
-            };
-            await _test.Add(x);
 
-            var Id = x.Id;
-
-            foreach (var i in data.ReportFields)
-            {
-                await _tmplt.Add(new ReportFields
+                var tst = new Test
                 {
-                    Fieldname = i.Fieldname,
-                    Index = i.Index,
-                    MinRef = i.MinRef,
-                    MaxRef = i.MaxRef,
-                    Unit = i.Unit,
-                    TestId = Id
-                });
+                    TestName = data.TestName,
+                    Abb = data.Abb,
+                    Price = data.Price,
+                    Provider = data.Provider,
+                };
+                
+                await _cntx.tests.AddAsync(tst);
+                await _cntx.SaveChangesAsync();
+
+                int tstId = tst.Id;
+
+                foreach (var i in data.ReportFields)
+                {
+                    await _cntx.reportFields.AddAsync(new ReportFields
+                    {
+                        Fieldname = i.Fieldname,
+                        Index = i.Index,
+                        MinRef = i.MinRef,
+                        MaxRef = i.MaxRef,
+                        Unit = i.Unit,
+                        TestId = tstId
+                    });
+                }
+
+                await _cntx.SaveChangesAsync();
+                await transaction.CommitAsync();
+
             }
         }
 
@@ -97,26 +110,58 @@ namespace Services.LabService
 
         public async Task EditTemplate(EdittemplateObj data)
         {
-            var existingF = await _tmplt.GetByProp("TestId", data.TestId);
-
-            //delete all existing fields
-            foreach (var item in existingF)
+            using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                await _tmplt.Delete(item.Id);
-            }
-
-            //Add all sent fields
-            foreach (var item in data.Fields)
-            {
-                await _tmplt.Add(new ReportFields
+                foreach (var item in data.Fields)
                 {
-                    Fieldname = item.Fieldname,
-                    Index = item.Index,
-                    MinRef = item.MinRef,
-                    MaxRef = item.MaxRef,
-                    Unit = item.Unit,
-                    TestId = data.TestId
-                });
+
+                    if (item.Stat == "exist")//update existing, protecting the Id
+                    {
+                        var existingField = await _cntx.reportFields.FindAsync(item.Id);
+                        if (existingField != null)
+                        {
+                            existingField.Fieldname = item.Fieldname;
+                            existingField.Index = item.Index;
+                            existingField.MinRef = item.MinRef;
+                            existingField.MaxRef = item.MaxRef;
+                            existingField.Unit = item.Unit;
+                            existingField.TestId = data.TestId;
+
+                            _cntx.reportFields.Update(existingField);
+                        }
+                    }
+                    else if (item.Stat == "new")//add new fields
+                    {
+                        ReportFields x = new ReportFields
+                        {
+                            Id = 0,
+                            Fieldname = item.Fieldname,
+                            Index = item.Index,
+                            MinRef = item.MinRef,
+                            MaxRef = item.MaxRef,
+                            Unit = item.Unit,
+                            TestId = data.TestId
+                        };
+                        await _cntx.reportFields.AddAsync(x);
+                    }
+                    else if(item.Stat == "deleted") 
+                    {
+                        ReportFields x = new ReportFields
+                        {
+                            Id = item.Id,
+                            Fieldname = item.Fieldname,
+                            Index = item.Index,
+                            MinRef = item.MinRef,
+                            MaxRef = item.MaxRef,
+                            Unit = item.Unit,
+                            TestId = data.TestId
+                        };
+                        _cntx.reportFields.Remove(x);
+                    }
+                }
+                await _cntx.SaveChangesAsync();
+                await transaction.CommitAsync();
+
             }
         }
 
