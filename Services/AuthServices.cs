@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Models.DTO;
+using SendGrid.Helpers.Mail;
 using Services.AppointmentService;
 using System;
 using System.Collections.Generic;
@@ -66,11 +67,25 @@ namespace Services
         public async Task<string> CreateToken(int UserId)
         {
             var tmp = await _user.Get(UserId);
+            int? RoleId = null;
+
+            if (tmp.Role == "Doctor") {
+                RoleId = _cnt.doctors.SingleOrDefault(d => d.UserId == UserId)?.Id;
+            }else if (tmp.Role == "LabAssistant") {
+                RoleId = _cnt.labAssistants.SingleOrDefault(l => l.UserId == UserId)?.Id;
+            }else if (tmp.Role == "Cashier") {
+                RoleId = _cnt.cashiers.SingleOrDefault(c => c.UserId == UserId)?.Id;
+            }else if (tmp.Role == "Receptionist") {
+                RoleId = _cnt.receptionists.SingleOrDefault(r => r.UserId == UserId)?.Id;
+            }else {
+                RoleId = 0;//Admin ID
+            }
 
             List<Claim> claims = new List<Claim> {
                 new Claim("Id",tmp.Id.ToString()),
                 new Claim("Name", tmp.Name !),
                 new Claim("Role", tmp.Role !),
+                new Claim("RoleId",RoleId.ToString()),
                 new Claim("IssuedAt", DateTime.UtcNow.ToString()),
                 new Claim("Profile",tmp.ImageUrl)
             };
