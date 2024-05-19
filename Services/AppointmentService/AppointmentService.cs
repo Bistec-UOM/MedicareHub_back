@@ -26,7 +26,8 @@ namespace Services.AppointmentService
             _patient = patient;
             _doctor = doctor;
             _unable_date = unableDate;
-        }     
+        } 
+        
         public async Task<int> AddAppointment(Appointment appointment)  //Add an appointment
         {
             bool appointmentExists = _dbcontext.appointments.Any(a => a.PatientId == appointment.PatientId && a.DateTime == appointment.DateTime); //checking if there already appointments for that time slot on that patient
