@@ -34,6 +34,7 @@ namespace DataAccessLayer
         public DbSet<User> users { get; set; }
         public DbSet<User_Tele> user_Teles { get; set; }
         //----------------------------------------------
+        public DbSet<Admin> admins { get; set; }
         public DbSet<Doctor> doctors { get; set; }
         public DbSet<Receptionist> receptionists { get; set; }
         public DbSet<Cashier> cashiers { get; set; }
