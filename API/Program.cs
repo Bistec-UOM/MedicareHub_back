@@ -33,6 +33,19 @@ builder.Services.AddSwaggerGen(options =>
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy =>
+        policy.RequireClaim("Role", "Admin"));
+    options.AddPolicy("Recep", policy =>
+        policy.RequireClaim("Role", "Receptionist"));
+    options.AddPolicy("Doct", policy =>
+        policy.RequireClaim("Role", "Doctor"));
+    options.AddPolicy("Cash", policy =>
+        policy.RequireClaim("Role", "Cashier"));
+    options.AddPolicy("Lab", policy =>
+        policy.RequireClaim("Role", "Lab Assistant"));
+});
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
