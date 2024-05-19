@@ -101,7 +101,7 @@ namespace Services.LabService
             return age;
         }
 
-        async public Task<Boolean> UplaodResults(Result data)
+        async public Task<Boolean> UplaodResults(Result data,int RoleId)
         {
             foreach (var i in data.Results!)
             {
@@ -125,6 +125,7 @@ namespace Services.LabService
 
             tmp.DateTime=DateTime.UtcNow;
             tmp.Status = "done";
+            tmp.LbAstID = RoleId;
             _cntx.labReports.Update(tmp);
             await _cntx.SaveChangesAsync();
             return true;

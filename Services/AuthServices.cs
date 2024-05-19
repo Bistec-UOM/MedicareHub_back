@@ -71,7 +71,7 @@ namespace Services
 
             if (tmp.Role == "Doctor") {
                 RoleId = _cnt.doctors.SingleOrDefault(d => d.UserId == UserId)?.Id;
-            }else if (tmp.Role == "LabAssistant") {
+            }else if (tmp.Role == "Lab Assistant") {
                 RoleId = _cnt.labAssistants.SingleOrDefault(l => l.UserId == UserId)?.Id;
             }else if (tmp.Role == "Cashier") {
                 RoleId = _cnt.cashiers.SingleOrDefault(c => c.UserId == UserId)?.Id;
