@@ -37,6 +37,14 @@ namespace Services.AdminServices
                 };
                 dbContext.doctors.Add(doctor);
             }
+            else if (user.Role == "Admin")
+            {
+                var admin = new Admin
+                {
+                    UserId = user.Id,
+                };
+                dbContext.admins.Add(admin);
+            }
             else if (user.Role == "Receptionist")
             {
                 var receptionist = new Receptionist

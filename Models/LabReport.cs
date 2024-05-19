@@ -36,7 +36,7 @@ namespace Models
 
 
         [ForeignKey("LbAstID")]
-        public int LbAstID { get; set; }
+        public int? LbAstID { get; set; }
         [JsonIgnore]
         public LabAssistant? LbAst { get; set; }
 
