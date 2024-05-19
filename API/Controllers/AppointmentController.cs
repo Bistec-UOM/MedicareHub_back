@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using Models;
 using Models.DTO;
 using Services.AppointmentService;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
+    [Authorize(Policy = "Recep")]
     [Route("api/[controller]")]
     [ApiController]
     public class AppointmentController : ControllerBase
@@ -40,15 +43,28 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult> AddAppointment(Appointment appointment)  //Adding an appointment
         {
+            var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+            int roleId = int.Parse(claim);
+
+            if (roleId == 0) { return Unauthorized(); }
+
+            var app = appointment;
+            app.RecepId=roleId;
+
+
+
             try
-            {
-              var result= await _appointment.AddAppointment(appointment);
-              return Ok(result);
-             
-            }catch(Exception ex)
-            {
-               return BadRequest(ex.Message);
-            }
+                {
+                    var result = await _appointment.AddAppointment(app);
+                    return Ok(result);
+
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+          
         }
 
 
@@ -173,10 +189,26 @@ namespace API.Controllers
             return Ok(appointments);
         }
         [HttpGet("patients")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
         {
-            var patients = await _appointment.GetPatients();
-            return Ok(patients);
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            var Role = identity.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
+
+            if(Role=="Receptionist")
+            {
+
+                var patients = await _appointment.GetPatients();
+                return Ok(patients);
+
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+
+
         }
         [HttpPut("{id}")]
         public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment

@@ -12,9 +12,12 @@ using Services.AppointmentService;
 using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+using DotNetEnv;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 // Add services to the container.
 
