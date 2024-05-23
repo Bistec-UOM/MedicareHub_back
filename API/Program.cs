@@ -31,7 +31,9 @@ builder.Services.AddSwaggerGen(options =>
     {
         In = ParameterLocation.Header,
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "Enter 'Bearer {token}'"
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
