@@ -17,9 +17,9 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Notification notification)
+        public async Task<IActionResult> Post(Notification notification)
         {
-            // Send notification to all connected clients
+            // Send notification to a specific user
             await _hubContext.Clients.All.SendAsync("ReceiveNotification", notification.Message);
             return Ok();
         }
@@ -27,6 +27,7 @@ namespace API.Controllers
 
     public class Notification
     {
+        //public int UserId { get; set; } // Include UserId to specify the target user
         public string Message { get; set; }
     }
 }
