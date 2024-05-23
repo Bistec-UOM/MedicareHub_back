@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Identity.Client;
 using Models;
 using Models.DTO;
@@ -10,20 +11,23 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Authorize(Policy = "Recep")]
+   
     [Route("api/[controller]")]
     [ApiController]
     public class AppointmentController : ControllerBase
     {
 
         private readonly AppointmentService _appointment;
-        public AppointmentController(AppointmentService appointment)
+        private readonly IHubContext<NotificationHub> _hubContext;
+        public AppointmentController(AppointmentService appointment, IHubContext<NotificationHub> hubContext)
         {
             
             _appointment = appointment;
+            _hubContext = hubContext;
 
         }
-        
+
+        [Authorize(Policy = "Recep")]
         [HttpGet("patient/{id}", Name = "GetPatient")]
 
         public async Task<ActionResult<Patient>> GetPatient(int id)  //get patient by id
@@ -31,6 +35,7 @@ namespace API.Controllers
             return Ok(await _appointment.GetPatient(id));
         }
 
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet]
 
         public async Task<ActionResult<ICollection<Appointment>>> GetAllAppointments()   //getting all appointments
@@ -40,6 +45,7 @@ namespace API.Controllers
             return Ok(appointments);
         }
 
+        [Authorize(Policy = "Recep")]
         [HttpPost]
         public async Task<ActionResult> AddAppointment(Appointment appointment)  //Adding an appointment
         {
@@ -56,7 +62,8 @@ namespace API.Controllers
             try
                 {
                     var result = await _appointment.AddAppointment(app);
-                    return Ok(result);
+                    await _hubContext.Clients.Group(appointment.DoctorId.ToString()).SendAsync("ReceiveNotification", "A new appointment has been added");
+                return Ok(result);
 
                 }
                 catch (Exception ex)
@@ -67,7 +74,7 @@ namespace API.Controllers
           
         }
 
-
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet("{id}", Name = "GetAppointment")]
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)  //getting an appointment by id
@@ -76,6 +83,7 @@ namespace API.Controllers
             return Ok(appointment);
         }
 
+        [Authorize(Policy = "Recep")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> DeleteAppointment(int id)  
         {
@@ -106,6 +114,7 @@ namespace API.Controllers
             return Ok(deletedAppointment);
         }
 
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
         public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)  //getting all the appointments of a specific doctor
         {
@@ -113,19 +122,21 @@ namespace API.Controllers
             return Ok(doctorAppointments);
         }
 
-
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
         {
            
             return Ok(await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId,date));
         }
+        [Authorize(Policy = "Recep")]
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors() //getting the doctors list
         {
             var doctors =  _appointment.GetDoctors();
             return Ok(doctors);
         }
+        [Authorize(Policy = "Recep")]
         [HttpPost("patients")]
         public async Task RegisterPatient(Patient patient)  //registering a patient
         {
@@ -133,6 +144,7 @@ namespace API.Controllers
             await _appointment.RegisterPatient(patient);
 
         }
+        [Authorize(Policy = "Recep&Doct")]
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)  //cancel the appointment by doctor
         {
@@ -158,6 +170,7 @@ namespace API.Controllers
             }
             return Ok(targetAppointment);
         }
+       
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date) //cancel all apps of a day by doctor
         {
@@ -182,14 +195,15 @@ namespace API.Controllers
             }
             return NoContent();
         }
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
         {
             var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
             return Ok(appointments);
         }
+        [Authorize(Policy = "Recep")]
         [HttpGet("patients")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -210,12 +224,15 @@ namespace API.Controllers
 
 
         }
+
+        [Authorize(Policy = "Recep")]
         [HttpPut("{id}")]
         public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment
         {
 
             return Ok(await _appointment.UpdateAppointment(id, appointment));
         }
+        [Authorize(Policy = "Recep&Doct")]
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
         {
@@ -246,7 +263,7 @@ namespace API.Controllers
             return NoContent();
 
         }
-
+        [Authorize(Policy = "Doct")]
         [HttpPost("unableDates")]
         public async Task AddUnableDate(Unable_Date uDate)  //adding unable dates
         {
@@ -254,6 +271,8 @@ namespace API.Controllers
            
         }
 
+
+       
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {
