@@ -21,7 +21,6 @@ namespace API.Controllers.LabControllers
         }
 
         //Get the list of all lab tests to display in test list=================
-        [Authorize(Policy = "Lab")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
