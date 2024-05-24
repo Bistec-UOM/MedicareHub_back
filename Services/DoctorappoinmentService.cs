@@ -19,14 +19,17 @@ namespace Services
         private readonly IRepository<Prescription> _pres;
         private readonly IRepository<Prescript_drug> _drug;
         private readonly IRepository<LabReport> _labs;
+        private readonly IRepository<Test> _tests;
         public DoctorappoinmentService(IRepository<Appointment> appoinments, ApplicationDbContext context,
-                                        IRepository<Prescription> pres,IRepository<Prescript_drug> psrdrg, IRepository<LabReport> labs)
+                                        IRepository<Prescription> pres,IRepository<Prescript_drug> psrdrg, 
+                                        IRepository<LabReport> labs, IRepository<Test>tests)
         {
            _drug = psrdrg;
             _appoinments = appoinments;
             _context = context;
                 _pres = pres;
             _labs = labs;
+            _tests = tests;
         }
        // get appoinment list from database
         public async Task<List<object>> GetPatientNamesForApp()
@@ -130,6 +133,8 @@ namespace Services
             var prescriptionIds = prescriptions.Select(p => p.Id).ToList();
             // get the prescription ids list according to the appoinment ids
 
+           
+
             var prescriptionWithDrugsList = new List<PrescriptionWithDrugs>();
 
             foreach (var x in prescriptionIds)
@@ -141,10 +146,23 @@ namespace Services
                     .Where(pd => pd.PrescriptionId == x)
                     .ToListAsync();
 
+                var relatedLabReports = await _context.labReports
+                    .Where(lr => lr.PrescriptionID == x)
+                    .ToListAsync();
+                // Fetch test names for the related lab reports
+                var labReportIds = relatedLabReports.Select(lr => lr.Id).ToList();
+
+                var testNames = await _context.tests
+                    .Where(t => labReportIds.Contains(t.Id))
+                    .Select(t => t.TestName)
+                    .ToListAsync();
+
                 var prescriptDrugs = new PrescriptionWithDrugs
                 {
                     Prescription = prescription,
-                   Drugs = prescriptionDrugs
+                   Drugs = prescriptionDrugs,
+                    LabReports = relatedLabReports,
+                    TestNames = testNames
                 };
 
                 prescriptionWithDrugsList.Add(prescriptDrugs);
