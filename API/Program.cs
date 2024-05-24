@@ -5,15 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Models;
-using Models.DTO.Doctor;
 using Services;
-using Services.AdminServices;
-using Services.AppointmentService;
-using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using DotNetEnv;
-using API.Hubs;
+using Models.DTO.Doctor;
+using Services.AdminServices;
+using Services.AppointmentService;
+using Services.LabService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +22,7 @@ Env.Load();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
@@ -38,20 +37,17 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
+// Configure Authorization
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy =>
-        policy.RequireClaim("Role", "Admin"));
-    options.AddPolicy("Recep", policy =>
-        policy.RequireClaim("Role", "Receptionist"));
-    options.AddPolicy("Doct", policy =>
-        policy.RequireClaim("Role", "Doctor"));
-    options.AddPolicy("Cash", policy =>
-        policy.RequireClaim("Role", "Cashier"));
-    options.AddPolicy("Lab", policy =>
-        policy.RequireClaim("Role", "Lab Assistant"));
+    options.AddPolicy("Admin", policy => policy.RequireClaim("Role", "Admin"));
+    options.AddPolicy("Recep", policy => policy.RequireClaim("Role", "Receptionist"));
+    options.AddPolicy("Doct", policy => policy.RequireClaim("Role", "Doctor"));
+    options.AddPolicy("Cash", policy => policy.RequireClaim("Role", "Cashier"));
+    options.AddPolicy("Lab", policy => policy.RequireClaim("Role", "Lab Assistant"));
 });
 
+// Configure Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -61,7 +57,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateIssuer = false,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                builder.Configuration.GetSection("AppSettings:Token").Value!.PadRight(64, '\0')))
+                builder.Configuration.GetSection("AppSettings:Token").Value.PadRight(64, '\0')))
         };
 
         options.Events = new JwtBearerEvents
@@ -69,10 +65,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
-
-                // If the request is for the hub endpoint, get the token from the query string
                 var path = context.HttpContext.Request.Path;
-                if (!string.IsNullOrEmpty(accessToken) &&(path.StartsWithSegments("/notificationHub")))
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationHub"))
                 {
                     context.Token = accessToken;
                 }
@@ -80,6 +74,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
 
 // Enable CORS for React.js
 builder.Services.AddCors(options =>
@@ -93,51 +88,37 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure Entity Framework and Dependency Injection for services and repositories
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("defaultString"));
 });
 
-
-
-// Dependency Injection for various services
+// Register services
 builder.Services.AddScoped<NotificationService>();
-
-
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Unable_Date>, Repository<Unable_Date>>();
-
 builder.Services.AddScoped<DoctorappoinmentService>();
 builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
 builder.Services.AddScoped<IRepository<AddDrugs>, Repository<AddDrugs>>();
 builder.Services.AddScoped<IRepository<Prescript_drug>, Repository<Prescript_drug>>();
 builder.Services.AddScoped<IRepository<LabReport>, Repository<LabReport>>();
-
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<BillService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
-
 builder.Services.AddScoped<IPatientService, PatientService>();
-builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
-
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRepository<User>, Repository<User>>();
-
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
-builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
-
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<ValueService>();
 builder.Services.AddScoped<DoctorAnalyticService>();
-
 builder.Services.AddScoped<IRepository<ReportFields>, Repository<ReportFields>>();
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
 builder.Services.AddScoped<IRepository<LabReport>, Repository<LabReport>>();
 builder.Services.AddScoped<IRepository<Record>, Repository<Record>>();
-
 builder.Services.AddScoped<AuthServices>();
 builder.Services.AddScoped<IRepository<Otp>, Repository<Otp>>();
 
@@ -157,8 +138,8 @@ app.UseAuthentication(); // Ensure authentication is added before authorization
 app.UseAuthorization();
 app.UseCors("ReactJSDomain");
 
-// Map controllers
+// Map controllers and SignalR hub
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub"); // Ensure the hub route is correct
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

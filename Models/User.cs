@@ -24,6 +24,7 @@ namespace Models
         public Boolean IsDeleted {  get; set; }
         public string? ImageUrl { get; set; }
         public DateTime? DOB { get; set; }
+        public string? ConnectionId { get; set; }
 
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
