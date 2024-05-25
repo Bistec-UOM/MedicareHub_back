@@ -1,27 +1,22 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-
-namespace API
-
+using System.Collections.Concurrent;
 
 {
-    public class NotificationHub:Hub
     {
+        private static readonly ConcurrentDictionary<string, string> UserConnections = new ConcurrentDictionary<string, string>();
 
-        public async Task JoinGroup(string doctorId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, doctorId);
+            }
+
         }
 
-        public async Task LeaveGroup(string doctorId)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, doctorId);
+            {
         }
 
-        public async Task SendNotificationToDoctor(string doctorId, string message)
+        public static string GetConnectionId(string userId)
         {
-            await Clients.Group(doctorId).SendAsync("ReceiveNotification", message);
+            UserConnections.TryGetValue(userId, out var connectionId);
+            return connectionId;
         }
-
     }
 }
