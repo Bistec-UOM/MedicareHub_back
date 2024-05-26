@@ -18,12 +18,11 @@ namespace API.Controllers
     {
 
         private readonly AppointmentService _appointment;
-        private readonly IHubContext<NotificationHub> _hubContext;
-        public AppointmentController(AppointmentService appointment, IHubContext<NotificationHub> hubContext)
+        public AppointmentController(AppointmentService appointment)
         {
             
             _appointment = appointment;
-            _hubContext = hubContext;
+           
 
         }
 
@@ -62,7 +61,6 @@ namespace API.Controllers
             try
                 {
                     var result = await _appointment.AddAppointment(app);
-                    await _hubContext.Clients.Group(appointment.DoctorId.ToString()).SendAsync("ReceiveNotification", "A new appointment has been added");
                 return Ok(result);
 
                 }
