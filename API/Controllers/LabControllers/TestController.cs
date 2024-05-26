@@ -1,5 +1,4 @@
-﻿using API.Hubs;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +22,7 @@ namespace API.Controllers.LabControllers
 
 
         //Get the list of all lab tests to display in test list=================
+        [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
