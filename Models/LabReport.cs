@@ -18,7 +18,7 @@ namespace Models
         [JsonIgnore]
         public Prescription? Prescription { get; set; }
 
-
+        public DateTime? AcceptedDate { get; set; }
         public DateTime? DateTime { get; set; }
 
 
