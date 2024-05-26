@@ -70,6 +70,7 @@ namespace Services.LabService
             if (tmp != null)
             {
                 tmp.Status = "accepted";
+                tmp.AcceptedDate = DateTime.Now;
                 await _rep.Update(tmp);
                 return true;
             }
@@ -85,7 +86,8 @@ namespace Services.LabService
                         Id = l.Id,
                         TestId = l.TestId,
                         TestName = l.Test!.TestName,
-                        Abb= l.Test.Abb
+                        Abb= l.Test.Abb,
+                        Accepted = l.AcceptedDate
                      })
                 .ToListAsync<object>();
         }

@@ -50,10 +50,9 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("Role", "Cashier"));
     options.AddPolicy("Lab", policy =>
         policy.RequireClaim("Role", "Lab Assistant"));
-    options.AddPolicy("Recep&Doct", policy =>
-        policy.RequireAssertion(context =>
-          context.User.HasClaim(c => (c.Type == "Role" && c.Value == "Receptionist") ||
-                                     (c.Type == "Role" && c.Value == "Doctor"))));
+    options.AddPolicy("Doct&Recep", policy =>
+       policy.RequireAssertion(context =>
+           context.User.HasClaim(c => c.Type == "Role" && (c.Value == "Receptionist" || c.Value == "Doctor"))));
 });
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
