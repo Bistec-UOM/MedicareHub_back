@@ -106,6 +106,7 @@ namespace Services
                 {
                     PrescriptionID = pId,
                     DateTime = null,
+                    AcceptedDate = null,
                     TestId = d.TestId,
                     Status = "new"
                 };
