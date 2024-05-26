@@ -270,7 +270,7 @@ namespace API.Controllers
         }
 
 
-       
+        [Authorize(Policy = "Recep&Doct")]
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {

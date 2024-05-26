@@ -157,6 +157,6 @@ app.UseCors("ReactJSDomain");
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub");
+
 
 app.Run();
