@@ -1,5 +1,4 @@
-﻿using API.Hubs;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -16,27 +15,14 @@ namespace API.Controllers.LabControllers
     public class TestController : ControllerBase
     {
         private readonly TestService _tst;
-        private readonly IHubContext<NotificationHub> _hubContext;
-        public TestController(TestService test, IHubContext<NotificationHub> hubContext)
+        public TestController(TestService test)
         {
             _tst = test;
-            _hubContext = hubContext;
         }
 
-        [HttpPost("send")]
-        public async Task<IActionResult> SendMessageToUser(string userId, string message)
-        {
-            var connectionId = NotificationHub.GetConnectionId(userId);
-            if (!string.IsNullOrEmpty(connectionId))
-            {
-                await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveMessage", message);
-                return Ok("Message sent.");
-            }
-
-            return NotFound("User not connected.");
-        }
 
         //Get the list of all lab tests to display in test list=================
+        [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
