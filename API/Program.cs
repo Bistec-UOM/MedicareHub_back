@@ -31,7 +31,9 @@ builder.Services.AddSwaggerGen(options =>
     {
         In = ParameterLocation.Header,
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "Enter 'Bearer {token}'"
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
@@ -40,11 +42,19 @@ builder.Services.AddSwaggerGen(options =>
 // Configure Authorization
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("Admin", policy => policy.RequireClaim("Role", "Admin"));
-    options.AddPolicy("Recep", policy => policy.RequireClaim("Role", "Receptionist"));
-    options.AddPolicy("Doct", policy => policy.RequireClaim("Role", "Doctor"));
-    options.AddPolicy("Cash", policy => policy.RequireClaim("Role", "Cashier"));
-    options.AddPolicy("Lab", policy => policy.RequireClaim("Role", "Lab Assistant"));
+    options.AddPolicy("Admin", policy =>
+        policy.RequireClaim("Role", "Admin"));
+    options.AddPolicy("Recep", policy =>
+        policy.RequireClaim("Role", "Receptionist"));
+    options.AddPolicy("Doct", policy =>
+        policy.RequireClaim("Role", "Doctor"));
+    options.AddPolicy("Cash", policy =>
+        policy.RequireClaim("Role", "Cashier"));
+    options.AddPolicy("Lab", policy =>
+        policy.RequireClaim("Role", "Lab Assistant"));
+    options.AddPolicy("Doct&Recep", policy =>
+       policy.RequireAssertion(context =>
+           context.User.HasClaim(c => c.Type == "Role" && (c.Value == "Receptionist" || c.Value == "Doctor"))));
 });
 
 // Configure Authentication

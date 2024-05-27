@@ -25,6 +25,7 @@ namespace Models
         public string? ImageUrl { get; set; }
         public DateTime? DOB { get; set; }
         public string? ConnectionId { get; set; }
+        public Boolean IsActive { get; set; }
 
         [JsonIgnore]
         public List<User_Tele>? User_Tele { get; set; }
