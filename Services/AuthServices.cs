@@ -106,9 +106,11 @@ namespace Services
             return jwt;
         }
 
+
+        //OTP stages : ready --> vaild --> done / expired
         public async Task<string> SendOTP(int id)
         {
-            var tmp = await _user.Get(id);
+            var tmp = await _cnt.users.Where(e => e.Id == id).FirstOrDefaultAsync();
             Otp obj = new Otp();
 
             Random RndNm = new Random();
@@ -127,36 +129,55 @@ namespace Services
 
         public async Task<String> CheckOTP(SentOTP data)
         {
-            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.OTP);
-            if(otp.status == "ready")
+            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.UserId);
+            if(otp != null)
             {
-                if (otp.code == data.OTP)//otp verified
+                if (otp.status == "ready")
                 {
-                    otp.status = "done";
-                    await _otp.Update(otp);
-                    return "OK";
+                    if (otp.code == data.OTP)//otp verified
+                    {
+                        otp.status = "valid";
+                        await _otp.Update(otp);
+                        return "OK";
+                    }
+                    else
+                    {
+                        return "OTP doesn't match";
+                    }
+                }
+                else if (otp.status == "expired")
+                {
+                    return "OTP has expired. Try again";
                 }
                 else
                 {
-                    return "OTP doesn't match";
+                    return "Invalid Attempt. Try again";
                 }
-            }else if(otp.status == "expired")
-            {
-                return "OTP has expired. Try again";
             }
             else
             {
-                return "OTP is not valid. Try again";
+                return "Doen't exist";
             }
+
         }
 
         public async Task NewPassword(NewPassword data)
         {
-            User user = await _cnt.users.Where(e => e.Id == data.UserId).FirstOrDefaultAsync();
-            if(user != null)
+            Otp? otp = await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.UserId);
+            if (otp.status == "valid")
             {
-                user.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
-                await _user.Update(user);
+                User? user = await _cnt.users.Where(e => e.Id == data.UserId).FirstOrDefaultAsync();
+                using (var transaction = await _cnt.Database.BeginTransactionAsync())
+                {
+                    otp.status = "done";
+                    _cnt.otps.Update(otp);
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                    _cnt.users.Update(user);
+                    await _cnt.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
+
             }
 
         }

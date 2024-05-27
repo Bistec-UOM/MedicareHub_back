@@ -10,6 +10,5 @@ namespace Models.DTO.Auth
     {
         public int UserId { get; set; }
         public string Password { get; set; } = null!;
-        public string ConfirmPassword { get; set; } = null!;
     }
 }
