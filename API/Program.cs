@@ -13,6 +13,7 @@ using Services.LabService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using DotNetEnv;
+using API;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,8 @@ Env.Load();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
@@ -153,5 +156,6 @@ app.UseCors("ReactJSDomain");
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
