@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.DTO
 {
-    public class UserLog
+    public class Bill
     {
-        public int UserId {  get; set; }
-        public string Password { get; set; } = null!;
+        public List<Bill_drug>? Data {  get; set; }
+        public float Total { get; set; }
     }
 }

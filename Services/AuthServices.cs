@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
-using Models.DTO;
+using Models.DTO.Auth;
 using SendGrid.Helpers.Mail;
 using Services.AppointmentService;
 using System;
@@ -106,7 +106,7 @@ namespace Services
             return jwt;
         }
 
-        public async Task<string> VerifyCode(int id)
+        public async Task<string> SendOTP(int id)
         {
             var tmp = await _user.Get(id);
             Otp obj = new Otp();
@@ -115,6 +115,7 @@ namespace Services
             obj.code = RndNm.Next(100000, 999999);
             obj.status = "ready";
             obj.userId = id;
+            obj.DateTime= DateTime.UtcNow;
 
             await _otp.Add(obj);
 
@@ -124,17 +125,40 @@ namespace Services
             return ("Check out your Email, A verification code is sent to "+tmp.Email);
         }
 
-        public async Task<Boolean> ConfirmCode(int Uid,int code)
+        public async Task<String> CheckOTP(SentOTP data)
         {
-            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == Uid && o.status == "ready");
-            if (code == otp.code)
+            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.OTP);
+            if(otp.status == "ready")
             {
-                return true;
+                if (otp.code == data.OTP)//otp verified
+                {
+                    otp.status = "done";
+                    await _otp.Update(otp);
+                    return "OK";
+                }
+                else
+                {
+                    return "OTP doesn't match";
+                }
+            }else if(otp.status == "expired")
+            {
+                return "OTP has expired. Try again";
             }
             else
             {
-                return false;
+                return "OTP is not valid. Try again";
             }
+        }
+
+        public async Task NewPassword(NewPassword data)
+        {
+            User user = await _cnt.users.Where(e => e.Id == data.UserId).FirstOrDefaultAsync();
+            if(user != null)
+            {
+                user.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                await _user.Update(user);
+            }
+
         }
     }
 }
