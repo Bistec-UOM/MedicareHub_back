@@ -4,6 +4,7 @@ using Models;
 using Models.DTO.Doctor;
 using SendGrid.Helpers.Mail;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -65,6 +66,50 @@ namespace Services
             }
             return age;
         }
+
+     //....................................................................................................................................
+     //....................................................................................................................................
+     //....................................................................................................................................
+
+       // get appoinment list from database filter on doctorId and todays date
+        public async Task<List<object>> GetPatientNamesForApp2(int doctorId)
+        {
+            var today = DateTime.UtcNow.Date; // Get today's date
+
+            var tmp = _context.appointments
+
+            .Where(a => a.Status == "new" && a.DoctorId == doctorId && a.DateTime.Date == today) // Filter appointments with status "new"                
+            .Select(a => new
+            {
+                id = a.Id,
+                date = a.DateTime.Date,
+                time = a.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                status = "pending",
+                Patient = new
+                {
+                    name = a.Patient.Name,
+                    age = CaluclateAge2((DateTime)a.Patient.DOB),
+                    gender = a.Patient.Gender,
+                    id = a.Patient.Id
+                }
+            })
+            .ToList<object>();
+            return tmp;
+        }
+        //funtion for calculate the age from DOB
+        private static int CaluclateAge2(DateTime dob)
+        {
+            DateTime now = DateTime.UtcNow;
+            int age = now.Year - dob.Year;
+            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            {
+                age--;
+            }
+            return age;
+        }
+    //......................................................................................................................................
+    //........................................................................................................................................
+    //......................................................................................................................................
 
         // for prescription
         public async Task<Appointment> AddPrescription(AddDrugs data)
