@@ -33,6 +33,7 @@ namespace DataAccessLayer
         public DbSet<Patient_Teles> Patient_Teles { get; set; }
         public DbSet<User> users { get; set; }
         public DbSet<User_Tele> user_Teles { get; set; }
+        public DbSet<Notification> notification { get; set; }
         //----------------------------------------------
         public DbSet<Admin> admins { get; set; }
         public DbSet<Doctor> doctors { get; set; }

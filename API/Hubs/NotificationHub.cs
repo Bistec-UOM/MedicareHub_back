@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using System;
+using System.Text.Json; // Add this line
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public interface INotificationClient
 {
@@ -30,25 +30,32 @@ public class NotificationHub : Hub<INotificationClient>
 
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        // var connectionId = Context.ConnectionId;
         var connectionId = Context.ConnectionId;
-        // Find the user associated with the connectionId
         var user = await _dbContext.users.FirstOrDefaultAsync(u => u.ConnectionId == connectionId);
         if (user != null)
         {
-            // Update the user's email to dhammika@gmail.com
-            user.Email = "dhammika@gmail.com";
-            user.ConnectionId = null; // Clear the connection ID
-
-            // Save changes to the database
-            await _dbContext.SaveChangesAsync();
-
-            // Broadcast the new email
-            await Clients.All.broadcastMessage(user.Name, "User has disconnected.");
+            await Clients.All.Receiver("User has disconnected.");
         }
 
         await base.OnDisconnectedAsync(exception);
     }
+
+    public async Task ManualDisconnect(string Id)
+    {
+        if(int.TryParse(Id,out int userId))
+        {
+            var user = await _dbContext.users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user != null)
+            {
+                user.IsActive = false;
+                user.ConnectionId = null;
+                await _dbContext.SaveChangesAsync();
+                await Clients.All.broadcastMessage(user.Name, "User has manually disconnected.");
+            }
+        }
+        
+    }
+
 
     public string GetConnectionId()
     {
@@ -62,28 +69,31 @@ public class NotificationHub : Hub<INotificationClient>
             var user = await _dbContext.users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user != null)
             {
-                user.Email = "yasiru@gmail.com"; // Update the user's email to yasiru@gmail.com
-                user.ConnectionId = Context.ConnectionId; // Update the user's connection ID
-                await _dbContext.SaveChangesAsync(); // Save changes to the database
-                // Call the broadcastMessage method to update clients with the new email
-                await Clients.All.broadcastMessage(user.Email, message);
+                user.IsActive = true;
+                user.ConnectionId = Context.ConnectionId;
+                await _dbContext.SaveChangesAsync();
+                await Clients.Client(Context.ConnectionId).broadcastMessage(user.Name, message);
             }
             else
             {
-                // Handle the case where the user is not found
-                await Clients.All.ReceiveNotification($"User with ID {id} not found.");
+                await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
             }
         }
         else
         {
-            // Handle the case where the id is not a valid integer
-            await Clients.All.ReceiveNotification($"Invalid user ID {id}.");
+            await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
         }
     }
 
-    private async Task<User> GetUserByConnectionId(string connectionId)
+    public async Task UsersCalling()
     {
-        // Find the user by their connection ID
-        return await _dbContext.users.FirstOrDefaultAsync(u => u.ConnectionId == connectionId);
+        await UpdateUserList();
+    }
+
+    private async Task UpdateUserList()
+    {
+        var users = await _dbContext.users.ToListAsync();
+        var usersJson = JsonSerializer.Serialize(users);
+        await Clients.All.Receiver(usersJson);
     }
 }

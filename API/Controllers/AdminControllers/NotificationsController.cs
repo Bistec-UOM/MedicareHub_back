@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
+using Models;
 
 namespace API.Controllers
 {
@@ -18,24 +20,42 @@ namespace API.Controllers
             _context = context;
         }
         [HttpPost]
-        public async Task<IActionResult> Post(Notification notification)
+        public async Task<IActionResult> Post([FromBody] Notification notification)
         {
-            var user = await _context.users.FindAsync(notification.UserId);      
-            await _hubContext.Clients.All.ReceiveNotification($"{user.Name}->{notification.Message}");
-            return Ok();
+            // Find the user by UserId
+           
+
+            // Send notification using SignalR
+            await _hubContext.Clients.All.ReceiveNotification($"{notification.To} -> {notification.Message}");
+
+            // Add the notification to the database context
+            notification.To = "Pharmacist";
+            notification.From = "System";
+            notification.SendAt = DateTime.UtcNow;  // Setting the SendAt time
+            _context.notification.Add(notification);
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return Ok(notification);
         }
         [HttpPost("get")]
         public async Task<IActionResult> Poster(Notification notification)
         {
-            var user = await _context.users.FindAsync(notification.UserId);      
-            await _hubContext.Clients.All.Receiver($"from receiver {user.Name}->{notification.Message}");
-            return Ok();
+            await _hubContext.Clients.All.Receiver($"from receiver {notification.To}->{notification.Message}");
+            // Add the notification to the database context
+            notification.To = "Doctor";
+            notification.From = "System";
+            notification.SendAt = DateTime.UtcNow;  // Setting the SendAt time
+            _context.notification.Add(notification);
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return Ok(notification);
+
         }
     }
 
-    public class Notification
-    {
-        public int UserId { get; set; }
-        public string Message { get; set; }
-    }
+ 
 }
