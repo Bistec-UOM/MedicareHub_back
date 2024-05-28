@@ -13,6 +13,8 @@ using Models.DTO.Doctor;
 using Services.AdminServices;
 using Services.AppointmentService;
 using Services.LabService;
+using API;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +24,8 @@ Env.Load();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 
-// Configure Swagger/OpenAPI
+builder.Services.AddSignalR();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
@@ -180,5 +183,6 @@ app.UseCors("ReactJSDomain");
 // Map controllers and SignalR hub
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
+
 
 app.Run();

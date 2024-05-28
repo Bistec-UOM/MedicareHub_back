@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Models.DTO;
 using Services;
 
 namespace API.Controllers
@@ -33,7 +34,7 @@ namespace API.Controllers
             return Ok(medicineDetails);
         }
         [HttpPost("AddBillDrugs")]
-        public async Task<IActionResult> AddBillDrugs(IEnumerable<Bill_drug> billDrugs)
+        public async Task<IActionResult> AddBillDrugs(Bill billDrugs)
         {
             try
             {
