@@ -38,7 +38,7 @@ namespace API.Controllers
 
         //Add bill details (paid drugs)
         [HttpPost("AddBillDrugs")]
-        public async Task<IActionResult> AddBillDrugs(Bill data)
+        public async Task<IActionResult> AddBillDrugs(Bill billDrugs)
         {
             await _billService.AddBillDrugs(data);
             return Ok();

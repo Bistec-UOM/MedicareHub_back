@@ -8,7 +8,7 @@ namespace Models.DTO
 {
     public class Bill
     {
-        public List<Bill_drug>? Data {  get; set; }
+        public List<Bill_drug>? Data { get; set; }
         public float Total { get; set; }
     }
 }
