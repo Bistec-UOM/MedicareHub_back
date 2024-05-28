@@ -67,30 +67,6 @@ namespace Services
 
             return medicineDetails;
         }
-        public async Task AddBillDrugs(Bill data) 
-        {
-            using (var transaction = await _cntx.Database.BeginTransactionAsync())
-            {
-                foreach (var item in data.Data)
-                {
-                    await _cntx.bill_Drugs.AddAsync(item);
-                }
-
-                Prescription tmp = await _cntx.prescriptions.Where(e => e.Id == data.Data[0].PrescriptionID).FirstOrDefaultAsync();
-                tmp.Total = data.Total;
-                tmp.CashierId = 1;
-
-                Appointment tmp2 = await _cntx.appointments.Where(e => e.Id == tmp.AppointmentID).FirstOrDefaultAsync();
-                tmp2.Status = "paid";
-
-                _cntx.prescriptions.Update(tmp);
-                _cntx.appointments.Update(tmp2);
-
-                await _cntx.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-        }
-
         public async Task AddBillDrugs(Bill data)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())

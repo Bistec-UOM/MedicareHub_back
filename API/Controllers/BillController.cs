@@ -40,7 +40,7 @@ namespace API.Controllers
         [HttpPost("AddBillDrugs")]
         public async Task<IActionResult> AddBillDrugs(Bill billDrugs)
         {
-            await _billService.AddBillDrugs(data);
+            await _billService.AddBillDrugs(billDrugs);
             return Ok();
         }
 

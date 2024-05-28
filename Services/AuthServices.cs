@@ -111,25 +111,33 @@ namespace Services
         public async Task<string> SendOTP(int id)
         {
             var tmp = await _cnt.users.Where(e => e.Id == id).FirstOrDefaultAsync();
-            Otp obj = new Otp();
+            if (tmp != null)
+            {
+                Otp obj = new Otp();
 
-            Random RndNm = new Random();
-            obj.code = RndNm.Next(100000, 999999);
-            obj.status = "ready";
-            obj.userId = id;
-            obj.DateTime= DateTime.UtcNow;
+                Random RndNm = new Random();
+                obj.code = RndNm.Next(100000, 999999);
+                obj.status = "ready";
+                obj.userId = id;
+                obj.DateTime = DateTime.UtcNow;
 
-            await _otp.Add(obj);
+                await _otp.Add(obj);
 
-            string msg = obj.code+ " is your verification code. Please use this to verify your identity before reset the password.";
-            var sendMail = new EmailSender();
-            await sendMail.SendMail("Reset password","kwalskinick@gmail.com",tmp.Name,msg);
-            return ("Check out your Email, A verification code is sent to "+tmp.Email);
+                string msg = obj.code + " is your verification code. Please use this to verify your identity before reset the password.";
+                var sendMail = new EmailSender();
+                await sendMail.SendMail("Reset password", "kwalskinick@gmail.com", tmp.Name, msg);
+                return ("Check out your Email, A verification code is sent to " + tmp.Email);
+            }
+            else
+            {
+                return "";
+            }
+
         }
 
         public async Task<String> CheckOTP(SentOTP data)
         {
-            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.UserId);
+            var otp=await _cnt.otps.OrderByDescending(e => e.Id).FirstOrDefaultAsync(o => o.userId == data.UserId);
             if(otp != null)
             {
                 if (otp.status == "ready")
@@ -142,28 +150,23 @@ namespace Services
                     }
                     else
                     {
-                        return "OTP doesn't match";
+                        return "Incorrect OTP";
                     }
-                }
-                else if (otp.status == "expired")
+                }else
                 {
                     return "OTP has expired. Try again";
-                }
-                else
-                {
-                    return "Invalid Attempt. Try again";
                 }
             }
             else
             {
-                return "Doen't exist";
+                return "OTP Doen't exist";
             }
 
         }
 
         public async Task NewPassword(NewPassword data)
         {
-            Otp? otp = await _cnt.otps.FirstOrDefaultAsync(o => o.userId == data.UserId);
+            Otp? otp = await _cnt.otps.OrderByDescending(e => e.Id).FirstOrDefaultAsync(o => o.userId == data.UserId);
             if (otp.status == "valid")
             {
                 User? user = await _cnt.users.Where(e => e.Id == data.UserId).FirstOrDefaultAsync();

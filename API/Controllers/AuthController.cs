@@ -48,7 +48,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest("User doen't exist");
             }
         }
 
@@ -56,7 +56,7 @@ namespace API.Controllers
         async public Task<ActionResult> CheckOTP(SentOTP data)
         {
             String msg=await _auth.CheckOTP(data);
-            if (msg == "Ok")
+            if (msg == "OK")
             {
                 return Ok();
             }
