@@ -104,33 +104,62 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("defaultString"));
 });
 
-// Register services
-builder.Services.AddScoped<NotificationService>();
+
+//=================================================================================================================
+//                                Injections list
+//=================================================================================================================
+
+//Receptionist-----------------------------------------------------------
+
 builder.Services.AddScoped<AppointmentService>();
 builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Unable_Date>, Repository<Unable_Date>>();
+
+//Doctor-----------------------------------------------------------------
+
 builder.Services.AddScoped<DoctorappoinmentService>();
 builder.Services.AddScoped<IRepository<Prescription>, Repository<Prescription>>();
 builder.Services.AddScoped<IRepository<AddDrugs>, Repository<AddDrugs>>();
 builder.Services.AddScoped<IRepository<Prescript_drug>, Repository<Prescript_drug>>();
 builder.Services.AddScoped<IRepository<LabReport>, Repository<LabReport>>();
+
+//Pharmacy---------------------------------------------------------------
 builder.Services.AddScoped<DrugsService>();
 builder.Services.AddScoped<BillService>();
 builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
+
+//Admin------------------------------------------------------------------
 builder.Services.AddScoped<IPatientService, PatientService>();
+builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
+
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+
+builder.Services.AddScoped<NotificationService>();
+
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IRepository<Drug>, Repository<Drug>>();
+
+//Lab--------------------------------------------------------------------
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<ValueService>();
 builder.Services.AddScoped<DoctorAnalyticService>();
+
 builder.Services.AddScoped<IRepository<ReportFields>, Repository<ReportFields>>();
 builder.Services.AddScoped<IRepository<Test>, Repository<Test>>();
 builder.Services.AddScoped<IRepository<LabReport>, Repository<LabReport>>();
 builder.Services.AddScoped<IRepository<Record>, Repository<Record>>();
+
+//Login-------------------------------------------------------------------
 builder.Services.AddScoped<AuthServices>();
 builder.Services.AddScoped<IRepository<Otp>, Repository<Otp>>();
+
+//builder.Services.AddScoped<IAppointmentRepository, AppointmentService>();
+
+//=================================================================================================================
+//=================================================================================================================
 
 // Build the app
 var app = builder.Build();
