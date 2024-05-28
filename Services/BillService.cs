@@ -67,7 +67,7 @@ namespace Services
 
             return medicineDetails;
         }
-        public async Task AddBillDrugs(Bill data) 
+        public async Task AddBillDrugs(Bill data)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
@@ -76,11 +76,11 @@ namespace Services
                     await _cntx.bill_Drugs.AddAsync(item);
                 }
 
-                Prescription tmp = await _cntx.prescriptions.Where(e => e.Id == data.Data[0].PrescriptionID).FirstOrDefaultAsync();
+                Prescription tmp=await _cntx.prescriptions.Where(e => e.Id == data.Data[0].PrescriptionID).FirstOrDefaultAsync();
                 tmp.Total = data.Total;
                 tmp.CashierId = 1;
 
-                Appointment tmp2 = await _cntx.appointments.Where(e => e.Id == tmp.AppointmentID).FirstOrDefaultAsync();
+                Appointment tmp2 =await _cntx.appointments.Where(e => e.Id==tmp.AppointmentID).FirstOrDefaultAsync();
                 tmp2.Status = "paid";
 
                 _cntx.prescriptions.Update(tmp);
@@ -89,6 +89,7 @@ namespace Services
                 await _cntx.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
+
         }
 
         private static int CaluclateAge(DateTime dob)

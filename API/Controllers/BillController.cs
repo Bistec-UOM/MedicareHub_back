@@ -23,6 +23,8 @@ namespace API.Controllers
             var pe = await _billService.RequestList();
             return Ok(pe);
         }
+
+
         [HttpPost("GetMedicineDetails")]
         public async Task<ActionResult<IDictionary<string, List<Drug>>>> GetMedicineDetails([FromBody] List<string> medicineNames)
         {
@@ -33,18 +35,13 @@ namespace API.Controllers
             }
             return Ok(medicineDetails);
         }
+
+        //Add bill details (paid drugs)
         [HttpPost("AddBillDrugs")]
         public async Task<IActionResult> AddBillDrugs(Bill billDrugs)
         {
-            try
-            {
-                await _billService.AddBillDrugs(billDrugs);
-                return Ok(" successfully and appointment status updated to 'paid'");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An error occurred while adding bill drugs: " + ex.Message);
-            }
+            await _billService.AddBillDrugs(billDrugs);
+            return Ok();
         }
 
     }
