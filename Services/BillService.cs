@@ -1,12 +1,14 @@
 ﻿using DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Models;
+using Models.DTO;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Services
 {
@@ -65,30 +67,29 @@ namespace Services
 
             return medicineDetails;
         }
-        public async Task AddBillDrugs(IEnumerable<Bill_drug> billDrugs)
+        public async Task AddBillDrugs(Bill data)
         {
-            try
+            using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                await _cntx.bill_Drugs.AddRangeAsync(billDrugs);
-
-                foreach (var billDrug in billDrugs)
+                foreach (var item in data.Data)
                 {
-                    var prescription = await _cntx.prescriptions
-                        .Include(p => p.Appointment)
-                        .FirstOrDefaultAsync(p => p.Id == billDrug.PrescriptionID);
-
-                    if (prescription != null && prescription.Appointment != null)
-                    {
-                        prescription.Appointment.Status = "paid";
-                    }
+                    await _cntx.bill_Drugs.AddAsync(item);
                 }
 
+                Prescription tmp=await _cntx.prescriptions.Where(e => e.Id == data.Data[0].PrescriptionID).FirstOrDefaultAsync();
+                tmp.Total = data.Total;
+                tmp.CashierId = 1;
+
+                Appointment tmp2 =await _cntx.appointments.Where(e => e.Id==tmp.AppointmentID).FirstOrDefaultAsync();
+                tmp2.Status = "paid";
+
+                _cntx.prescriptions.Update(tmp);
+                _cntx.appointments.Update(tmp2);
+
                 await _cntx.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while adding bill drugs: " + ex.Message);
-            }
+
         }
 
         private static int CaluclateAge(DateTime dob)
