@@ -4,9 +4,12 @@ using Models;
 using Models.DTO;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+
 
 namespace Services.AppointmentService
 {
@@ -18,14 +21,17 @@ namespace Services.AppointmentService
         private readonly IRepository<Patient> _patient;
         private readonly IRepository<User> _doctor;
         private readonly IRepository<Unable_Date> _unable_date;
-        
-        public AppointmentService(ApplicationDbContext dbcontext,IRepository<Appointment> appointment,IRepository<Patient> patient,IRepository<User> doctor,IRepository<Unable_Date> unableDate)
+        private readonly IRepository<Notification> _notification;
+      
+
+        public AppointmentService(ApplicationDbContext dbcontext,IRepository<Appointment> appointment,IRepository<Patient> patient,IRepository<User> doctor,IRepository<Unable_Date> unableDate, IRepository<Notification> notification)
         {
             _dbcontext = dbcontext;
             _appointment = appointment;
             _patient = patient;
             _doctor = doctor;
             _unable_date = unableDate;
+            _notification = notification;
         } 
         
         public async Task<int> AddAppointment(Appointment appointment)  //Add an appointment
@@ -316,6 +322,13 @@ namespace Services.AppointmentService
             var uDates = _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId && u.StartTime.Hour==00 && u.StartTime.Minute==00&& u.EndTime.Hour==23 && u.EndTime.Minute==59);
             return  uDates.ToList();
         }
+
+        public async Task AddNotification(Notification notification)
+        {
+            await _notification.Add(notification);  
+        }
+
+      
 
         
     }

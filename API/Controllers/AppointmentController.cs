@@ -1,13 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AppointmentNotificationHandler;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Models;
 using Models.DTO;
 using Services.AppointmentService;
+using System.Diagnostics;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers
 {
@@ -16,12 +21,16 @@ namespace API.Controllers
     [ApiController]
     public class AppointmentController : ControllerBase
     {
-
+        private readonly ApplicationDbContext _dbContext; 
         private readonly AppointmentService _appointment;
-        public AppointmentController(AppointmentService appointment)
+        private readonly IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
+
+        public AppointmentController(ApplicationDbContext dbContext,AppointmentService appointment, IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> hubContext)
         {
             
             _appointment = appointment;
+            _dbContext = dbContext;
+            _hubContext = hubContext;
            
 
         }
@@ -34,7 +43,7 @@ namespace API.Controllers
             return Ok(await _appointment.GetPatient(id));
         }
 
-        [Authorize(Policy = "Recep&Doct")]
+          [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
 
         public async Task<ActionResult<ICollection<Appointment>>> GetAllAppointments()   //getting all appointments
@@ -56,11 +65,30 @@ namespace API.Controllers
             var app = appointment;
             app.RecepId=roleId;
 
-
-
             try
                 {
                     var result = await _appointment.AddAppointment(app);
+                    var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                    var userId = doctor?.UserId;  //get the user id of the doctor
+                    var notification = $"New appointment added for {appointment.DateTime}";
+
+                if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                {
+                    Debug.WriteLine($"User ConnectionId: {connectionId}");
+                    await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
+                }
+                else
+                {
+                    Notification newNotification=new Notification();
+                    newNotification.Message= notification;
+                    newNotification.From = appointment.RecepId.ToString();
+                    newNotification.To = appointment.DoctorId.ToString();   
+                    newNotification.SendAt = DateTime.Now;
+
+                    _appointment.AddNotification(newNotification);  
+                    
+                }
+
                 return Ok(result);
 
                 }
@@ -72,7 +100,7 @@ namespace API.Controllers
           
         }
 
-        [Authorize(Policy = "Recep&Doct")]
+         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("{id}", Name = "GetAppointment")]
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)  //getting an appointment by id
@@ -112,7 +140,7 @@ namespace API.Controllers
             return Ok(deletedAppointment);
         }
 
-        [Authorize(Policy = "Recep&Doct")]
+        [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
         public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)  //getting all the appointments of a specific doctor
         {
@@ -120,7 +148,7 @@ namespace API.Controllers
             return Ok(doctorAppointments);
         }
 
-        [Authorize(Policy = "Recep&Doct")]
+        [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
         {
@@ -142,7 +170,7 @@ namespace API.Controllers
             await _appointment.RegisterPatient(patient);
 
         }
-        [Authorize(Policy = "Recep&Doct")]
+        [Authorize(Policy = "Doct&Recep")]
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)  //cancel the appointment by doctor
         {
@@ -193,7 +221,7 @@ namespace API.Controllers
             }
             return NoContent();
         }
-        [Authorize(Policy = "Recep&Doct")]
+        [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
         {
@@ -230,7 +258,7 @@ namespace API.Controllers
 
             return Ok(await _appointment.UpdateAppointment(id, appointment));
         }
-        [Authorize(Policy = "Recep&Doct")]
+        [Authorize(Policy = "Doct&Recep")]
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
         {
@@ -270,13 +298,15 @@ namespace API.Controllers
         }
 
 
-        [Authorize(Policy = "Recep&Doct")]
+       // [Authorize(Policy = "Doct&Recep")]
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {
             var uDates= await _appointment.getUnableDates(doctorId);
             return Ok(uDates);
         }
+
+
 
 
 
