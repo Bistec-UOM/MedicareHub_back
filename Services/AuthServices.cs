@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Models;
-using Models.DTO;
+using Models.DTO.Auth;
 using SendGrid.Helpers.Mail;
 using Services.AppointmentService;
 using System;
@@ -106,35 +106,83 @@ namespace Services
             return jwt;
         }
 
-        public async Task<string> VerifyCode(int id)
+
+        //OTP stages : ready --> vaild --> done / expired
+        public async Task<string> SendOTP(int id)
         {
-            var tmp = await _user.Get(id);
-            Otp obj = new Otp();
-
-            Random RndNm = new Random();
-            obj.code = RndNm.Next(100000, 999999);
-            obj.status = "ready";
-            obj.userId = id;
-
-            await _otp.Add(obj);
-
-            string msg = obj.code+ " is your verification code. Please use this to verify your identity before reset the password.";
-            var sendMail = new EmailSender();
-            await sendMail.SendMail("Reset password","kwalskinick@gmail.com",tmp.Name,msg);
-            return ("Check out your Email, A verification code is sent to "+tmp.Email);
-        }
-
-        public async Task<Boolean> ConfirmCode(int Uid,int code)
-        {
-            var otp=await _cnt.otps.FirstOrDefaultAsync(o => o.userId == Uid && o.status == "ready");
-            if (code == otp.code)
+            var tmp = await _cnt.users.Where(e => e.Id == id).FirstOrDefaultAsync();
+            if (tmp != null)
             {
-                return true;
+                Otp obj = new Otp();
+
+                Random RndNm = new Random();
+                obj.code = RndNm.Next(100000, 999999);
+                obj.status = "ready";
+                obj.userId = id;
+                obj.DateTime = DateTime.UtcNow;
+
+                await _otp.Add(obj);
+
+                string msg = obj.code + " is your verification code. Please use this to verify your identity before reset the password.";
+                var sendMail = new EmailSender();
+                await sendMail.SendMail("Reset password", "kwalskinick@gmail.com", tmp.Name, msg);
+                return ("Check out your Email, A verification code is sent to " + tmp.Email);
             }
             else
             {
-                return false;
+                return "";
             }
+
+        }
+
+        public async Task<String> CheckOTP(SentOTP data)
+        {
+            var otp=await _cnt.otps.OrderByDescending(e => e.Id).FirstOrDefaultAsync(o => o.userId == data.UserId);
+            if(otp != null)
+            {
+                if (otp.status == "ready")
+                {
+                    if (otp.code == data.OTP)//otp verified
+                    {
+                        otp.status = "valid";
+                        await _otp.Update(otp);
+                        return "OK";
+                    }
+                    else
+                    {
+                        return "Incorrect OTP";
+                    }
+                }else
+                {
+                    return "OTP has expired. Try again";
+                }
+            }
+            else
+            {
+                return "OTP Doen't exist";
+            }
+
+        }
+
+        public async Task NewPassword(NewPassword data)
+        {
+            Otp? otp = await _cnt.otps.OrderByDescending(e => e.Id).FirstOrDefaultAsync(o => o.userId == data.UserId);
+            if (otp.status == "valid")
+            {
+                User? user = await _cnt.users.Where(e => e.Id == data.UserId).FirstOrDefaultAsync();
+                using (var transaction = await _cnt.Database.BeginTransactionAsync())
+                {
+                    otp.status = "done";
+                    _cnt.otps.Update(otp);
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(data.Password);
+                    _cnt.users.Update(user);
+                    await _cnt.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
+
+            }
+
         }
     }
 }
