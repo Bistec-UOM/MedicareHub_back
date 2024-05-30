@@ -14,6 +14,7 @@ using Services.AdminServices;
 using Services.AppointmentService;
 using Services.LabService;
 using API;
+using AppointmentNotificationHandler;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -119,6 +120,8 @@ builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<Unable_Date>, Repository<Unable_Date>>();
+builder.Services.AddScoped<IRepository<Notification>, Repository<Notification>>();
+
 
 //Doctor-----------------------------------------------------------------
 
@@ -171,7 +174,7 @@ var app = builder.Build();
 //if (app.Environment.IsDevelopment())
 //{ }
 app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();
@@ -183,6 +186,7 @@ app.UseCors("ReactJSDomain");
 // Map controllers and SignalR hub
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<AppointmentNotificationHub>("/appointmentnotificationHub");
 
 
 app.Run();
