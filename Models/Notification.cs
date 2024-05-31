@@ -13,6 +13,7 @@ namespace Models
         public string? To { get; set; }
         public string? Message { get; set; }
         public DateTime? SendAt { get; set; }
+        public bool? Seen { get; set; }
     }
 }
 

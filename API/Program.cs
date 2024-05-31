@@ -94,7 +94,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactJSDomain", policy =>
     {
-        policy.WithOrigins("https://medicare-hub-front-21j6.vercel.app")
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
