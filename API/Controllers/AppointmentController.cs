@@ -71,11 +71,13 @@ namespace API.Controllers
                     var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
                     var userId = doctor?.UserId;  //get the user id of the doctor
                     var notification = $"New appointment added for {appointment.DateTime}";
+                   
 
                 if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
                 {
                     Debug.WriteLine($"User ConnectionId: {connectionId}");
                     await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
+                    Debug.WriteLine("Notification sent via SignalR.");
                 }
                 else
                 {
@@ -84,6 +86,7 @@ namespace API.Controllers
                     newNotification.From = appointment.RecepId.ToString();
                     newNotification.To = appointment.DoctorId.ToString();   
                     newNotification.SendAt = DateTime.Now;
+                    newNotification.Seen = false;
 
                     _appointment.AddNotification(newNotification);  
                     
@@ -305,6 +308,23 @@ namespace API.Controllers
             var uDates= await _appointment.getUnableDates(doctorId);
             return Ok(uDates);
         }
+
+        [HttpGet("Notifications/{userId}")]
+        public async Task<ActionResult<ICollection<Notification>>> getNotifications(int userId)
+        {
+            var notifications=await _appointment.getNotifications(userId);
+            return Ok(notifications);
+        }
+
+
+        [HttpPost("Notifications")]
+        public async Task AddNotification(Unable_Date uDate)  //adding unable dates
+        {
+            await _appointment.AddUnableDate(uDate);
+
+        }
+
+
 
 
 

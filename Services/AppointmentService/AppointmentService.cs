@@ -328,6 +328,12 @@ namespace Services.AppointmentService
             await _notification.Add(notification);  
         }
 
+        public async Task<List<Notification>> getNotifications(int userId)
+        {
+            var notifications = _dbcontext.notification.Where(u => u.To == userId.ToString()).ToList();
+            return notifications.ToList();
+
+        }
       
 
         
