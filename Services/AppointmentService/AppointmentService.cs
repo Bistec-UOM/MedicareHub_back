@@ -323,15 +323,40 @@ namespace Services.AppointmentService
             return  uDates.ToList();
         }
 
-        public async Task AddNotification(Notification notification)
+        public async  Task AddNotification(Notification notification)
         {
-            await _notification.Add(notification);  
+             await _notification.Add(notification);  
+
         }
 
-        public async Task<List<Notification>> getNotifications(int userId)
+        public async Task<List<Notification>> getNotifications(int userId)  //getting only unseen notifications or todays notifications
         {
-            var notifications = _dbcontext.notification.Where(u => u.To == userId.ToString()).ToList();
+
+            DateTime todayfull = new DateTime();
+            DateTime today = todayfull.Date;
+
+
+            var notifications = _dbcontext.notification
+    .Where(u => u.To == userId.ToString() &&
+                ((!u.Seen.HasValue || !u.Seen.Value) ||
+                 (u.SendAt != null && u.SendAt.Value.Date == DateTime.Today.Date)))
+    .ToList();
+
+
             return notifications.ToList();
+
+        }
+
+        public async Task markAsSeenNotifications(int userId, bool newSeenValue)
+        {
+            var notifications = _dbcontext.notification.Where(u => u.To == userId.ToString() && u.Seen==false);
+            foreach (var notification in notifications)
+            {
+                notification.Seen = newSeenValue;
+            }
+
+
+            await _dbcontext.SaveChangesAsync();
 
         }
       

@@ -60,7 +60,9 @@ namespace API.Controllers
             var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
             int roleId = int.Parse(claim);
 
-            if (roleId == 0) { return Unauthorized(); }
+            if (roleId == 0) {
+                return Unauthorized();
+            }
 
             var app = appointment;
             app.RecepId=roleId;
@@ -79,8 +81,7 @@ namespace API.Controllers
                     await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
                     Debug.WriteLine("Notification sent via SignalR.");
                 }
-                else
-                {
+                
                     Notification newNotification=new Notification();
                     newNotification.Message= notification;
                     newNotification.From = appointment.RecepId.ToString();
@@ -88,9 +89,8 @@ namespace API.Controllers
                     newNotification.SendAt = DateTime.Now;
                     newNotification.Seen = false;
 
-                    _appointment.AddNotification(newNotification);  
-                    
-                }
+                   await AddNotification(newNotification);
+              
 
                 return Ok(result);
 
@@ -318,11 +318,19 @@ namespace API.Controllers
 
 
         [HttpPost("Notifications")]
-        public async Task AddNotification(Unable_Date uDate)  //adding unable dates
+        public async Task AddNotification(Notification notification)  //adding notifications
         {
-            await _appointment.AddUnableDate(uDate);
+            await _appointment.AddNotification(notification);
 
         }
+
+        [HttpPut("notifications/{userId}/user/{newSeenValue}")]
+        public async Task MarkAsSeenNotifications(int userId,bool newSeenValue)
+        {
+            await _appointment.markAsSeenNotifications(userId,newSeenValue);
+        }
+
+
 
 
 

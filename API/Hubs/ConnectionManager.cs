@@ -6,7 +6,7 @@ public class ConnectionManager
 
     public static void AddConnection(string userId, string connectionId)
     {
-        _userConnections.TryAdd(userId, connectionId);
+        _userConnections.AddOrUpdate(userId, connectionId, (key, oldValue) => connectionId);
     }
 
     public static void RemoveConnection(string connectionId)
