@@ -38,10 +38,17 @@ namespace API.Controllers
 
         //Add bill details (paid drugs)
         [HttpPost("AddBillDrugs")]
-        public async Task<IActionResult> AddBillDrugs(Bill billDrugs)
+        public async Task<IActionResult> AddBillDrugs([FromBody] Bill billDrugs)
         {
-            await _billService.AddBillDrugs(billDrugs);
-            return Ok();
+            try
+            {
+                await _billService.AddBillDrugs(billDrugs);
+                return Ok("Bill drugs added successfully and appointment status updated to 'paid'");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while adding bill drugs: {ex.Message}");
+            }
         }
 
     }
