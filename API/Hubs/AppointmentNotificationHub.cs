@@ -51,10 +51,8 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             Debug.WriteLine($"User ID: {kvp.Key}, Connection ID: {kvp.Value}");
         }
 
-
-
         // Send a personalized message to the connected user
-        await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
+       // await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
 
         await base.OnConnectedAsync();
     }
