@@ -10,7 +10,6 @@ env:
   AZURE_WEBAPP_NAME: MediicareHub
   AZURE_WEBAPP_PACKAGE_PATH: './publish'
 
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -30,10 +29,13 @@ jobs:
       - name: Build
         run: dotnet build ./API/API.sln --configuration Release --no-restore
 
+      - name: Run tests
+        run: dotnet test ./TestingProject/TestingProject.csproj --no-build --verbosity normal
+
       - name: Publish
         run: dotnet publish ./API/API.sln --configuration Release --no-build --output '${{env.AZURE_WEBAPP_PACKAGE_PATH}}'
 
-      - name: Deployement
+      - name: Deploy
         uses: azure/webapps-deploy@v2
         with: 
             app-name: ${{env.AZURE_WEBAPP_NAME}}
