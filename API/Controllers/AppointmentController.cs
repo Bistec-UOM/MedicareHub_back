@@ -136,6 +136,7 @@ namespace API.Controllers
                 string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
 
 
+
                 EmailSender emailSernder = new EmailSender();
                 await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
 
