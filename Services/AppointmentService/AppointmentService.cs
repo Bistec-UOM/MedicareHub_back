@@ -59,9 +59,54 @@ namespace Services.AppointmentService
                 var patient = await GetPatient(patientId);
                 string emailSubject = "Confirmation: Your Appointment with Medicare Hub";
                 string userName = patient?.FullName;
-                string emailMessage = "Dear " + patient.Name + ",\n" + "We're thrilled to confirm your appointment with Medicare Hub scheduled for " + appointment.DateTime;
+
+                Doctor doctor = _dbcontext.doctors.Find(appointment.DoctorId);
+                var doctorUser=_dbcontext.users.Find(doctor.UserId);
+
+                var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                var time = appointment.DateTime.ToString("f");
+                var venue = "Medicare Hub Clinic, 123 Main Street, City";
+                var doctorName = doctorUser.Name;
+                var message = "Dear "+ userName+", <br/><br/>We are delighted to confirm your appointment with Medicare Hub.";
+
+                var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{message}</p>
+        <div style='border: 2px solid #09D636; padding: 15px; border-radius: 10px; background-color: #e8f5e9;'>
+            <h3 style='color: #09D636;'>Appointment Details</h3>
+            <ul style='color: #555555; font-size: 16px;'>
+                <li><strong>Time:</strong> {time}</li>
+                <li><strong>Venue:</strong> {venue}</li>
+                <li><strong>Doctor:</strong> {doctorName}</li>
+            </ul>
+        </div>
+          <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span>please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!.</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
+
+
+               
                 EmailSender emailSernder = new EmailSender();
-                await emailSernder.SendMail(emailSubject, patient.Email, userName, emailMessage);
+                await emailSernder.SendMail(emailSubject, patient.Email, userName, htmlContent);
                 return 0;   
 
             }
@@ -182,12 +227,54 @@ namespace Services.AppointmentService
         }
         public async Task RegisterPatient(Patient patient)  //registering a patient
         {
-            await _patient.Add(patient);  //adding the patient to the table
+            await _patient.Add(patient);  // Adding the patient to the table
             string emailSubject = "Your Medicare Hub Membership: A Warm Welcome Awaits!";
             string userName = patient.FullName;
-            string emailMessage = "Dear " + patient.Name +"\n"+ "Thank you for choosing Medicare Hub. We're honored to be part of your healthcare journey. Please reach out if you need anything.";
-            EmailSender emailSernder= new EmailSender();  //sending email after succeful registration of a patient
-            await emailSernder.SendMail(emailSubject,patient.Email,userName,emailMessage);
+            var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+            string emailMessage = "Dear " + patient.Name + ",<br/><br/>Thank you for choosing Medicare Hub. We're honored to be part of your healthcare journey. Please reach out if you need anything.";
+
+            var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #09D636; padding: 15px; border-radius: 10px; background-color: #e8f5e9;'>
+            <h3 style='color: #09D636; text-align: center;'>Welcome to Medicare Hub</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We are delighted to have you as a member of our community. At Medicare Hub, we are committed to providing you with exceptional care and service. Here are some of the benefits you can look forward to:
+            </p>
+            <ul style='color: #555555; font-size: 16px;'>
+                <li>Access to top-notch medical professionals</li>
+                <li>Comprehensive healthcare services</li>
+                <li>Personalized care plans</li>
+                <li>24/7 customer support</li>
+            </ul>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span>Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span>please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span >Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
+
+
+
+            EmailSender emailSernder = new EmailSender();  //sending email after succeful registration of a patient
+            await emailSernder.SendMail(emailSubject,patient.Email,userName,htmlContent);
         }
        public async Task<int> UpdateAppointment(int id, Appointment appointment)  //just update appointment(time)
         {   
@@ -216,7 +303,60 @@ namespace Services.AppointmentService
                 {
                     try
                     {
+
                         await _dbcontext.SaveChangesAsync();
+                        var patientId = appointment.PatientId;   // sending an email to the patient
+                        var patient = await GetPatient(patientId);
+                        string emailSubject = "Appointment Update: Your Updated Appointment with Medicare Hub";
+                        string userName = patient?.FullName;
+
+                        Doctor doctor = _dbcontext.doctors.Find(appointment.DoctorId);
+                        var doctorUser = _dbcontext.users.Find(doctor.UserId);
+
+                        var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                        var newTime = appointment.DateTime.ToString("f");  // Formatted date and time
+                        var venue = "Medicare Hub Clinic, 123 Main Street, City";
+                        var doctorName = doctorUser.Name;
+                        var message = $"Dear {userName},<br/><br/>We would like to inform you that your appointment with Medicare Hub has been rescheduled. Please find the updated details below:";
+
+                        var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{message}</p>
+        <div style='border: 2px solid #09D636; padding: 15px; border-radius: 10px; background-color: #e8f5e9;'>
+            <h3 style='color: #09D636;'>Updated Appointment Details</h3>
+            <ul style='color: #555555; font-size: 16px;'>
+                <li><strong>New Time:</strong> {newTime}</li>
+                <li><strong>Venue:</strong> {venue}</li>
+                <li><strong>Doctor:</strong> {doctorName}</li>
+            </ul>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span>Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span >Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
+
+
+
+                        EmailSender emailSernder = new EmailSender();
+                        await emailSernder.SendMail(emailSubject, patient.Email, userName, htmlContent);
                         return 0;
                     }
                     catch (Exception ex)
@@ -285,12 +425,46 @@ namespace Services.AppointmentService
 
                     var targetEmail = targetPatient.Email;
                     var targetDay = oldAppointment.DateTime.Date;
-                    var targetTime = oldAppointment.DateTime;
-                    string emailSubject = "Appointment Update: Cancellation Notification"; //sending the cancel notification mail
+                    var targetTime = oldAppointment.DateTime.ToString("f");
+                    string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
                     string userName = targetPatient.FullName;
-                    string emailMessage = "Dear " + targetPatient.Name + ",\n" + " We regret to inform you that your scheduled appointment with Medicare Hub on " + targetTime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targetTime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                    var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #FF0000; padding: 15px; border-radius: 10px; background-color: #ffebee;'>
+            <h3 style='color: #FF0000; text-align: center;'>Appointment Cancelled</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We understand that this may be disappointing and we sincerely apologize for any inconvenience caused. Your well-being is our priority, and we are here to assist you in rescheduling your appointment or addressing any concerns you may have.
+            </p>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span>Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
+
                     EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailSubject, targetEmail, userName, emailMessage);
+                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
                     await _dbcontext.SaveChangesAsync();
                     return oldAppointment;
