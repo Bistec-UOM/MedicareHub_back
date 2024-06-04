@@ -129,16 +129,49 @@ namespace API.Controllers
 
                 var targetEmail = targetPatient.Email??"default@gmail.com" ;
                 var targetday = deletedAppointment.DateTime.Date;
-                var targettime = deletedAppointment.DateTime;
+                var targettime = deletedAppointment.DateTime.ToString("f");
 
-                string emailsubject = "appointment update: cancellation notification";
-                string username = targetPatient.FullName ?? "Patient";
-                string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+                string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                string userName = targetPatient.FullName;
+                var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #FF0000; padding: 15px; border-radius: 10px; background-color: #ffebee;'>
+            <h3 style='color: #FF0000; text-align: center;'>Appointment Cancelled</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We understand that this may be disappointing and we sincerely apologize for any inconvenience caused. Your well-being is our priority, and we are here to assist you in rescheduling your appointment or addressing any concerns you may have.
+            </p>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
 
 
 
                 EmailSender emailSernder = new EmailSender();
-                await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+                await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
             }
             return Ok(deletedAppointment);
@@ -189,13 +222,46 @@ namespace API.Controllers
             {
                 var targetEmail = targetPatient.Email ??"default@gmail.com";
                 var targetday = targetAppointment.DateTime.Date;
-                var targettime = targetAppointment.DateTime;
+                var targettime = targetAppointment.DateTime.ToString("f");
 
-                string emailsubject = "appointment update: cancellation notification"; //sending an email after cancelling the appointment by doctor
-                string username = targetPatient.FullName ?? "Patient" ;
-                string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+                string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                string userName = targetPatient.FullName;
+                var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #FF0000; padding: 15px; border-radius: 10px; background-color: #ffebee;'>
+            <h3 style='color: #FF0000; text-align: center;'>Appointment Cancelled</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We understand that this may be disappointing and we sincerely apologize for any inconvenience caused. Your well-being is our priority, and we are here to assist you in rescheduling your appointment or addressing any concerns you may have.
+            </p>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
                 EmailSender emailSernder = new EmailSender();
-                await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+                await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
             }
             return Ok(targetAppointment);
@@ -213,13 +279,45 @@ namespace API.Controllers
 
                     var targetEmail = targetPatient.Email ?? "default@gmail.com";
                     var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime;
+                    var targettime = app.DateTime.ToString("f");
+                    string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                    string userName = targetPatient.FullName;
+                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
 
-                    string emailsubject = "appointment update: cancellation notification"; //sending emails after cancelling all appointments by doctor
-                    string username = targetPatient.FullName ?? "Patient";
-                    string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+                    var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #FF0000; padding: 15px; border-radius: 10px; background-color: #ffebee;'>
+            <h3 style='color: #FF0000; text-align: center;'>Appointment Cancelled</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We understand that this may be disappointing and we sincerely apologize for any inconvenience caused. Your well-being is our priority, and we are here to assist you in rescheduling your appointment or addressing any concerns you may have.
+            </p>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
                     EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
                 }
             }
@@ -280,13 +378,47 @@ namespace API.Controllers
                 {
                     var targetEmail = targetPatient.Email ?? "default@gmail.com";
                     var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime;
+                    var targettime = app.DateTime.ToString("f");
 
-                    string emailsubject = "appointment update: cancellation notification"; //sending emails after deleting prescheduled appointments by a receptionsist
-                    string username = targetPatient.FullName ?? "Patient";
-                    string emailmessage = "dear " + targetPatient.Name + ",\n" + " we regret to inform you that your scheduled appointment with medicare hub on " + targettime + " has been cancelled. we apologize for any inconvenience this may cause you.";
+                    //sending emails after deleting prescheduled appointments by a receptionsist
+                    string emailSubject = "Appointment Update: Cancellation Notification";
+                    string userName = targetPatient.FullName;
+                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                    var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px;'>{emailMessage}</p>
+        <div style='border: 2px solid #FF0000; padding: 15px; border-radius: 10px; background-color: #ffebee;'>
+            <h3 style='color: #FF0000; text-align: center;'>Appointment Cancelled</h3>
+            <p style='color: #555555; font-size: 16px;'>
+                We understand that this may be disappointing and we sincerely apologize for any inconvenience caused. Your well-being is our priority, and we are here to assist you in rescheduling your appointment or addressing any concerns you may have.
+            </p>
+        </div>
+        <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
                     EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailsubject, targetEmail, username, emailmessage);
+                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
                 }
 
             }
