@@ -55,6 +55,12 @@ namespace API.Controllers
             return Ok(notification);
 
         }
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var notifications = await _context.notification.ToListAsync();
+            return Ok(notifications);
+        }   
     }
 
  

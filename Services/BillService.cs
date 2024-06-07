@@ -72,6 +72,24 @@ namespace Services
 
             return medicineDetails;
         }
+        public async Task<List<string>> GetMedicinesNotInStock(List<string> medicineNames)
+        {
+            var medicinesNotInStock = new List<string>();
+
+            // Get the list of names that are available in the database
+            var availableNames = await _cntx.drugs
+                .Where(d => medicineNames.Contains(d.GenericN))
+                .Select(d => d.GenericN)
+                .ToListAsync();
+
+            // Find names that are not in the availableNames list
+            medicinesNotInStock = medicineNames.Except(availableNames).ToList();
+
+            return medicinesNotInStock;
+        }
+
+
+
         public async Task AddBillDrugs(Bill data)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())
