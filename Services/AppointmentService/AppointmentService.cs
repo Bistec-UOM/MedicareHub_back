@@ -506,14 +506,14 @@ namespace Services.AppointmentService
         public async Task<List<Notification>> getNotifications(int userId)  //getting only unseen notifications or todays notifications
         {
 
-            DateTime todayfull = new DateTime();
-            DateTime today = todayfull.Date;
+            var today = DateTime.Today;
+
 
 
             var notifications = _dbcontext.notification
     .Where(u => u.To == userId.ToString() &&
                 ((!u.Seen.HasValue || !u.Seen.Value) ||
-                 (u.SendAt != null && u.SendAt.Value.Date == DateTime.Today.Date)))
+                 (u.SendAt != null && u.SendAt.Value.Date == today)))
     .ToList();
 
 
