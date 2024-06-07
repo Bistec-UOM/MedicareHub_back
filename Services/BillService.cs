@@ -63,6 +63,11 @@ namespace Services
                 {
                     medicineDetails.Add(name, medicines);
                 }
+                else
+                {
+                    List<Drug> emptyDrg = new List<Drug>(); 
+                    medicineDetails.Add(name, emptyDrg);
+                }
             }
 
             return medicineDetails;
