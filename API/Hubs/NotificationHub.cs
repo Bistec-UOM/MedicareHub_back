@@ -133,13 +133,13 @@ public class NotificationHub : Hub<INotificationClient>
 
         bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
 
-        if (!messageExists)
-        {
+        //if (!messageExists)
+        //{
             var notifications = new List<Notification>();
 
             foreach (var connection in pharmacistConnections)
             {
-                await Clients.Client(connection.connectionId).ReceiveNotification(message);
+                await Clients.Client(connection.connectionId).ReceiveNotification(message); 
 
                 var notification = new Notification
                 {
@@ -155,7 +155,7 @@ public class NotificationHub : Hub<INotificationClient>
 
             await _dbContext.notification.AddRangeAsync(notifications);
             await _dbContext.SaveChangesAsync();
-        }
+        //}
     }
 
     public async Task ASking(List<string> medicineNames)

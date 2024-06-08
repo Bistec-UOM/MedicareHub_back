@@ -37,7 +37,7 @@ namespace API.Controllers
         {
             var medicineDetails = await _billService.GetMedicineDetails(medicineNames);
             var removedData = await _billService.GetMedicinesNotInStock(medicineNames);
-            var message = $"\"{string.Join(", ", removedData)}\", are not available in our store";
+            var message = $"{string.Join(", ", removedData)}, are not available in our store";
             var pharmacistConnections = _dbContext.users
                     .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
                     .Select(u => new
@@ -45,7 +45,7 @@ namespace API.Controllers
                         connectionId = u.ConnectionId,
                         Id = u.Id
                     })
-                .ToList();
+                    .ToList();
 
 
                 var notifications = new List<Notification>();
