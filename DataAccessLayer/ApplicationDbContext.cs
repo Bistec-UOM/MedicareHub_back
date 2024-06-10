@@ -27,13 +27,16 @@ namespace DataAccessLayer
         public DbSet<Record> records { get; set; }
         public DbSet<Test> tests { get; set; }
         public DbSet<ReportFields> reportFields { get; set; }
+        public DbSet<ServiceCharge> serviceCharges { get; set; }
 
         //Admin===================================================================
         public DbSet<Patient> patients { get; set; }
         public DbSet<Patient_Teles> Patient_Teles { get; set; }
         public DbSet<User> users { get; set; }
         public DbSet<User_Tele> user_Teles { get; set; }
+        public DbSet<Notification> notification { get; set; }
         //----------------------------------------------
+        public DbSet<Admin> admins { get; set; }
         public DbSet<Doctor> doctors { get; set; }
         public DbSet<Receptionist> receptionists { get; set; }
         public DbSet<Cashier> cashiers { get; set; }
@@ -50,6 +53,7 @@ namespace DataAccessLayer
 
             modelBuilder.Entity<Test>().Property(t => t.Price).HasColumnType("decimal(18,2)");
             modelBuilder.Entity<Drug>().Property(t => t.Price).HasColumnType("decimal(18,2)");
+
 
             base.OnModelCreating(modelBuilder);
         }

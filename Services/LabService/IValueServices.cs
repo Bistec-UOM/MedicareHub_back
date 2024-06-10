@@ -17,7 +17,7 @@ namespace Services.LabService
 
         public Task<IEnumerable<Object>> AcceptedSamplesList();
 
-        public Task<Boolean> UplaodResults(Result data);
+        public Task<Boolean> UplaodResults(Result data,int RoleId);
 
         public Task<List<VResult>> CheckResult(int Pid);
 

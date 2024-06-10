@@ -12,5 +12,6 @@ namespace Models
         public int userId { get; set; }
         public int code { get; set; }
         public string? status { get; set; }
+        public DateTime? DateTime { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Models
         [JsonIgnore]
         public Prescription? Prescription { get; set; }
 
-
+        public DateTime? AcceptedDate { get; set; }
         public DateTime? DateTime { get; set; }
 
 
@@ -36,7 +36,7 @@ namespace Models
 
 
         [ForeignKey("LbAstID")]
-        public int LbAstID { get; set; }
+        public int? LbAstID { get; set; }
         [JsonIgnore]
         public LabAssistant? LbAst { get; set; }
 

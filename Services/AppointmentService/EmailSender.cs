@@ -11,25 +11,31 @@ namespace Services.AppointmentService
 {
     public class EmailSender
     {
+        string ApiKey = Environment.GetEnvironmentVariable("API_KEY");
+
+        
 
 
 
 
-
-
-        public async Task SendMail(string subject,string toEmail,string userName,string message)
+        public async Task SendMail(string subject,string toEmail,string userName,string htmlContent)
         {
-            //var apiKey = akey;
-           // var client = new SendGridClient(apiKey);
+            var apiKey = ApiKey;
+            var client = new SendGridClient(apiKey);
             var from = new EmailAddress("chathuraishara63@gmail.com", "Medicare Hub");
            
             var to = new EmailAddress(toEmail, userName);
-            var plainTextContent = message;
-            var htmlContent = "";
+            var plainTextContent = "";
+           
+
+
+
+
+
             try
             {
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-               // var response = await client.SendEmailAsync(msg);
+                var response = await client.SendEmailAsync(msg);
 
 
             }catch (Exception ex)

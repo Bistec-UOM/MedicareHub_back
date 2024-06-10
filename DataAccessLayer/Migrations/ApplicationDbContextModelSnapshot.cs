@@ -22,6 +22,24 @@ namespace DataAccessLayer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Models.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("admins");
+                });
+
             modelBuilder.Entity("Models.Appointment", b =>
                 {
                     b.Property<int>("Id")
@@ -180,10 +198,13 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("AcceptedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("LbAstID")
+                    b.Property<int?>("LbAstID")
                         .HasColumnType("int");
 
                     b.Property<int>("PrescriptionID")
@@ -207,6 +228,34 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("labReports");
                 });
 
+            modelBuilder.Entity("Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("From")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Seen")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("SendAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("To")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("notification");
+                });
+
             modelBuilder.Entity("Models.Otp", b =>
                 {
                     b.Property<int>("Id")
@@ -214,6 +263,9 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("code")
                         .HasColumnType("int");
@@ -433,6 +485,22 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("reportFields");
                 });
 
+            modelBuilder.Entity("Models.ServiceCharge", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("serviceCharges");
+                });
+
             modelBuilder.Entity("Models.Test", b =>
                 {
                     b.Property<int>("Id")
@@ -499,6 +567,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ContactNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -516,6 +587,9 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -559,6 +633,17 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("user_Teles");
+                });
+
+            modelBuilder.Entity("Models.Admin", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.Appointment", b =>
@@ -644,9 +729,7 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("Models.LabAssistant", "LbAst")
                         .WithMany()
-                        .HasForeignKey("LbAstID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LbAstID");
 
                     b.HasOne("Models.Prescription", "Prescription")
                         .WithMany("LabReport")

@@ -10,5 +10,7 @@ namespace Models.DTO.Doctor
     {
         public Prescription Prescription { get; set; }
         public List<Prescript_drug> Drugs { get; set; }
+        public List<LabReport> LabReports { get; set; }
+        public List<String> TestNames { get; set; }
     }
 }

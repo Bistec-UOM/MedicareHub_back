@@ -54,7 +54,7 @@ namespace API.Controllers.LabControllers
         {
             if (data != null && data.Results!=null)
             {
-                var tmp = await _vs.UplaodResults(data);
+                var tmp = await _vs.UplaodResults(data,1);
                 if (tmp)
                 {
                     return Ok(data);

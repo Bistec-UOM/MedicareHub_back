@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.DTO.Lab;
 using Models.DTO.Lab.EditTemplate;
@@ -68,39 +69,49 @@ namespace Services.LabService
 
         public async Task AddTemplate(TemplateObj data)
         {
-            using (var transaction = await _cntx.Database.BeginTransactionAsync())
+            Test x = await _cntx.tests.Where(e => e.TestName == data.TestName).FirstOrDefaultAsync();
+            if (x == null)
             {
-
-                var tst = new Test
+                using (var transaction = await _cntx.Database.BeginTransactionAsync())
                 {
-                    TestName = data.TestName,
-                    Abb = data.Abb,
-                    Price = data.Price,
-                    Provider = data.Provider,
-                };
-                
-                await _cntx.tests.AddAsync(tst);
-                await _cntx.SaveChangesAsync();
 
-                int tstId = tst.Id;
-
-                foreach (var i in data.ReportFields)
-                {
-                    await _cntx.reportFields.AddAsync(new ReportFields
+                    var tst = new Test
                     {
-                        Fieldname = i.Fieldname,
-                        Index = i.Index,
-                        MinRef = i.MinRef,
-                        MaxRef = i.MaxRef,
-                        Unit = i.Unit,
-                        TestId = tstId
-                    });
+                        TestName = data.TestName,
+                        Abb = data.Abb,
+                        Price = data.Price,
+                        Provider = data.Provider,
+                    };
+
+                    await _cntx.tests.AddAsync(tst);
+                    await _cntx.SaveChangesAsync();
+
+                    int tstId = tst.Id;
+
+                    foreach (var i in data.ReportFields)
+                    {
+                        await _cntx.reportFields.AddAsync(new ReportFields
+                        {
+                            Fieldname = i.Fieldname,
+                            Index = i.Index,
+                            MinRef = i.MinRef,
+                            MaxRef = i.MaxRef,
+                            Unit = i.Unit,
+                            TestId = tstId
+                        });
+                    }
+
+                    await _cntx.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
                 }
-
-                await _cntx.SaveChangesAsync();
-                await transaction.CommitAsync();
-
             }
+            else
+            {
+                throw new Exception();
+            }
+
+ 
         }
 
         public async Task EditField(ReportFields item)

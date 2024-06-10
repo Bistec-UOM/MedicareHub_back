@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Models.DTO;
+using Models.DTO.Auth;
 using Services;
 
 namespace API.Controllers
@@ -38,25 +38,39 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("reset/OTP")]
-        async public Task<ActionResult> VerifyOTP(int id)
+        [HttpPost("reset/sendOTP")]
+        async public Task<ActionResult> SendOTP(int id)
         {
-            string tmp=await _auth.VerifyCode(id);
+            string tmp=await _auth.SendOTP(id);
             if (tmp != null)
             {
                 return Ok(tmp);
             }
             else
             {
-                return BadRequest();
+                return BadRequest("User doen't exist");
             }
         }
 
-        [HttpPost("reset/password")]
-        async public Task<ActionResult> NewPassword(UserLog data)
+        [HttpPost("reset/checkOTP")]
+        async public Task<ActionResult> CheckOTP(SentOTP data)
         {
+            String msg=await _auth.CheckOTP(data);
+            if (msg == "OK")
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(msg);
+            }
+        }
+
+        [HttpPost("reset/new")]
+        async public Task<ActionResult> NewPassword(NewPassword data)
+        {
+            await _auth.NewPassword(data);
             return Ok();
         }
-        
     }
 }

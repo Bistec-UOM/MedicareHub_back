@@ -11,6 +11,8 @@ namespace Models
 {
     public class Test
     {
+        public object id;
+
         public int Id { get; set; }
         public string TestName { get; set; } = null!;
         public string Abb { get; set; } = null!;
