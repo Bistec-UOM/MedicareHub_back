@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AppointmentNotificationHandler;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Services.AdminServices;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers.AdminControllers
 {
@@ -13,10 +19,13 @@ namespace API.Controllers.AdminControllers
     public class AnalyticController : ControllerBase
     {
         private readonly IAnalyticsService _analyticsService;
+        private readonly AppointmentNotificationHub _hubContext;
+        private readonly ApplicationDbContext _dbContext;
 
-        public AnalyticController(IAnalyticsService analyticsService)
+        public AnalyticController(ApplicationDbContext dbContext,IAnalyticsService analyticsService)
         {
             _analyticsService = analyticsService;
+            _dbContext = dbContext;
         }
 
         [HttpGet("male-female-patients-count")]
@@ -130,5 +139,20 @@ namespace API.Controllers.AdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpGet("GetScaredDrugs")]
+        public async Task<IActionResult> GetScaredDrugs()
+        {
+            try
+            {
+                var res = await _analyticsService.GetScaredDrugs();
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
+        }
+        
+       
     }
 }

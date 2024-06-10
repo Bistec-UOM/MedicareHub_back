@@ -120,6 +120,23 @@ namespace Services.AdminServices
                     Available = d.Avaliable
                 })
                 .ToList();
+            
+
+            return drugAvailability;
+
+        }
+        public async Task<object> GetScaredDrugs()
+        {
+            // Query the database to get the generic name and available count of 
+            var drugAvailability = _dbcontext.drugs
+                .Where(d => d.Avaliable < 10)
+                .Select(d => new
+                {
+                    Name = d.BrandN + "(" + (d.Weight) + "mg)",
+                    Available = d.Avaliable
+                })
+                .ToList();
+
 
             return drugAvailability;
 
