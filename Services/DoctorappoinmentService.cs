@@ -58,8 +58,8 @@ namespace Services
             var tests = await _context.tests
                 .Select(t => new
                 {
-                    id = t.Id,
-                    name = t.TestName
+                    TestId = t.Id,
+                    labTestName = t.TestName
                 })
                 .ToListAsync();
 
