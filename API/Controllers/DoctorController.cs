@@ -21,10 +21,10 @@ namespace API.Controllers
         [HttpGet("AppointList")]
         public async Task<ActionResult<List<Object>>> GetPatientNamesForApp()
         {
-            var tmp=await _appointments.GetPatientNamesForApp();
+            var tmp = await _appointments.GetAppointmentsAndTests();
             return Ok(tmp);
         }
-        
+
         //....................................................................................................................................
         //........................................................................................................................................
         //....................................................................................................................................
@@ -34,7 +34,7 @@ namespace API.Controllers
         {
             var tmp = await _appointments.GetPatientNamesForApp2(doctorId);
             return Ok(tmp);
-        }        
+        }
         //....................................................................................................................................
         //........................................................................................................................................
         //....................................................................................................................................
@@ -42,7 +42,7 @@ namespace API.Controllers
         [HttpPost("Prescription")]
         public async Task<ActionResult<Appointment>> AddPrescription(AddDrugs data)
         {
-            var tmp=await _prescription.AddPrescription(data);
+            var tmp = await _prescription.AddPrescription(data);
             return Ok(tmp);
         }
 
@@ -50,9 +50,9 @@ namespace API.Controllers
         [HttpGet("prescription/{patientId}")]
         public async Task<ActionResult> PrescriptionByPatientId(int patientId)
         {
-           var prescriptionDrugs = await _appointments.PrescriptionByPatientId(patientId);
-           return Ok(prescriptionDrugs);           
-          
+            var prescriptionDrugs = await _appointments.PrescriptionByPatientId(patientId);
+            return Ok(prescriptionDrugs);
+
         }
 
     }
