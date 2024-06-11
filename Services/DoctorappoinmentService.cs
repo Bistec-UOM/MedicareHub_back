@@ -32,31 +32,46 @@ namespace Services
             _labs = labs;
             _tests = tests;
         }
-        // get appoinment list from database
-        public async Task<List<object>> GetPatientNamesForApp()
-        {
-            var tmp = _context.appointments
 
-            .Where(a => a.Status == "new") // Filter appointments with status "new"                
-            .Select(a => new
-            {
-                id = a.Id,
-                date = a.DateTime.Date,
-                time = a.DateTime.TimeOfDay.ToString(@"hh\:mm"),
-                status = "pending",
-                Patient = new
+        // get appoinment list from database
+        public async Task<object> GetAppointmentsAndTests()
+        {
+            var appointments = await _context.appointments
+                .Where(a => a.Status == "new") // Filter appointments with status "new"                
+                .Select(a => new
                 {
-                    name = a.Patient.Name,
-                    age = CaluclateAge((DateTime)a.Patient.DOB),
-                    gender = a.Patient.Gender,
-                    id = a.Patient.Id
-                }
-            })
-            .ToList<object>();
-            return tmp;
+                    id = a.Id,
+                    date = a.DateTime.Date,
+                    time = a.DateTime.TimeOfDay.ToString(@"hh\:mm"),
+                    status = "pending",
+                    Patient = new
+                    {
+                        name = a.Patient.Name,
+                        age = CalculateAge((DateTime)a.Patient.DOB),
+                        gender = a.Patient.Gender,
+                        id = a.Patient.Id
+                    },
+                   
+                })
+                .ToListAsync();
+
+            var tests = await _context.tests
+                .Select(t => new
+                {
+                    id = t.Id,
+                    name = t.TestName
+                })
+                .ToListAsync();
+
+            return new
+            {
+                Appointments = appointments,
+                Tests = tests
+            };
         }
-        //funtion for calculate the age from DOB
-        private static int CaluclateAge(DateTime dob)
+
+        // Function to calculate the age from DOB
+        private static int CalculateAge(DateTime dob)
         {
             DateTime now = DateTime.UtcNow;
             int age = now.Year - dob.Year;
@@ -67,16 +82,17 @@ namespace Services
             return age;
         }
 
-     //....................................................................................................................................
-     //....................................................................................................................................
-     //....................................................................................................................................
 
-       // get appoinment list from database filter on doctorId and todays date
-        public async Task<List<object>> GetPatientNamesForApp2(int doctorId)
+  //....................................................................................................................................
+  //....................................................................................................................................
+  //....................................................................................................................................
+
+        // get appoinment list from database filter on doctorId and todays date
+        public async Task<object> GetPatientNamesForApp2(int doctorId)
         {
             var today = DateTime.UtcNow.Date; // Get today's date
 
-            var tmp = _context.appointments
+            var tmp = await _context.appointments
 
             .Where(a => a.Status == "new" && a.DoctorId == doctorId && a.DateTime.Date == today) // Filter appointments with status "new"                
             .Select(a => new
@@ -93,8 +109,21 @@ namespace Services
                     id = a.Patient.Id
                 }
             })
-            .ToList<object>();
-            return tmp;
+            .ToListAsync();
+
+            var tests = await _context.tests
+                .Select(t => new
+                {
+                    id = t.Id,
+                    name = t.TestName
+                })
+                .ToListAsync();
+
+            return new
+            {
+                Appointments = tmp ,
+                Tests = tests
+            };
         }
         //funtion for calculate the age from DOB
         private static int CaluclateAge2(DateTime dob)
@@ -107,70 +136,70 @@ namespace Services
             }
             return age;
         }
-    //......................................................................................................................................
-    //........................................................................................................................................
-    //......................................................................................................................................
+ //......................................................................................................................................
+ //........................................................................................................................................
+ //......................................................................................................................................
 
         // for prescription
         public async Task<Appointment> AddPrescription(AddDrugs data)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
-            { 
-            var x = new Prescription
             {
-                DateTime = DateTime.Now,
-                AppointmentID = data.Id,
-                description = data.Description,
-                Total = 0,
-                CashierId = 1
-            };
-
-            await _context.AddAsync(x);
-            await _context.SaveChangesAsync();
-
-            int pId = x.Id; //prescription id
-
-            foreach (var i in data.Drugs)
-            {
-                var Obj = new Prescript_drug
+                var x = new Prescription
                 {
-                    PrescriptionId = pId,
-                    GenericN = i.GenericN,
-                    Weight = i.Weight,
-                    Unit = i.Unit,
-                    Period = i.Period
+                    DateTime = DateTime.Now,
+                    AppointmentID = data.Id,
+                    description = data.Description,
+                    Total = 0,
+                    CashierId = 1
                 };
 
-                await _context.prescript_Drugs.AddAsync(Obj);
-            }
+                await _context.AddAsync(x);
+                await _context.SaveChangesAsync();
 
+                int pId = x.Id; //prescription id
 
-            foreach (var d in data.Labs)
-            {
-                var Obj = new LabReport
+                foreach (var i in data.Drugs)
                 {
-                    PrescriptionID = pId,
-                    DateTime = null,
-                    AcceptedDate = null,
-                    TestId = d.TestId,
-                    Status = "new"
-                };
-                await _context.labReports.AddAsync(Obj);
+                    var Obj = new Prescript_drug
+                    {
+                        PrescriptionId = pId,
+                        GenericN = i.GenericN,
+                        Weight = i.Weight,
+                        Unit = i.Unit,
+                        Period = i.Period
+                    };
+
+                    await _context.prescript_Drugs.AddAsync(Obj);
+                }
+
+
+                foreach (var d in data.Labs)
+                {
+                    var Obj = new LabReport
+                    {
+                        PrescriptionID = pId,
+                        DateTime = null,
+                        AcceptedDate = null,
+                        TestId = d.TestId,
+                        Status = "new"
+                    };
+                    await _context.labReports.AddAsync(Obj);
+                }
+                await _context.SaveChangesAsync();
+
+                // update appoinment patient status
+                var appointment = await _appoinments.Get(data.Id);
+                appointment.Status = "completed";
+                await _appoinments.Update(appointment);
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return appointment;
             }
-            await _context.SaveChangesAsync();
-
-            // update appoinment patient status
-            var appointment = await _appoinments.Get(data.Id);
-            appointment.Status = "completed";
-            await _appoinments.Update(appointment);
-
-            await _context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-
-            return appointment;
         }
-    }
 
         //get the patient history according to thier patient ids
         public async Task<List<PrescriptionWithDrugs>> PrescriptionByPatientId(int patientId)
@@ -187,7 +216,7 @@ namespace Services
             var prescriptionIds = prescriptions.Select(p => p.Id).ToList();
             // get the prescription ids list according to the appoinment ids
 
-           
+
 
             var prescriptionWithDrugsList = new List<PrescriptionWithDrugs>();
 
@@ -214,7 +243,7 @@ namespace Services
                 var prescriptDrugs = new PrescriptionWithDrugs
                 {
                     Prescription = prescription,
-                   Drugs = prescriptionDrugs,
+                    Drugs = prescriptionDrugs,
                     LabReports = relatedLabReports,
                     TestNames = testNames
                 };

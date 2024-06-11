@@ -10,5 +10,6 @@ namespace Models.DTO
     {
         public Appointment Appointment { get; set; }
         public Patient patient { get; set; }
+       
     }
 }

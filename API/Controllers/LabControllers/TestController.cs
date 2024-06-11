@@ -7,6 +7,7 @@ using Models;
 using Models.DTO.Lab;
 using Models.DTO.Lab.EditTemplate;
 using Services.LabService;
+using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
 {
@@ -22,7 +23,6 @@ namespace API.Controllers.LabControllers
 
 
         //Get the list of all lab tests to display in test list=================
-        [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
@@ -57,8 +57,15 @@ namespace API.Controllers.LabControllers
         [HttpPost("Template")]
         public async Task<ActionResult> Addtmp(TemplateObj item)
         {
-            await _tst.AddTemplate(item);
-            return Ok();
+            try
+            {
+                await _tst.AddTemplate(item);
+                return Ok();
+            }
+            catch
+            {
+                return NotFound("This test name already Exist");
+            }
         }
 
         //edit existing template=============================================

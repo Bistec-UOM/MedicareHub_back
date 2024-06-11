@@ -63,34 +63,96 @@ namespace Services
                 {
                     medicineDetails.Add(name, medicines);
                 }
+                else
+                {
+                    List<Drug> emptyDrg = new List<Drug>(); 
+                    medicineDetails.Add(name, emptyDrg);
+                }
             }
 
             return medicineDetails;
         }
+        public async Task<List<string>> GetMedicinesNotInStock(List<string> medicineNames)
+        {
+            var medicinesNotInStock = new List<string>();
+
+            // Get the list of names that are available in the database
+            var availableNames = await _cntx.drugs
+                .Where(d => medicineNames.Contains(d.GenericN))
+                .Select(d => d.GenericN)
+                .ToListAsync();
+
+            // Find names that are not in the availableNames list
+            medicinesNotInStock = medicineNames.Except(availableNames).ToList();
+
+            return medicinesNotInStock;
+        }
+
+
+
         public async Task AddBillDrugs(Bill data)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
-                foreach (var item in data.Data)
+                try
                 {
-                    await _cntx.bill_Drugs.AddAsync(item);
+                    foreach (var item in data.Data)
+                    {
+                        var drug = await _cntx.drugs.FirstOrDefaultAsync(d => d.Id == item.DrugID);
+
+                        if (drug == null)
+                        {
+                            throw new Exception($"Drug with ID {item.DrugID} not found.");
+                        }
+
+                        if (drug.Avaliable < item.Amount)
+                        {
+                            throw new Exception($"Not enough quantity for drug with ID {item.DrugID}. Available: {drug.Avaliable}, Requested: {item.Amount}");
+                        }
+
+                        // Reduce the quantity of the drug
+                        drug.Avaliable -= item.Amount;
+                        _cntx.drugs.Update(drug);
+
+                        // Add the bill drug
+                        await _cntx.bill_Drugs.AddAsync(item);
+                    }
+
+                    var prescription = await _cntx.prescriptions
+                        .FirstOrDefaultAsync(e => e.Id == data.Data[0].PrescriptionID);
+
+                    if (prescription == null)
+                    {
+                        throw new Exception($"Prescription with ID {data.Data[0].PrescriptionID} not found.");
+                    }
+
+                    prescription.Total = data.Total;
+                    prescription.CashierId = 1;
+
+                    var appointment = await _cntx.appointments
+                        .FirstOrDefaultAsync(e => e.Id == prescription.AppointmentID);
+
+                    if (appointment == null)
+                    {
+                        throw new Exception($"Appointment with ID {prescription.AppointmentID} not found.");
+                    }
+
+                    appointment.Status = "paid";
+
+                    _cntx.prescriptions.Update(prescription);
+                    _cntx.appointments.Update(appointment);
+
+                    await _cntx.SaveChangesAsync();
+                    await transaction.CommitAsync();
                 }
-
-                Prescription tmp=await _cntx.prescriptions.Where(e => e.Id == data.Data[0].PrescriptionID).FirstOrDefaultAsync();
-                tmp.Total = data.Total;
-                tmp.CashierId = 1;
-
-                Appointment tmp2 =await _cntx.appointments.Where(e => e.Id==tmp.AppointmentID).FirstOrDefaultAsync();
-                tmp2.Status = "paid";
-
-                _cntx.prescriptions.Update(tmp);
-                _cntx.appointments.Update(tmp2);
-
-                await _cntx.SaveChangesAsync();
-                await transaction.CommitAsync();
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception("An error occurred while adding bill drugs: " + ex.Message);
+                }
             }
-
         }
+
 
         private static int CaluclateAge(DateTime dob)
         {

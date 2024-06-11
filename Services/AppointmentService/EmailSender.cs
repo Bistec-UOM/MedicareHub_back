@@ -18,15 +18,20 @@ namespace Services.AppointmentService
 
 
 
-        public async Task SendMail(string subject,string toEmail,string userName,string message)
+        public async Task SendMail(string subject,string toEmail,string userName,string htmlContent)
         {
             var apiKey = ApiKey;
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("chathuraishara63@gmail.com", "Medicare Hub");
            
             var to = new EmailAddress(toEmail, userName);
-            var plainTextContent = message;
-            var htmlContent = "";
+            var plainTextContent = "";
+           
+
+
+
+
+
             try
             {
                 var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);

@@ -5,38 +5,58 @@ using Models;
 using System;
 using System.Text.Json; // Add this line
 using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.AspNetCore.Connections.Features;
-using Sprache;
-using Services;
+using System.Collections.Concurrent;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http;
+using System.Diagnostics;
 
-
-public interface INotificationClient
+namespace AppointmentNotificationHandler;
+public interface IAppointmentNotificationClient
 {
     Task ReceiveNotification(string message);
     Task Receiver(string message);
-    Task Render(List<Drug> medicinesNotInStock);
     Task broadcastMessage(string name, string message);
-    Task ASking(List<string> medicineNames);
-
-
+    Task NotifyDoctor(int doctorId, string message);
+    Task SendMessageToUser(string userId, string message);
 }
-public class NotificationHub : Hub<INotificationClient>
+
+public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
 {
     private readonly ApplicationDbContext _dbContext;
-    private readonly BillService _billService;
 
-    public NotificationHub(ApplicationDbContext dbContext, BillService billService)
+    
+   
+
+
+    public AppointmentNotificationHub(ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
-        _billService = billService;
     }
 
     public override async Task OnConnectedAsync()
     {
-        await Clients.All.ReceiveNotification($"Thank you for connecting: {Context.ConnectionId}");
+        // Get the connection ID of the connected user
+        var connectionId = Context.ConnectionId;
+        // var token = Context.GetHttpContext().Request.Query["medicareHubToken"];
+        var httpContext = Context.GetHttpContext();
+        var userId = httpContext.Request.Query["userId"].ToString();
+
+        ConnectionManager.AddConnection(userId, connectionId);
+
+        Debug.WriteLine("User Connections:");
+        foreach (var kvp in ConnectionManager._userConnections)
+        {
+            Debug.WriteLine($"User ID: {kvp.Key}, Connection ID: {kvp.Value}");
+        }
+
+        // Send a personalized message to the connected user
+       // await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
+
         await base.OnConnectedAsync();
     }
+
 
     public override async Task OnDisconnectedAsync(Exception exception)
     {
@@ -44,10 +64,7 @@ public class NotificationHub : Hub<INotificationClient>
         var user = await _dbContext.users.FirstOrDefaultAsync(u => u.ConnectionId == connectionId);
         if (user != null)
         {
-            user.IsActive = false;
-            user.ConnectionId = null;
-            await _dbContext.SaveChangesAsync();
-            await Clients.All.broadcastMessage(user.Name, "User has manually disconnected.");
+            await Clients.All.Receiver("User has disconnected.");
         }
 
         await base.OnDisconnectedAsync(exception);
@@ -66,7 +83,9 @@ public class NotificationHub : Hub<INotificationClient>
                 await Clients.All.broadcastMessage(user.Name, "User has manually disconnected.");
             }
         }
+
     }
+
 
     public string GetConnectionId()
     {
@@ -108,59 +127,37 @@ public class NotificationHub : Hub<INotificationClient>
         await Clients.All.Receiver(usersJson);
     }
 
-    public async Task NotiToPharmacist()
+    public async Task NotifyDoctor(int doctorId, string message)
     {
-        var drugAvailability = _dbContext.drugs
-            .Where(d => d.Avaliable < 10)
-            .Select(d => new
+        Debug.WriteLine("User Connections:", ConnectionManager._userConnections);
+
+        var doct = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
+        var userId = doct.UserId;
+        //var doctor = await _dbContext.users.FirstOrDefaultAsync(u => u.Id == doct.UserId);
+       
+            if (ConnectionManager._userConnections.TryGetValue(userId.ToString(), out string connectionId))
             {
-                Name = d.BrandN + "(" + d.Weight + "mg)",
-                Available = d.Avaliable
-            })
-            .ToList();
-
-        var pharmacistConnections = _dbContext.users
-            .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
-            .Select(u => new
-            {
-                connectionId = u.ConnectionId,
-                Id = u.Id
-            })
-            .ToList();
-
-        var unavailableDrugs = drugAvailability.Select(d => d.Name);
-        var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
-
-        bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
-
-        if (!messageExists)
-        {
-            var notifications = new List<Notification>();
-
-            foreach (var connection in pharmacistConnections)
-            {
-                await Clients.Client(connection.connectionId).ReceiveNotification(message); 
-
-                var notification = new Notification
-                {
-                    From = "System",
-                    To = connection.Id.ToString(),
-                    Message = message,
-                    SendAt = DateTime.Now,
-                    Seen = false
-                };
-
-                notifications.Add(notification);
+                // Send the notification to the retrieved connection ID
+                await Clients.Client(connectionId).ReceiveNotification(message);
             }
 
-            await _dbContext.notification.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
+        
+       
+    }
+
+    public async Task SendMessageToUser(string userId, string message)
+    {
+        if (ConnectionManager._userConnections.TryGetValue(userId, out string connectionId))
+        {
+            await Clients.Client(connectionId).ReceiveNotification(message);
+        }
+        else
+        {
+            // Handle case where user ID is not found in the dictionary
         }
     }
 
-    public async Task ASking(List<string> medicineNames)
-    {
-        var medicinesNotInStock = await _billService.GetMedicinesNotInStock(medicineNames);
-        //await Clients.All.Render(medicinesNotInStock); // Ensure this line is active to broadcast the data
-    }
+
+
+
 }
