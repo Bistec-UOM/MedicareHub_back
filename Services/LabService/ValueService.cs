@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.DTO.Lab.UploadResults;
@@ -19,6 +20,7 @@ namespace Services.LabService
         private readonly IRepository<Record> _rec;
         private readonly IRepository<Test> _tst;
         private readonly ApplicationDbContext _cntx;
+
         public ValueService(IRepository<LabReport> rep,IRepository<Record> rec, IRepository<Test> tst, ApplicationDbContext contxt)
         {
             _rep = rep;
@@ -132,28 +134,15 @@ namespace Services.LabService
             _cntx.labReports.Update(tmp);
             await _cntx.SaveChangesAsync();
 
-            var dataObj = await _cntx.labReports
-                .Include(lr => lr.Prescription)
-                .ThenInclude(p => p.Appointment)
-                .ThenInclude(a => a.Patient)
-                .Include(lr => lr.Test)
-                .FirstOrDefaultAsync(lr => lr.Id == data.ReportId);
+            //var sendMail = new EmailSender();
+            //string msg = "Results of your recent lab test ("+labReportInfo.TestName+") on "+labReportInfo.AcceptedDate+"" +
+            //    " is ready and available.";
+            //if (data.Servere == true)
+            //{
+            //    msg = msg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+            //}
 
-            var labReportInfo = new {
-                PatientName = dataObj.Prescription.Appointment.Patient.Name,
-                TestName = dataObj.Test.TestName,
-                AcceptedDate = dataObj.AcceptedDate
-            };
-
-            var sendMail = new EmailSender();
-            string msg = "Results of your recent lab test ("+labReportInfo.TestName+") on "+labReportInfo.AcceptedDate+"" +
-                " is ready and available.";
-            if (data.Servere == true)
-            {
-                msg = msg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
-            }
-
-            await sendMail.SendMail(labReportInfo.TestName+" results", "kwalskinick@gmail.com", labReportInfo.PatientName,msg);
+            //await sendMail.SendMail(labReportInfo.TestName+" results", "kwalskinick@gmail.com", labReportInfo.PatientName,msg);
 
             return true;
         }
