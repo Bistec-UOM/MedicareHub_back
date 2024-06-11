@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO.Lab.UploadResults;
@@ -7,6 +8,7 @@ using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
 {
+    [Authorize(Policy = "Lab")]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
@@ -52,9 +54,12 @@ namespace API.Controllers.LabControllers
         [HttpPost("Result")]
         async public Task<ActionResult> UploadResults(Result data)
         {
+            var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+            int roleId = int.Parse(claim);
+
             if (data != null && data.Results!=null)
             {
-                var tmp = await _vs.UplaodResults(data,1);
+                var tmp = await _vs.UplaodResults(data,roleId);
                 if (tmp)
                 {
                     return Ok(data);
@@ -74,7 +79,7 @@ namespace API.Controllers.LabControllers
 
         //check the results of the report doctor requested is available
         [HttpGet("Result")]
-        public async Task<ActionResult> CheckResult(int Pid)
+        public async Task<ActionResult> CheckResult(int Pid) 
         {
             return Ok(await _vs.CheckResult(Pid));
         }

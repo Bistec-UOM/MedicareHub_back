@@ -11,6 +11,7 @@ using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
 {
+    [Authorize(Policy = "Lab")]
     [Route("api/[controller]")]
     [ApiController]
     public class TestController : ControllerBase
