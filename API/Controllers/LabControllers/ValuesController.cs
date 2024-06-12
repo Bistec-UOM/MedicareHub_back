@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AppointmentNotificationHandler;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.DTO.Lab.UploadResults;
+using Services.AppointmentService;
 using Services.LabService;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
@@ -12,9 +18,14 @@ namespace API.Controllers.LabControllers
     public class ValuesController : ControllerBase
     {
         private readonly ValueService _vs;
-        public ValuesController(ValueService vs) 
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
+
+        public ValuesController(ValueService vs, IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> hubContext,ApplicationDbContext dbContext) 
         {
             _vs = vs;
+            _hubContext = hubContext;
+            _dbContext = dbContext;
         }
 
 
@@ -57,7 +68,8 @@ namespace API.Controllers.LabControllers
                 var tmp = await _vs.UplaodResults(data,1);
                 if (tmp)
                 {
-                    return Ok(data);
+
+                    return Ok();
                 }
                 else
                 {

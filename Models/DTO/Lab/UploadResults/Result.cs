@@ -11,5 +11,6 @@ namespace Models.DTO.Lab.UploadResults
         public int ReportId { get; set; }
         public DateTime DateTime { get; set; }
         public List<ResultField>? Results { get; set; }
+        public Boolean Servere { get; set; }
     }
 }

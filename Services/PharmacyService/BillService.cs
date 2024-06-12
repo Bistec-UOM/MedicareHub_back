@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Services
+namespace Services.PharmacyService
 {
     public class BillService
     {
@@ -25,18 +25,18 @@ namespace Services
             var prescriptionData = await _cntx.prescriptions
                 .Include(p => p.Appointment)
                 .ThenInclude(a => a.Patient)
-                .Where(p => p.Appointment.Status=="completed")
+                .Where(p => p.Appointment.Status == "completed")
                 .Select(p => new
                 {
                     id = p.Id,
                     time = p.DateTime.TimeOfDay.ToString(@"hh\:mm"),
-                    Total = p.Total,
-                    CashierId = p.CashierId,
+                    p.Total,
+                    p.CashierId,
                     name = p.Appointment.Patient.Name,
                     age = CaluclateAge((DateTime)p.Appointment.Patient.DOB),
                     gender = p.Appointment.Patient.Gender,
                     medicine = _cntx.prescript_Drugs
-                        .Where(d => d.PrescriptionId == p.Id && p.Appointment.Status=="completed")
+                        .Where(d => d.PrescriptionId == p.Id && p.Appointment.Status == "completed")
                         .Select(d => new
                         {
                             DrugId = d.Id,
@@ -65,7 +65,7 @@ namespace Services
                 }
                 else
                 {
-                    List<Drug> emptyDrg = new List<Drug>(); 
+                    List<Drug> emptyDrg = new List<Drug>();
                     medicineDetails.Add(name, emptyDrg);
                 }
             }
@@ -158,7 +158,7 @@ namespace Services
         {
             DateTime now = DateTime.UtcNow;
             int age = now.Year - dob.Year;
-            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            if (now.Month < dob.Month || now.Month == dob.Month && now.Day < dob.Day)
             {
                 age--;
             }
