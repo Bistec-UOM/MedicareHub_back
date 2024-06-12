@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTO;
@@ -7,6 +8,7 @@ using Services.LabService;
 
 namespace API.Controllers.DoctorControllers
 {
+    [Authorize(Policy = "Doct")]
     [Route("api/[controller]")]
     [ApiController]
     public class HistoryController : ControllerBase

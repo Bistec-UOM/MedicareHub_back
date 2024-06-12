@@ -207,18 +207,16 @@ namespace Services.LabService
         }
 
 
-        public async Task<Boolean> MarkCheck(int id)
+        public async Task MarkCheck(List<int> ids)
         {
-            var tmp = await _rep.Get(id);
-            if(tmp.Status == "done" ) 
+            foreach (var item in ids)
             {
-                tmp.Status = "checked";
-                await _rep.Update(tmp);
-                return true;
-            }
-            else
-            {
-                return false;
+                var tmp = await _rep.Get(item);
+                if (tmp.Status == "done")
+                {
+                    tmp.Status = "checked";
+                    await _rep.Update(tmp);
+                }
             }
 
         }

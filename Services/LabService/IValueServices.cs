@@ -21,6 +21,6 @@ namespace Services.LabService
 
         public Task<List<VResult>> CheckResult(int Pid);
 
-        public Task<Boolean> MarkCheck(int id);
+        public Task MarkCheck(List<int> ids);
     }
 }

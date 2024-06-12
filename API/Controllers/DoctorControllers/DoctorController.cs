@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.DTO.Doctor;
 using Services.AppointmentService;
@@ -6,6 +7,7 @@ using Services.DoctorService;
 
 namespace API.Controllers.DoctorControllers
 {
+    [Authorize(Policy = "Doct")]
     [Route("api/[controller]")]
     [ApiController]
     public class DoctorController : ControllerBase
@@ -29,10 +31,13 @@ namespace API.Controllers.DoctorControllers
         //........................................................................................................................................
         //....................................................................................................................................
 
-        [HttpGet("AppointList2/{doctorId}")]
-        public async Task<ActionResult<List<object>>> GetPatientNamesForApp2(int doctorId)
+        [HttpGet("AppointList2")]
+        public async Task<ActionResult<List<object>>> GetPatientNamesForApp2()
         {
-            var tmp = await _appointments.GetPatientNamesForApp2(doctorId);
+            var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+            int roleId = int.Parse(claim);
+
+            var tmp = await _appointments.GetPatientNamesForApp2(roleId);
             return Ok(tmp);
         }
         //....................................................................................................................................
