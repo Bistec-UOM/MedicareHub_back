@@ -187,7 +187,7 @@ app.UseCors("ReactJSDomain");
 
 // Map controllers and SignalR hub
 app.MapControllers();
-app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<AdminHub>("/notificationHub");
 app.MapHub<AppointmentNotificationHub>("/appointmentnotificationHub");
 
 

@@ -16,17 +16,17 @@ public interface INotificationClient
     Task ReceiveNotification(string message);
     Task Receiver(string message);
     Task Render(List<Drug> medicinesNotInStock);
-    Task broadcastMessage(string name, string message);
+    Task AdminBroadcastMessage(string name, string message);
     Task ASking(List<string> medicineNames);
 
 
 }
-public class NotificationHub : Hub<INotificationClient>
+public class AdminHub : Hub<INotificationClient>
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly BillService _billService;
 
-    public NotificationHub(ApplicationDbContext dbContext, BillService billService)
+    public AdminHub(ApplicationDbContext dbContext, BillService billService)
     {
         _dbContext = dbContext;
         _billService = billService;
@@ -47,7 +47,7 @@ public class NotificationHub : Hub<INotificationClient>
             user.IsActive = false;
             user.ConnectionId = null;
             await _dbContext.SaveChangesAsync();
-            await Clients.All.broadcastMessage(user.Name, "User has manually disconnected.");
+            await Clients.All.AdminBroadcastMessage(user.Name, "User has Asyncly disconnected.");
         }
 
         await base.OnDisconnectedAsync(exception);
@@ -63,7 +63,7 @@ public class NotificationHub : Hub<INotificationClient>
                 user.IsActive = false;
                 user.ConnectionId = null;
                 await _dbContext.SaveChangesAsync();
-                await Clients.All.broadcastMessage(user.Name, "User has manually disconnected.");
+                await Clients.All.AdminBroadcastMessage(user.Name, "User has manually disconnected.");
             }
         }
     }
@@ -83,16 +83,16 @@ public class NotificationHub : Hub<INotificationClient>
                 user.IsActive = true;
                 user.ConnectionId = Context.ConnectionId;
                 await _dbContext.SaveChangesAsync();
-                await Clients.Client(Context.ConnectionId).broadcastMessage(user.Name, message);
+                await Clients.All.AdminBroadcastMessage(user.Name, message);
             }
             else
             {
-                await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
+                await Clients.All.ReceiveNotification($"User with ID {id} not found.");
             }
         }
         else
         {
-            await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
+            await Clients.All.ReceiveNotification($"Invalid user ID {id}.");
         }
     }
 
@@ -108,55 +108,7 @@ public class NotificationHub : Hub<INotificationClient>
         await Clients.All.Receiver(usersJson);
     }
 
-    public async Task NotiToPharmacist()
-    {
-        var drugAvailability = _dbContext.drugs
-            .Where(d => d.Avaliable < 10)
-            .Select(d => new
-            {
-                Name = d.BrandN + "(" + d.Weight + "mg)",
-                Available = d.Avaliable
-            })
-            .ToList();
-
-        var pharmacistConnections = _dbContext.users
-            .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
-            .Select(u => new
-            {
-                connectionId = u.ConnectionId,
-                Id = u.Id
-            })
-            .ToList();
-
-        var unavailableDrugs = drugAvailability.Select(d => d.Name);
-        var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
-
-        bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
-
-        if (!messageExists)
-        {
-            var notifications = new List<Notification>();
-
-            foreach (var connection in pharmacistConnections)
-            {
-                await Clients.Client(connection.connectionId).ReceiveNotification(message); 
-
-                var notification = new Notification
-                {
-                    From = "System",
-                    To = connection.Id.ToString(),
-                    Message = message,
-                    SendAt = DateTime.Now,
-                    Seen = false
-                };
-
-                notifications.Add(notification);
-            }
-
-            await _dbContext.notification.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
-        }
-    }
+    
 
     public async Task ASking(List<string> medicineNames)
     {
