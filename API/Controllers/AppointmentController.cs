@@ -85,7 +85,7 @@ namespace API.Controllers
                 if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
                 {
                     Debug.WriteLine($"User ConnectionId: {connectionId}");
-                    await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
+                    await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
                     Debug.WriteLine("Notification sent via SignalR.");
                 }
                 
