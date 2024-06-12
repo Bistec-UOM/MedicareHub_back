@@ -1,9 +1,11 @@
 ﻿using DataAccessLayer;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Models.DTO.Lab.UploadResults;
 using Models.DTO.Lab.ViewResults;
 using SendGrid.Helpers.Mail;
+using Services.AppointmentService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +20,7 @@ namespace Services.LabService
         private readonly IRepository<Record> _rec;
         private readonly IRepository<Test> _tst;
         private readonly ApplicationDbContext _cntx;
+
         public ValueService(IRepository<LabReport> rep,IRepository<Record> rec, IRepository<Test> tst, ApplicationDbContext contxt)
         {
             _rep = rep;
@@ -130,6 +133,17 @@ namespace Services.LabService
             tmp.LbAstID = RoleId;
             _cntx.labReports.Update(tmp);
             await _cntx.SaveChangesAsync();
+
+            //var sendMail = new EmailSender();
+            //string msg = "Results of your recent lab test ("+labReportInfo.TestName+") on "+labReportInfo.AcceptedDate+"" +
+            //    " is ready and available.";
+            //if (data.Servere == true)
+            //{
+            //    msg = msg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+            //}
+
+            //await sendMail.SendMail(labReportInfo.TestName+" results", "kwalskinick@gmail.com", labReportInfo.PatientName,msg);
+
             return true;
         }
 
