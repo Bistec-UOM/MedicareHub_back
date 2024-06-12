@@ -26,8 +26,8 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
 {
     private readonly ApplicationDbContext _dbContext;
 
-    
-   
+
+
 
 
     public AppointmentNotificationHub(ApplicationDbContext dbContext)
@@ -52,7 +52,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         }
 
         // Send a personalized message to the connected user
-      //  await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
+        //  await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
 
         await base.OnConnectedAsync();
     }
@@ -106,12 +106,12 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             }
             else
             {
-              //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
+                //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
             }
         }
         else
         {
-          //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
+            //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
         }
     }
 
@@ -134,22 +134,22 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         var doct = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == doctorId);
         var userId = doct.UserId;
         //var doctor = await _dbContext.users.FirstOrDefaultAsync(u => u.Id == doct.UserId);
-       
-            if (ConnectionManager._userConnections.TryGetValue(userId.ToString(), out string connectionId))
-            {
-                // Send the notification to the retrieved connection ID
-              //  await Clients.Client(connectionId).ReceiveNotification(message);
-            }
 
-        
-       
+        if (ConnectionManager._userConnections.TryGetValue(userId.ToString(), out string connectionId))
+        {
+            // Send the notification to the retrieved connection ID
+            //  await Clients.Client(connectionId).ReceiveNotification(message);
+        }
+
+
+
     }
 
     public async Task SendMessageToUser(string userId, string message)
     {
         if (ConnectionManager._userConnections.TryGetValue(userId, out string connectionId))
         {
-          //  await Clients.Client(connectionId).ReceiveNotification(message);
+            //  await Clients.Client(connectionId).ReceiveNotification(message);
         }
         else
         {
@@ -157,6 +157,58 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         }
     }
 
+
+
+    //------------------------------------------------------message to pharmacist using analytics | admin related------------------------------------------------
+    public async Task NotiToPharmacist()
+    {
+        var drugAvailability = _dbContext.drugs
+            .Where(d => d.Avaliable < 10)
+            .Select(d => new
+            {
+                Name = d.BrandN + "(" + d.Weight + "mg)",
+                Available = d.Avaliable
+            })
+            .ToList();
+
+        var pharmacistConnections = _dbContext.users
+            .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
+            .Select(u => new
+            {
+                connectionId = u.ConnectionId,
+                Id = u.Id
+            })
+            .ToList();
+
+        var unavailableDrugs = drugAvailability.Select(d => d.Name);
+        var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+
+        bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
+
+        //if (!messageExists)
+        //{
+            var notifications = new List<Notification>();
+
+            foreach (var connection in pharmacistConnections)
+            {
+
+                var notification = new Notification
+                {
+                    From = "System",
+                    To = connection.Id.ToString(),
+                    Message = message,
+                    SendAt = DateTime.Now,
+                    Seen = false
+                };
+                await Clients.Client(connection.connectionId).ReceiveNotification(notification);
+
+                notifications.Add(notification);
+            }
+
+            await _dbContext.notification.AddRangeAsync(notifications);
+            await _dbContext.SaveChangesAsync();
+        //}
+    }
 
 
 
