@@ -1,12 +1,14 @@
 ﻿using DataAccessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTO;
-using Services;
+using Services.DoctorService;
 using Services.LabService;
 
-namespace API.Controllers
+namespace API.Controllers.DoctorControllers
 {
+    [Authorize(Policy = "Doct")]
     [Route("api/[controller]")]
     [ApiController]
     public class HistoryController : ControllerBase
@@ -15,7 +17,7 @@ namespace API.Controllers
         private readonly ValueService _vs;
         private readonly DoctorappoinmentService _dApp;
 
-        public HistoryController(DoctorAnalyticService ans, ValueService vs,DoctorappoinmentService dApp)
+        public HistoryController(DoctorAnalyticService ans, ValueService vs, DoctorappoinmentService dApp)
         {
             _ans = ans;
             _vs = vs;
@@ -26,9 +28,9 @@ namespace API.Controllers
         [HttpGet("history")]
         public async Task<ActionResult<History>> RequestHistory(int Pid)
         {
-            History tmp= new History();
+            History tmp = new History();
             tmp.Lb = await _vs.CheckResult(Pid);
-            tmp.Rec =  await _dApp.PrescriptionByPatientId(Pid);
+            tmp.Rec = await _dApp.PrescriptionByPatientId(Pid);
             tmp.Drgs = await _ans.TrackDrugList(Pid);
             tmp.Rprts = await _ans.TrackReportList(Pid);
             return Ok(tmp);

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Connections.Features;
 using Sprache;
-using Services;
+using Services.PharmacyService;
 
 
 public interface INotificationClient
@@ -34,7 +34,7 @@ public class NotificationHub : Hub<INotificationClient>
 
     public override async Task OnConnectedAsync()
     {
-        await Clients.All.ReceiveNotification($"Thank you for connecting: {Context.ConnectionId}");
+        //await Clients.All.ReceiveNotification($"Thank you for connecting: {Context.ConnectionId}");
         await base.OnConnectedAsync();
     }
 

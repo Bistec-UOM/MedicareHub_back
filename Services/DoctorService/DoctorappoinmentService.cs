@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Services
+namespace Services.DoctorService
 {
     public class DoctorappoinmentService
     {
@@ -51,15 +51,15 @@ namespace Services
                         gender = a.Patient.Gender,
                         id = a.Patient.Id
                     },
-                   
+
                 })
                 .ToListAsync();
 
             var tests = await _context.tests
                 .Select(t => new
                 {
-                    id = t.Id,
-                    name = t.TestName
+                    TestId = t.Id,
+                    labTestName = t.TestName
                 })
                 .ToListAsync();
 
@@ -75,7 +75,7 @@ namespace Services
         {
             DateTime now = DateTime.UtcNow;
             int age = now.Year - dob.Year;
-            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            if (now.Month < dob.Month || now.Month == dob.Month && now.Day < dob.Day)
             {
                 age--;
             }
@@ -83,18 +83,18 @@ namespace Services
         }
 
 
-  //....................................................................................................................................
-  //....................................................................................................................................
-  //....................................................................................................................................
+        //....................................................................................................................................
+        //....................................................................................................................................
+        //....................................................................................................................................
 
         // get appoinment list from database filter on doctorId and todays date
         public async Task<object> GetPatientNamesForApp2(int doctorId)
         {
-            var today = DateTime.UtcNow.Date; // Get today's date
+            //var today = DateTime.UtcNow.Date; // Get today's date
 
             var tmp = await _context.appointments
 
-            .Where(a => a.Status == "new" && a.DoctorId == doctorId && a.DateTime.Date == today) // Filter appointments with status "new"                
+            .Where(a => a.Status == "new" && a.DoctorId == doctorId) // Filter appointments with status "new"                
             .Select(a => new
             {
                 id = a.Id,
@@ -114,14 +114,14 @@ namespace Services
             var tests = await _context.tests
                 .Select(t => new
                 {
-                    id = t.Id,
-                    name = t.TestName
+                    TestId = t.Id,
+                    labTestName = t.TestName
                 })
                 .ToListAsync();
 
             return new
             {
-                Appointments = tmp ,
+                Appointments = tmp,
                 Tests = tests
             };
         }
@@ -130,15 +130,15 @@ namespace Services
         {
             DateTime now = DateTime.UtcNow;
             int age = now.Year - dob.Year;
-            if (now.Month < dob.Month || (now.Month == dob.Month && now.Day < dob.Day))
+            if (now.Month < dob.Month || now.Month == dob.Month && now.Day < dob.Day)
             {
                 age--;
             }
             return age;
         }
- //......................................................................................................................................
- //........................................................................................................................................
- //......................................................................................................................................
+        //......................................................................................................................................
+        //........................................................................................................................................
+        //......................................................................................................................................
 
         // for prescription
         public async Task<Appointment> AddPrescription(AddDrugs data)

@@ -15,7 +15,7 @@ using System.Diagnostics;
 namespace AppointmentNotificationHandler;
 public interface IAppointmentNotificationClient
 {
-    Task ReceiveNotification(string message);
+    Task ReceiveNotification(Notification notification);
     Task Receiver(string message);
     Task broadcastMessage(string name, string message);
     Task NotifyDoctor(int doctorId, string message);
@@ -52,7 +52,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         }
 
         // Send a personalized message to the connected user
-       // await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
+      //  await Clients.Client(connectionId).ReceiveNotification($"Hello kollone{userId}! Your Connection ID is: {connectionId}");
 
         await base.OnConnectedAsync();
     }
@@ -106,12 +106,12 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             }
             else
             {
-                await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
+              //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"User with ID {id} not found.");
             }
         }
         else
         {
-            await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
+          //  await Clients.Client(Context.ConnectionId).ReceiveNotification($"Invalid user ID {id}.");
         }
     }
 
@@ -138,7 +138,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             if (ConnectionManager._userConnections.TryGetValue(userId.ToString(), out string connectionId))
             {
                 // Send the notification to the retrieved connection ID
-                await Clients.Client(connectionId).ReceiveNotification(message);
+              //  await Clients.Client(connectionId).ReceiveNotification(message);
             }
 
         
@@ -149,7 +149,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
     {
         if (ConnectionManager._userConnections.TryGetValue(userId, out string connectionId))
         {
-            await Clients.Client(connectionId).ReceiveNotification(message);
+          //  await Clients.Client(connectionId).ReceiveNotification(message);
         }
         else
         {

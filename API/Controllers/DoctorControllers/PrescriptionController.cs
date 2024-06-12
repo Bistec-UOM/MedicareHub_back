@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.DoctorService;
 
-namespace API.Controllers
+namespace API.Controllers.DoctorControllers
 {
+    [Authorize(Policy = "Doct")]
     [Route("api/[controller]")]
     [ApiController]
     public class PrescriptionController : ControllerBase
