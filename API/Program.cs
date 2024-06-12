@@ -15,6 +15,8 @@ using Services.AppointmentService;
 using Services.LabService;
 using API;
 using AppointmentNotificationHandler;
+using Services.PharmacyService;
+using Services.DoctorService;
 
 
 var builder = WebApplication.CreateBuilder(args);

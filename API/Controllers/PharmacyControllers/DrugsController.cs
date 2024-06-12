@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.PharmacyService;
 
-namespace API.Controllers
+namespace API.Controllers.PharmacyControllers
 {
     [Route("api/[controller]")]
     [ApiController]

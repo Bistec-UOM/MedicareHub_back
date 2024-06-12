@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models;
-using Services;
+using Services.DoctorService;
 
-namespace API.Controllers
+namespace API.Controllers.DoctorControllers
 {
     [Route("api/[controller]")]
     [ApiController]

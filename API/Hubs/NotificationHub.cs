@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Connections.Features;
 using Sprache;
-using Services;
+using Services.PharmacyService;
 
 
 public interface INotificationClient

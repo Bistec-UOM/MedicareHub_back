@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Models;
 using Models.DTO;
-using Services;
+using Services.PharmacyService;
 
-namespace API.Controllers
+namespace API.Controllers.PharmacyControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -16,7 +16,7 @@ namespace API.Controllers
         private readonly IHubContext<NotificationHub, INotificationClient> _notificationHub;
         private readonly ApplicationDbContext _dbContext;
 
-        public BillController(BillService billService, IHubContext<NotificationHub, INotificationClient> notificationHub,ApplicationDbContext dbcontext)
+        public BillController(BillService billService, IHubContext<NotificationHub, INotificationClient> notificationHub, ApplicationDbContext dbcontext)
         {
             _billService = billService;
             _notificationHub = notificationHub;
@@ -43,30 +43,30 @@ namespace API.Controllers
                     .Select(u => new
                     {
                         connectionId = u.ConnectionId,
-                        Id = u.Id
+                        u.Id
                     })
                     .ToList();
 
 
-                var notifications = new List<Notification>();
+            var notifications = new List<Notification>();
 
-                foreach (var connection in pharmacistConnections)
+            foreach (var connection in pharmacistConnections)
+            {
+                await _notificationHub.Clients.Client(connection.connectionId).ReceiveNotification(message);
+
+                var notification = new Notification
                 {
-                    await _notificationHub.Clients.Client(connection.connectionId).ReceiveNotification(message);
+                    From = "System",
+                    To = connection.Id.ToString(),
+                    Message = message,
+                    SendAt = DateTime.Now,
+                    Seen = false
+                };
 
-                    var notification = new Notification
-                    {
-                        From = "System",
-                        To = connection.Id.ToString(),
-                        Message = message,
-                        SendAt = DateTime.Now,
-                        Seen = false
-                    };
-
-                    notifications.Add(notification);
-                }
-                await _dbContext.notification.AddRangeAsync(notifications);
-                await _dbContext.SaveChangesAsync();
+                notifications.Add(notification);
+            }
+            await _dbContext.notification.AddRangeAsync(notifications);
+            await _dbContext.SaveChangesAsync();
 
 
 
