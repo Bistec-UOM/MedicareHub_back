@@ -90,11 +90,11 @@ namespace Services.DoctorService
         // get appoinment list from database filter on doctorId and todays date
         public async Task<object> GetPatientNamesForApp2(int doctorId)
         {
-            var today = DateTime.UtcNow.Date; // Get today's date
+            //var today = DateTime.UtcNow.Date; // Get today's date
 
             var tmp = await _context.appointments
 
-            .Where(a => a.Status == "new" && a.DoctorId == doctorId && a.DateTime.Date == today) // Filter appointments with status "new"                
+            .Where(a => a.Status == "new" && a.DoctorId == doctorId) // Filter appointments with status "new"                
             .Select(a => new
             {
                 id = a.Id,
@@ -114,8 +114,8 @@ namespace Services.DoctorService
             var tests = await _context.tests
                 .Select(t => new
                 {
-                    id = t.Id,
-                    name = t.TestName
+                    TestId = t.Id,
+                    labTestName = t.TestName
                 })
                 .ToListAsync();
 
