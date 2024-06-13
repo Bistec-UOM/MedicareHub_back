@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AppointmentNotificationHandler;
+using DataAccessLayer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Services.AdminServices;
 using System;
@@ -10,11 +14,17 @@ namespace API.Controllers.AdminControllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
 
-        public UserController(IUserService userService)
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IUserService _userService;
+        private readonly IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
+
+
+        public UserController(IUserService userService,ApplicationDbContext dbContext,IHubContext<AppointmentNotificationHub,IAppointmentNotificationClient> hubContext)
         {
             _userService = userService;
+            _hubContext = hubContext;
+            _dbContext = dbContext;
         }
 
         // GET: api/<UserController>
@@ -100,5 +110,58 @@ namespace API.Controllers.AdminControllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        [HttpPost("SendCashierMsg")]
+        public async Task<IActionResult> SendNotiToCashier()
+        {
+
+            var drugAvailability = _dbContext.drugs
+            .Where(d => d.Avaliable < 10)
+            .Select(d => new
+            {
+                Name = d.BrandN + "(" + d.Weight + "mg)",
+                Available = d.Avaliable
+            })
+            .ToList();
+
+            var pharmacistConnections = _dbContext.users
+                .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
+                .Select(u => new
+                {
+                    connectionId = u.ConnectionId,
+                    Id = u.Id
+                })
+                .ToList();
+
+            var unavailableDrugs = drugAvailability.Select(d => d.Name);
+            var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+
+            bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
+
+  //          if (!messageExists)
+//            {
+                var notifications = new List<Notification>();
+
+                foreach (var connection in pharmacistConnections)
+                {
+                    var notification = new Notification
+                    {
+                        From = "System",
+                        To = connection.Id.ToString(),
+                        Message = message,
+                        SendAt = DateTime.Now,
+                        Seen = false
+                    };
+                    await _hubContext.Clients.Client(connection.connectionId).ReceiveNotification(notification);
+
+                    notifications.Add(notification);
+                }
+
+                await _dbContext.notification.AddRangeAsync(notifications);
+                await _dbContext.SaveChangesAsync();
+  //              return Ok();
+//            }
+            return Ok();
+       }
+
     }
 }

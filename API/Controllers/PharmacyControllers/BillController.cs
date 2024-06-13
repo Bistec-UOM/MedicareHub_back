@@ -1,10 +1,12 @@
-﻿using DataAccessLayer;
+﻿using AppointmentNotificationHandler;
+using DataAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Models;
 using Models.DTO;
 using Services.PharmacyService;
+using System.Diagnostics;
 
 namespace API.Controllers.PharmacyControllers
 {
@@ -13,13 +15,13 @@ namespace API.Controllers.PharmacyControllers
     public class BillController : ControllerBase
     {
         private readonly BillService _billService;
-        private readonly IHubContext<NotificationHub, INotificationClient> _notificationHub;
+        private readonly IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
         private readonly ApplicationDbContext _dbContext;
 
-        public BillController(BillService billService, IHubContext<NotificationHub, INotificationClient> notificationHub, ApplicationDbContext dbcontext)
+        public BillController(BillService billService, IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> hubContext, ApplicationDbContext dbcontext)
         {
             _billService = billService;
-            _notificationHub = notificationHub;
+            _hubContext = hubContext;
             _dbContext = dbcontext;
         }
 
@@ -43,16 +45,15 @@ namespace API.Controllers.PharmacyControllers
                     .Select(u => new
                     {
                         connectionId = u.ConnectionId,
-                        u.Id
+                        Id = u.Id
                     })
                     .ToList();
 
 
             var notifications = new List<Notification>();
 
-            foreach (var connection in pharmacistConnections)
-            {
-                await _notificationHub.Clients.Client(connection.connectionId).ReceiveNotification(message);
+           foreach (var connection in pharmacistConnections)
+           {
 
                 var notification = new Notification
                 {
@@ -63,8 +64,13 @@ namespace API.Controllers.PharmacyControllers
                     Seen = false
                 };
 
+
+                if (connection.Id!= null && ConnectionManager._userConnections.TryGetValue(connection.Id.ToString(), out var connectionId))
+                {
+                    await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
+                }
                 notifications.Add(notification);
-            }
+           }
             await _dbContext.notification.AddRangeAsync(notifications);
             await _dbContext.SaveChangesAsync();
 

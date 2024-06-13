@@ -11,10 +11,10 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class NotificationsController : ControllerBase
     {
-        private readonly IHubContext<NotificationHub, INotificationClient> _hubContext;
+        private readonly IHubContext<AdminHub, INotificationClient> _hubContext;
         private readonly ApplicationDbContext _context;
 
-        public NotificationsController(IHubContext<NotificationHub, INotificationClient> hubContext, ApplicationDbContext context)
+        public NotificationsController(IHubContext<AdminHub, INotificationClient> hubContext, ApplicationDbContext context)
         {
             _hubContext = hubContext;
             _context = context;
