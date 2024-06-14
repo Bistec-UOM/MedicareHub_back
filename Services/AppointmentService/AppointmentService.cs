@@ -533,6 +533,13 @@ namespace Services.AppointmentService
             await _dbcontext.SaveChangesAsync();
 
         }
+
+        public async Task<List<Unable_Date>> getUnableTimeslots(int doctorId,DateTime day)
+        {
+            var dates= _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId && u.Date == day);
+            return dates.ToList();
+
+        }
       
 
         
