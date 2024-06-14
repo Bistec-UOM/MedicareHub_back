@@ -465,6 +465,13 @@ namespace API.Controllers
             await _appointment.markAsSeenNotifications(userId,newSeenValue);
         }
 
+        [HttpGet("BlockDates/{doctorId}/date/{day}")]
+        public async Task<ActionResult<ICollection<Unable_Date>>> getUnableTimeSlots(int doctorId,DateTime day)
+        {
+            var results=await _appointment.getUnableTimeslots(doctorId, day);
+            return Ok(results);
+        }
+
 
 
 
