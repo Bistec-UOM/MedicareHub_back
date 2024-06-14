@@ -11,14 +11,26 @@ namespace Services.PharmacyService
     public class DrugsService
     {
         private readonly IRepository<Drug> _drg;
-        public DrugsService(IRepository<Drug> drg)
+        private readonly ApplicationDbContext _cntx;
+        public DrugsService(IRepository<Drug> drg, ApplicationDbContext cntx)
         {
             _drg = drg;
+            _cntx = cntx;
         }
 
-        public async Task AddDrug(Drug item)
+        public async Task<bool> AddDrug(Drug item)
         {
+            // Check if the drug with the same combination of genericName, brandName, and weight already exists
+            var existingDrug = _cntx.drugs
+                .FirstOrDefault(d => d.GenericN == item.GenericN && d.BrandN == item.BrandN && d.Weight == item.Weight);
+
+            if (existingDrug != null)
+            {
+                return false; // Drug already exists
+            }
+
             await _drg.Add(item);
+            return true; // Drug added successfully
         }
         public async Task<IEnumerable<Drug>> GetDrugs()
         {
@@ -52,6 +64,24 @@ namespace Services.PharmacyService
             // Update other properties as needed
 
             await _drg.Update(existingDrug);
+            return true;
+        }
+        public ServiceCharge GetServiceCharge()
+        {
+            return _cntx.serviceCharges.FirstOrDefault();
+        }
+
+        public bool UpdateServiceCharge(ServiceCharge updatedServiceCharge)
+        {
+            var existingServiceCharge = _cntx.serviceCharges.FirstOrDefault();
+            if (existingServiceCharge == null)
+                return false;
+
+            // Assuming the ServiceCharge table has an Amount property
+            existingServiceCharge.Price = updatedServiceCharge.Price;
+
+            _cntx.serviceCharges.Update(existingServiceCharge);
+            _cntx.SaveChanges();
             return true;
         }
 

@@ -17,7 +17,11 @@ namespace API.Controllers.PharmacyControllers
         [HttpPost]
         public async Task<ActionResult<string>> AddDrug(Drug item)
         {
-            await _drg.AddDrug(item);
+            var result = await _drg.AddDrug(item);
+            if (!result)
+            {
+                return BadRequest("Drug with the same combination of generic name, brand name, and weight already exists.");
+            }
             return Ok("Success");
         }
         [HttpGet]
@@ -52,6 +56,25 @@ namespace API.Controllers.PharmacyControllers
                 return Ok("Drug updated successfully.");
             else
                 return NotFound("Drug not found.");
+        }
+        [HttpGet("servicecharge")]
+        public ActionResult<ServiceCharge> GetServiceCharge()
+        {
+            var serviceCharge = _drg.GetServiceCharge();
+            if (serviceCharge == null)
+                return NotFound("Service charge not found.");
+
+            return Ok(serviceCharge);
+        }
+
+        [HttpPut("servicecharge")]
+        public ActionResult<string> UpdateServiceCharge([FromBody] ServiceCharge updatedServiceCharge)
+        {
+            var result = _drg.UpdateServiceCharge(updatedServiceCharge);
+            if (result)
+                return Ok("Service charge updated successfully.");
+            else
+                return NotFound("Service charge not found.");
         }
     }
 
