@@ -72,54 +72,54 @@ namespace API.Controllers.LabControllers
                 var tmp = await _vs.UplaodResults(data,roleId);
                 if (tmp)
                 {
-                    //var dataObj = await _dbContext.labReports
-                        //.Include(lr => lr.Prescription)
-                        //.ThenInclude(p => p.Appointment)
-                        //.ThenInclude(a => a.Patient)
-                        //.Include(lr => lr.Prescription)
-                        //.ThenInclude(p => p.Appointment)
-                        //.ThenInclude(a => a.Doctor)
-                        //.ThenInclude(d => d.User)
-                        //.Include(lr => lr.Test)
-                        //.FirstOrDefaultAsync(lr => lr.Id == data.ReportId);
+                    var dataObj = await _dbContext.labReports
+                        .Include(lr => lr.Prescription)
+                        .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Patient)
+                        .Include(lr => lr.Prescription)
+                        .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                        .Include(lr => lr.Test)
+                        .FirstOrDefaultAsync(lr => lr.Id == data.ReportId);
 
-                    //var labReportInfo = new
-                    //{
-                    //    PatientName = dataObj.Prescription.Appointment.Patient.Name,
-                    //    TestName = dataObj.Test.TestName,
-                    //    AcceptedDate = dataObj.AcceptedDate,
-                    //    UserId = dataObj.Prescription.Appointment.Doctor.UserId
-                    //};
-                    //
-                    //var sendMail = new EmailSender();
-                    //string emsg = "Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
-                    //    " is ready and available." + labReportInfo.UserId;
-                    //string notMsg = "Results of recent lab test (" + labReportInfo.TestName + ") of " + labReportInfo.PatientName + " on " + labReportInfo.AcceptedDate +
-                    //" is ready and available.";
-                    //
-                    //if (data.Servere == true)
-                    //{
-                    //    emsg = emsg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
-                    //    notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
-                    //}
+                    var labReportInfo = new
+                    {
+                        PatientName = dataObj.Prescription.Appointment.Patient.Name,
+                        TestName = dataObj.Test.TestName,
+                        AcceptedDate = dataObj.AcceptedDate,
+                        UserId = dataObj.Prescription.Appointment.Doctor.UserId
+                    };
+                    
+                    var sendMail = new EmailSender();
+                    string emsg = "Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
+                        " is ready and available." + labReportInfo.UserId;
+                    string notMsg = "Results of recent lab test (" + labReportInfo.TestName + ") of " + labReportInfo.PatientName + " on " + labReportInfo.AcceptedDate +
+                    " is ready and available.";
+                    
+                    if (data.Servere == true)
+                    {
+                        emsg = emsg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+                        notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
+                    }
 
-                    //Notification newNotification = new Notification();
-                    //newNotification.Message = notMsg;
-                    //newNotification.From = "1";//Add lab Id when authorized
-                    //newNotification.To = labReportInfo.UserId.ToString();
-                    //newNotification.SendAt = DateTime.Now;
-                    //newNotification.Seen = false;
-                    //
-                    //await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, emsg);
-                    //
-                    //if (labReportInfo.UserId != null && ConnectionManager._userConnections.TryGetValue(labReportInfo.UserId.ToString(), out var connectionId))
-                    //{
-                    //    Debug.WriteLine($"User ConnectionId: {connectionId}");
-                    //    await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                    //    Debug.WriteLine("Notification sent via SignalR.");
-                    //}
-                    //
-                    //await _dbContext.notification.AddAsync(newNotification);
+                    Notification newNotification = new Notification();
+                    newNotification.Message = notMsg;
+                    newNotification.From = "1";//Add lab Id when authorized
+                    newNotification.To = labReportInfo.UserId.ToString();
+                    newNotification.SendAt = DateTime.Now;
+                    newNotification.Seen = false;
+                    
+                    await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, emsg);
+                    
+                    if (labReportInfo.UserId != null && ConnectionManager._userConnections.TryGetValue(labReportInfo.UserId.ToString(), out var connectionId))
+                    {
+                        Debug.WriteLine($"User ConnectionId: {connectionId}");
+                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                        Debug.WriteLine("Notification sent via SignalR.");
+                    }
+                    
+                    await _dbContext.notification.AddAsync(newNotification);
 
                     return Ok();
                 }

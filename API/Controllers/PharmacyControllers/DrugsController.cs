@@ -20,7 +20,7 @@ namespace API.Controllers.PharmacyControllers
             var result = await _drg.AddDrug(item);
             if (!result)
             {
-                return BadRequest("Drug with the same combination of generic name, brand name, and weight already exists.");
+                return BadRequest("Drug already exists");
             }
             return Ok("Success");
         }
