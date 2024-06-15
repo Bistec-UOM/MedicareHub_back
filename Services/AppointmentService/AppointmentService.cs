@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Services.AppointmentService
 {
-    public class AppointmentService 
+    public class AppointmentService:IAppointmentService
     {
 
         private readonly ApplicationDbContext _dbcontext;
@@ -172,7 +172,7 @@ namespace Services.AppointmentService
             }
         }
 
-        public async Task<List<Appointment>> GetAll()  //get all appointments
+        public  async Task<List<Appointment>> GetAll()  //get all appointments
         {
             return await _appointment.GetAll();     
         }
@@ -531,6 +531,13 @@ namespace Services.AppointmentService
 
 
             await _dbcontext.SaveChangesAsync();
+
+        }
+
+        public async Task<List<Unable_Date>> getUnableTimeslots(int doctorId,DateTime day)
+        {
+            var dates= _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId && u.Date == day);
+            return dates.ToList();
 
         }
       

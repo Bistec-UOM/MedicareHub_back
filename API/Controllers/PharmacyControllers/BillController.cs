@@ -39,7 +39,8 @@ namespace API.Controllers.PharmacyControllers
         {
             var medicineDetails = await _billService.GetMedicineDetails(medicineNames);
             var removedData = await _billService.GetMedicinesNotInStock(medicineNames);
-            var message = $"{string.Join(", ", removedData)}, are not available in our store";
+            string message = removedData.Count == 0 ? "All medicines are available in our store" : $"{string.Join(", ", removedData)}, are not available in our store which is assigned by doctor";
+            //var message = $"{string.Join(", ", removedData)}, are not available in our store";
             var pharmacistConnections = _dbContext.users
                     .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
                     .Select(u => new
@@ -65,23 +66,27 @@ namespace API.Controllers.PharmacyControllers
                 };
 
 
-                if (connection.Id!= null && ConnectionManager._userConnections.TryGetValue(connection.Id.ToString(), out var connectionId))
+                if (connection.Id!= null && removedData.Count > 0 && ConnectionManager._userConnections.TryGetValue(connection.Id.ToString(), out var connectionId))
                 {
                     await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
                 }
                 notifications.Add(notification);
            }
-            await _dbContext.notification.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
-
-
-
-
-            if (medicineDetails == null || medicineDetails.Count == 0)
+           if(removedData.Count > 0)
             {
-                return NotFound();
+                await _dbContext.notification.AddRangeAsync(notifications);
+                await _dbContext.SaveChangesAsync();
+
             }
-            return Ok(message);
+
+
+
+
+            //if (medicineDetails == null || medicineDetails.Count == 0)
+            //{
+            //   return NotFound();
+            //}
+            return Ok(medicineDetails);
         }
 
         //Add bill details (paid drugs)
