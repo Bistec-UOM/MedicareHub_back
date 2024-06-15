@@ -100,16 +100,6 @@ namespace Services.PharmacyService
                     {
                         var drug = await _cntx.drugs.FirstOrDefaultAsync(d => d.Id == item.DrugID);
 
-                        if (drug == null)
-                        {
-                            throw new Exception($"Drug with ID {item.DrugID} not found.");
-                        }
-
-                        if (drug.Avaliable < item.Amount)
-                        {
-                            throw new Exception($"Not enough quantity for drug with ID {item.DrugID}. Available: {drug.Avaliable}, Requested: {item.Amount}");
-                        }
-
                         // Reduce the quantity of the drug
                         drug.Avaliable -= item.Amount;
                         _cntx.drugs.Update(drug);
@@ -119,24 +109,12 @@ namespace Services.PharmacyService
                     }
 
                     var prescription = await _cntx.prescriptions
-                        .FirstOrDefaultAsync(e => e.Id == data.Data[0].PrescriptionID);
-
-                    if (prescription == null)
-                    {
-                        throw new Exception($"Prescription with ID {data.Data[0].PrescriptionID} not found.");
-                    }
-
+                        .FirstOrDefaultAsync(e => e.Id == data.PrescriptId);
                     prescription.Total = data.Total;
                     prescription.CashierId = 1;
 
                     var appointment = await _cntx.appointments
                         .FirstOrDefaultAsync(e => e.Id == prescription.AppointmentID);
-
-                    if (appointment == null)
-                    {
-                        throw new Exception($"Appointment with ID {prescription.AppointmentID} not found.");
-                    }
-
                     appointment.Status = "paid";
 
                     _cntx.prescriptions.Update(prescription);

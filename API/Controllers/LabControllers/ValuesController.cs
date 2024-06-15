@@ -31,11 +31,8 @@ namespace API.Controllers.LabControllers
 
         [Authorize(Policy = "Lab")]
         [HttpGet("ReportRequest")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<object>> GetPatientPrescriptionData()
         {
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //var userRole = identity.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var res = await _vs.RequestList();
             return Ok(res);
         }

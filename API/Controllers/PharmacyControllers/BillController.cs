@@ -82,10 +82,10 @@ namespace API.Controllers.PharmacyControllers
 
 
 
-            if (medicineDetails == null || medicineDetails.Count == 0)
-            {
-                return NotFound();
-            }
+            //if (medicineDetails == null || medicineDetails.Count == 0)
+            //{
+            //   return NotFound();
+            //}
             return Ok(medicineDetails);
         }
 
