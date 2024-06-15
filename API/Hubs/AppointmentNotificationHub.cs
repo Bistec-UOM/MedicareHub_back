@@ -181,17 +181,21 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             .ToList();
 
         var unavailableDrugs = drugAvailability.Select(d => d.Name);
-        var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+        //var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+        string message = unavailableDrugs.Count() == 0 ?
+                                       "All drugs are available" :
+                                       string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-        bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
+        DateTime twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+        bool messageExists = await _dbContext.notification
+            .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
 
-        //if (!messageExists)
-        //{
+        if (!messageExists)
+        {
             var notifications = new List<Notification>();
 
             foreach (var connection in pharmacistConnections)
             {
-
                 var notification = new Notification
                 {
                     From = "System",
@@ -203,11 +207,12 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
                 await Clients.Client(connection.connectionId).ReceiveNotification(notification);
 
                 notifications.Add(notification);
+                await _dbContext.notification.AddAsync(notification);
+                await _dbContext.SaveChangesAsync();
             }
 
-            await _dbContext.notification.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
-        //}
+           
+        }
     }
 
 
