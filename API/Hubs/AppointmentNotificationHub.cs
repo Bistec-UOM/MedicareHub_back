@@ -192,7 +192,9 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
 
         if (!messageExists)
         {
-            var notifications = new List<Notification>();
+        }
+
+        var notifications = new List<Notification>();
 
             foreach (var connection in pharmacistConnections)
             {
@@ -212,7 +214,6 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             }
 
            
-        }
     }
 
 
