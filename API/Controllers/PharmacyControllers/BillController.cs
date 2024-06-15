@@ -86,7 +86,7 @@ namespace API.Controllers.PharmacyControllers
             {
                 return NotFound();
             }
-            return Ok(message);
+            return Ok(medicineDetails);
         }
 
         //Add bill details (paid drugs)
