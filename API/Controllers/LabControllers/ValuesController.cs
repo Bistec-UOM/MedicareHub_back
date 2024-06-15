@@ -38,7 +38,7 @@ namespace API.Controllers.LabControllers
         }
 
         [Authorize(Policy = "Lab")]
-        [HttpPost("Accept")]
+        [HttpGet("SetAccept")]
         async public Task<ActionResult> AccceptSample(int id)
         {
             var tmp= await _vs.AcceptSample(id);

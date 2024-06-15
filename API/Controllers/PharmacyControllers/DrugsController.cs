@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.PharmacyService;
 
 namespace API.Controllers.PharmacyControllers
 {
+    [Authorize(Policy = "Cash")]
     [Route("api/[controller]")]
     [ApiController]
     public class DrugsController : ControllerBase
