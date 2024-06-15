@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Services.AppointmentService
 {
-    public class AppointmentService 
+    public class AppointmentService:IAppointmentService
     {
 
         private readonly ApplicationDbContext _dbcontext;
@@ -172,7 +172,7 @@ namespace Services.AppointmentService
             }
         }
 
-        public async Task<List<Appointment>> GetAll()  //get all appointments
+        public  async Task<List<Appointment>> GetAll()  //get all appointments
         {
             return await _appointment.GetAll();     
         }
