@@ -90,7 +90,7 @@ namespace Services.PharmacyService
 
 
 
-        public async Task AddBillDrugs(Bill data)
+        public async Task AddBillDrugs(Bill data,int roleId)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
@@ -111,7 +111,7 @@ namespace Services.PharmacyService
                     var prescription = await _cntx.prescriptions
                         .FirstOrDefaultAsync(e => e.Id == data.PrescriptId);
                     prescription.Total = data.Total;
-                    prescription.CashierId = 1;
+                    prescription.CashierId = roleId;
 
                     var appointment = await _cntx.appointments
                         .FirstOrDefaultAsync(e => e.Id == prescription.AppointmentID);
