@@ -78,12 +78,12 @@ namespace API.Controllers
                     var userId = doctor?.UserId;  //get the user id of the doctor
                     var notification = $"New appointment added for {appointment.DateTime}";
 
-                    Notification newNotification = new Notification();
-                    newNotification.Message = notification;
-                    newNotification.From = appointment.RecepId.ToString();
-                    newNotification.To = appointment.DoctorId.ToString();
-                    newNotification.SendAt = DateTime.Now;
-                    newNotification.Seen = false;
+                Notification newNotification = new Notification();
+                newNotification.Message = notification;
+                newNotification.From = appointment.RecepId.ToString();
+                newNotification.To = appointment.DoctorId.ToString();
+                newNotification.SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
+                newNotification.Seen = false;
 
 
                     if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))

@@ -10,6 +10,7 @@ using Models.DTO.Lab.UploadResults;
 using Services.AppointmentService;
 using Services.LabService;
 using System.Diagnostics;
+using System.Net.Mail;
 using System.Security.Claims;
 
 namespace API.Controllers.LabControllers
@@ -31,17 +32,14 @@ namespace API.Controllers.LabControllers
 
         [Authorize(Policy = "Lab")]
         [HttpGet("ReportRequest")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<object>> GetPatientPrescriptionData()
         {
-            //var identity = HttpContext.User.Identity as ClaimsIdentity;
-            //var userRole = identity.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
             var res = await _vs.RequestList();
             return Ok(res);
         }
 
         [Authorize(Policy = "Lab")]
-        [HttpPost("Accept")]
+        [HttpGet("SetAccept")]
         async public Task<ActionResult> AccceptSample(int id)
         {
             var tmp= await _vs.AcceptSample(id);
@@ -75,54 +73,84 @@ namespace API.Controllers.LabControllers
                 var tmp = await _vs.UplaodResults(data,roleId);
                 if (tmp)
                 {
-                    //var dataObj = await _dbContext.labReports
-                        //.Include(lr => lr.Prescription)
-                        //.ThenInclude(p => p.Appointment)
-                        //.ThenInclude(a => a.Patient)
-                        //.Include(lr => lr.Prescription)
-                        //.ThenInclude(p => p.Appointment)
-                        //.ThenInclude(a => a.Doctor)
-                        //.ThenInclude(d => d.User)
-                        //.Include(lr => lr.Test)
-                        //.FirstOrDefaultAsync(lr => lr.Id == data.ReportId);
+                    var dataObj = await _dbContext.labReports
+                        .Include(lr => lr.Prescription)
+                        .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Patient)
+                        .Include(lr => lr.Prescription)
+                        .ThenInclude(p => p.Appointment)
+                        .ThenInclude(a => a.Doctor)
+                        .ThenInclude(d => d.User)
+                        .Include(lr => lr.Test)
+                        .FirstOrDefaultAsync(lr => lr.Id == data.ReportId);
 
-                    //var labReportInfo = new
-                    //{
-                    //    PatientName = dataObj.Prescription.Appointment.Patient.Name,
-                    //    TestName = dataObj.Test.TestName,
-                    //    AcceptedDate = dataObj.AcceptedDate,
-                    //    UserId = dataObj.Prescription.Appointment.Doctor.UserId
-                    //};
-                    //
-                    //var sendMail = new EmailSender();
-                    //string emsg = "Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
-                    //    " is ready and available." + labReportInfo.UserId;
-                    //string notMsg = "Results of recent lab test (" + labReportInfo.TestName + ") of " + labReportInfo.PatientName + " on " + labReportInfo.AcceptedDate +
-                    //" is ready and available.";
-                    //
-                    //if (data.Servere == true)
-                    //{
-                    //    emsg = emsg + "It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
-                    //    notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
-                    //}
+                    var labReportInfo = new
+                    {
+                        PatientName = dataObj.Prescription.Appointment.Patient.Name,
+                        TestName = dataObj.Test.TestName,
+                        AcceptedDate = dataObj.AcceptedDate,
+                        UserId = dataObj.Prescription.Appointment.Doctor.UserId
+                    };
+                    
+                    var sendMail = new EmailSender();
+                    string emsg = "Mr/Mrs. " + labReportInfo.PatientName + "<br/><br/>Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
+                        " is ready and available.";
+                    string notMsg = "Results of recent lab test (" + labReportInfo.TestName + ") of " + labReportInfo.PatientName + " on " + labReportInfo.AcceptedDate +
+                    " is ready and available.";
 
-                    //Notification newNotification = new Notification();
-                    //newNotification.Message = notMsg;
-                    //newNotification.From = "1";//Add lab Id when authorized
-                    //newNotification.To = labReportInfo.UserId.ToString();
-                    //newNotification.SendAt = DateTime.Now;
-                    //newNotification.Seen = false;
-                    //
-                    //await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, emsg);
-                    //
-                    //if (labReportInfo.UserId != null && ConnectionManager._userConnections.TryGetValue(labReportInfo.UserId.ToString(), out var connectionId))
-                    //{
-                    //    Debug.WriteLine($"User ConnectionId: {connectionId}");
-                    //    await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                    //    Debug.WriteLine("Notification sent via SignalR.");
-                    //}
-                    //
-                    //await _dbContext.notification.AddAsync(newNotification);
+                    if (data.Servere == true)
+                    {
+                        emsg = emsg + "<br> It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+                        notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
+                    }
+
+
+                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+
+                    var htmlContent = $@"
+<html>
+<body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+    <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
+        <h1 style='color: #09D636; text-align: center;'>
+            <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
+            Medicare <span style='color: #AFDCBB;'>Hub</span>
+        </h1>
+        <p style='color: #555555; font-size: 16px; font-weight :bold'>{emsg}</p>
+        <p style='font-size: 16px; color: #555;'>
+            <span >Our team looks forward to providing you with exceptional care and service.</span> 
+            <br/><br/>
+            If you have any questions or need further assistance, 
+            <span >please do not hesitate to contact us</span>. 
+            <br/><br/>
+            <span>Thank you for choosing Medicare Hub!</span>
+        </p>
+        <p style='font-size: 16px; color: #555;'>
+            Best regards,
+            <br/>
+            <span style='color: #007BFF;'>Medicare Hub Team</span>
+        </p>
+    </div>
+</body>
+</html>";
+
+ 
+                    Notification newNotification = new Notification();
+                    newNotification.Message = notMsg;
+                    newNotification.From = "1";//Add lab Id when authorized
+                    newNotification.To = labReportInfo.UserId.ToString();
+                    newNotification.SendAt = DateTime.Now;
+                    newNotification.Seen = false;
+                    
+                    await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, htmlContent);
+                    
+                    if (labReportInfo.UserId != null && ConnectionManager._userConnections.TryGetValue(labReportInfo.UserId.ToString(), out var connectionId))
+                    {
+                        Debug.WriteLine($"User ConnectionId: {connectionId}");
+                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                        Debug.WriteLine("Notification sent via SignalR.");
+                    }
+                    
+                    await _dbContext.notification.AddAsync(newNotification);
 
                     return Ok();
                 }

@@ -90,7 +90,7 @@ namespace Services.PharmacyService
 
 
 
-        public async Task AddBillDrugs(Bill data)
+        public async Task AddBillDrugs(Bill data,int roleId)
         {
             using (var transaction = await _cntx.Database.BeginTransactionAsync())
             {
@@ -99,16 +99,6 @@ namespace Services.PharmacyService
                     foreach (var item in data.Data)
                     {
                         var drug = await _cntx.drugs.FirstOrDefaultAsync(d => d.Id == item.DrugID);
-
-                        if (drug == null)
-                        {
-                            throw new Exception($"Drug with ID {item.DrugID} not found.");
-                        }
-
-                        if (drug.Avaliable < item.Amount)
-                        {
-                            throw new Exception($"Not enough quantity for drug with ID {item.DrugID}. Available: {drug.Avaliable}, Requested: {item.Amount}");
-                        }
 
                         // Reduce the quantity of the drug
                         drug.Avaliable -= item.Amount;
@@ -119,24 +109,12 @@ namespace Services.PharmacyService
                     }
 
                     var prescription = await _cntx.prescriptions
-                        .FirstOrDefaultAsync(e => e.Id == data.Data[0].PrescriptionID);
-
-                    if (prescription == null)
-                    {
-                        throw new Exception($"Prescription with ID {data.Data[0].PrescriptionID} not found.");
-                    }
-
+                        .FirstOrDefaultAsync(e => e.Id == data.PrescriptId);
                     prescription.Total = data.Total;
-                    prescription.CashierId = 1;
+                    prescription.CashierId = roleId;
 
                     var appointment = await _cntx.appointments
                         .FirstOrDefaultAsync(e => e.Id == prescription.AppointmentID);
-
-                    if (appointment == null)
-                    {
-                        throw new Exception($"Appointment with ID {prescription.AppointmentID} not found.");
-                    }
-
                     appointment.Status = "paid";
 
                     _cntx.prescriptions.Update(prescription);
@@ -164,6 +142,51 @@ namespace Services.PharmacyService
             }
             return age;
         }
+
+        //------------------------------------------Admin related------------------------------------------------
+        public async Task<Notification> ReadNoti()
+        {
+            var drugAvailability = await _cntx.drugs
+                .Where(d => d.Avaliable < 10)
+                .Select(d => new
+                {
+                    Name = d.GenericN + "(" + d.Weight + "mg)",
+                    Available = d.Avaliable
+                })
+                .ToListAsync();
+
+            var pharmacistConnections = await _cntx.users
+                .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
+                .Select(u => new
+                {
+                    connectionId = u.ConnectionId,
+                    Id = u.Id
+                })
+                .ToListAsync();
+
+            var unavailableDrugs = drugAvailability.Select(d => d.Name);
+            string message = unavailableDrugs.Count() == 0
+                ? ""
+                : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+
+            DateTime twentyFourHoursAgo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time").AddHours(-24);
+            bool messageExists = await _cntx.notification
+                .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
+            Notification noti = new Notification();
+
+            noti.Message = message;
+            noti.SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"), TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
+            noti.Seen = false;
+            noti.From = "System";
+            noti.To = 7.ToString();
+
+            return noti;
+
+
+           
+        }
+
+
 
 
     }

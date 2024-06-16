@@ -110,8 +110,14 @@ namespace Services.AdminServices
 
         public async Task UpdateUser(User user)
         {
-            user.Password = await HashPassword(user.Password);
+            // Check if the password is already hashed
+            if (!user.Password.StartsWith("$2a$1"))
+            {
+                user.Password = await HashPassword(user.Password);
+            }
             await _Repository.Update(user);
         }
+
+
     }
 }

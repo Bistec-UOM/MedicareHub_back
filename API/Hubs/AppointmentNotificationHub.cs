@@ -35,6 +35,8 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         _dbContext = dbContext;
     }
 
+
+
     public override async Task OnConnectedAsync()
     {
         // Get the connection ID of the connected user
@@ -181,34 +183,46 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             .ToList();
 
         var unavailableDrugs = drugAvailability.Select(d => d.Name);
-        var message = string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+        string message = unavailableDrugs.Count() == 0
+            ? "All drugs are available"
+            : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-        bool messageExists = await _dbContext.notification.AnyAsync(n => n.Message == message);
+        DateTime twentyFourHoursAgo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time").AddHours(-24);
+        bool messageExists = await _dbContext.notification
+            .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
 
         //if (!messageExists)
         //{
             var notifications = new List<Notification>();
 
-            foreach (var connection in pharmacistConnections)
+        foreach (var connection in pharmacistConnections)
+        {
+            if (connection.connectionId != null)
             {
-
                 var notification = new Notification
                 {
                     From = "System",
                     To = connection.Id.ToString(),
                     Message = message,
-                    SendAt = DateTime.Now,
+                    SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"),
                     Seen = false
                 };
-                await Clients.Client(connection.connectionId).ReceiveNotification(notification);
+                if (connection.connectionId != null && Clients.Client(connection.connectionId) != null)
+                {
+                    await Clients.Client(connection.connectionId).ReceiveNotification(notification);
+                }
+
 
                 notifications.Add(notification);
+                await _dbContext.notification.AddAsync(notification);
+                await _dbContext.SaveChangesAsync();
             }
+        }
 
-            await _dbContext.notification.AddRangeAsync(notifications);
-            await _dbContext.SaveChangesAsync();
+
         //}
     }
+
 
 
 

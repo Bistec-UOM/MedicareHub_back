@@ -93,23 +93,28 @@ namespace Services.AdminServices
                 .Include(p => p.Bill_drug)
                 .ToListAsync();
 
-            //group them by date
+            // Group them by date
             var prescriptBydate = prescriptions
                 .GroupBy(p => p.DateTime.Date);
+
             foreach (var grp in prescriptBydate)
             {
                 var date = grp.Key;
-                var totalAmount = 0;
+                float totalAmount = 0;
 
                 foreach (var prescript in grp)
                 {
-                    totalAmount += prescript.Bill_drug.Sum(bd => bd.Amount);
+                    // Use GetValueOrDefault to handle nullable float
+                    totalAmount += prescript.Total.GetValueOrDefault(0);
                 }
+
                 // Add the date and total amount to the result list
                 totalByDay.Add(new { datefor = date, income = totalAmount });
             }
+
             return totalByDay;
         }
+
         public async Task<object> GetAvailableCount()
         {
             // Query the database to get the generic name and available count of 
@@ -284,14 +289,14 @@ namespace Services.AdminServices
             var recep_attendance = await _dbcontext.appointments
                 .Include(ap => ap.Recep)
                 .ThenInclude(r => r.User)
-                .Where(p => p.DateTime.Year == date.Year && p.DateTime.Month == date.Month)
+                .Where(p => p.CreatedAt.Year == date.Year && p.CreatedAt.Month == date.Month)
                 .GroupBy(ap => new { ap.RecepId })
                 .Select(g => new
                 {
                     Id = g.First().Recep.User.Id,
                     Name = g.First().Recep.User.Name,
                     Role = "Receptionist",
-                    Count = g.Select(ap => ap.DateTime.Date).Distinct().Count()
+                    Count = g.Select(ap => ap.CreatedAt.Date).Distinct().Count()
                 })
                 .ToListAsync();
 

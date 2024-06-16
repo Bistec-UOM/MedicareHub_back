@@ -22,6 +22,11 @@ jobs:
         uses: actions/setup-dotnet@v3
         with: 
           dotnet-version: '7.0.x'
+      
+      - name: Create .env
+        run: |
+          touch .env
+          echo "API_KEY=${{secrets.API_KEY}}" > .env
 
       - name: Restore dependencies
         run: dotnet restore ./API/API.sln
