@@ -110,7 +110,7 @@ namespace API.Controllers.LabControllers
                     //newNotification.Message = notMsg;
                     //newNotification.From = "1";//Add lab Id when authorized
                     //newNotification.To = labReportInfo.UserId.ToString();
-                    //newNotification.SendAt = DateTime.Now;
+                    //newNotification.SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
                     //newNotification.Seen = false;
                     //
                     //await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, emsg);
