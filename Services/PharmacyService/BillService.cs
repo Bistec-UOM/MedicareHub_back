@@ -169,13 +169,13 @@ namespace Services.PharmacyService
                 ? ""
                 : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-            DateTime twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+            DateTime twentyFourHoursAgo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time").AddHours(-24);
             bool messageExists = await _cntx.notification
                 .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
             Notification noti = new Notification();
 
             noti.Message = message;
-            noti.SendAt = DateTime.Now;
+            noti.SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"), TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
             noti.Seen = false;
             noti.From = "System";
             noti.To = 7.ToString();
