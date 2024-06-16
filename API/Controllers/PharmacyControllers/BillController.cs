@@ -8,6 +8,7 @@ using Models;
 using Models.DTO;
 using Services.PharmacyService;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers.PharmacyControllers
 {
@@ -98,6 +99,20 @@ namespace API.Controllers.PharmacyControllers
             try
             {
                 await _billService.AddBillDrugs(billDrugs,roleId);
+                var noti =  await _billService.ReadNoti();
+                if (noti.Message!="")
+                {
+                    if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
+                    {
+                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(noti);
+                    }
+                    await _dbContext.notification.AddAsync(noti);
+                }
+
+
+
+               
+
                 return Ok("Bill drugs added successfully and appointment status updated to 'paid'");
             }
             catch (Exception ex)

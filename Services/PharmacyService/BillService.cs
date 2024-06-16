@@ -143,6 +143,51 @@ namespace Services.PharmacyService
             return age;
         }
 
+        //------------------------------------------Admin related------------------------------------------------
+        public async Task<Notification> ReadNoti()
+        {
+            var drugAvailability = await _cntx.drugs
+                .Where(d => d.Avaliable < 10)
+                .Select(d => new
+                {
+                    Name = d.GenericN + "(" + d.Weight + "mg)",
+                    Available = d.Avaliable
+                })
+                .ToListAsync();
+
+            var pharmacistConnections = await _cntx.users
+                .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
+                .Select(u => new
+                {
+                    connectionId = u.ConnectionId,
+                    Id = u.Id
+                })
+                .ToListAsync();
+
+            var unavailableDrugs = drugAvailability.Select(d => d.Name);
+            string message = unavailableDrugs.Count() == 0
+                ? ""
+                : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+
+            DateTime twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+            bool messageExists = await _cntx.notification
+                .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
+            Notification noti = new Notification();
+
+            noti.Message = message;
+            noti.SendAt = DateTime.Now;
+            noti.Seen = false;
+            noti.From = "System";
+            noti.To = 7.ToString();
+
+            return noti;
+
+
+           
+        }
+
+
+
 
     }
 }
