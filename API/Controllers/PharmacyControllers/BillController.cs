@@ -62,7 +62,7 @@ namespace API.Controllers.PharmacyControllers
                     From = "System",
                     To = connection.Id.ToString(),
                     Message = message,
-                    SendAt = DateTime.Now,
+                    SendAt = DateTime.Now.AddMinutes(330),
                     Seen = false
                 };
 

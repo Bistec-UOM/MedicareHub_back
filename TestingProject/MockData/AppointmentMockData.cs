@@ -16,31 +16,32 @@ namespace TestingProject.MockData
             {
                 new Appointment
                 {
+
                     Id = 5,
-                    DateTime= DateTime.Now,
+                    DateTime= DateTime.Now.AddMinutes(330),
                     Status="new",
                     PatientId=1,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= DateTime.Now.AddMinutes(330),
                     DoctorId=1,
                     RecepId=7
                 },
                 new Appointment
                 {
                     Id = 2,
-                    DateTime= DateTime.Now,
+                    DateTime= DateTime.Now.AddMinutes(330),
                     Status="new",
                     PatientId=2,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= DateTime.Now.AddMinutes(330),
                     DoctorId=2,
                     RecepId=7
 
                 }, new Appointment
                 {
                     Id = 3,
-                    DateTime= DateTime.Now,
+                    DateTime= DateTime.Now.AddMinutes(330),
                     Status="new",
                     PatientId=3,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= DateTime.Now.AddMinutes(330),
                     DoctorId=3,
                     RecepId=7
 
@@ -48,10 +49,10 @@ namespace TestingProject.MockData
                 new Appointment
                 {
                     Id = 4,
-                    DateTime= DateTime.Now,
+                    DateTime= DateTime.Now.AddMinutes(330),
                     Status="new",
                     PatientId=4,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= DateTime.Now.AddMinutes(330),
                     DoctorId=4,
                     RecepId=7
                 }
