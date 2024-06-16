@@ -169,7 +169,7 @@ namespace Services.PharmacyService
                 ? ""
                 : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-            DateTime twentyFourHoursAgo = DateTime.Now.AddHours(-24);
+            DateTime twentyFourHoursAgo = DateTime.Now.AddMinutes(330).AddHours(-24);
             bool messageExists = await _cntx.notification
                 .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
             Notification noti = new Notification();
