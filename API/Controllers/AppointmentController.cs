@@ -41,7 +41,20 @@ namespace API.Controllers
 
         public async Task<ActionResult<Patient>> GetPatient(int id)  //get patient by id
         {
-            return Ok(await _appointment.GetPatient(id));
+            try
+            {
+                var patient = await _appointment.GetPatient(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+                return Ok(await _appointment.GetPatient(id));
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [Authorize(Policy = "Doct&Recep")]
@@ -49,9 +62,17 @@ namespace API.Controllers
 
         public async Task<IActionResult> GetAllAppointments()   //getting all appointments
         {
-            var appointments = await _appointment.GetAll();
+            try
+            {
+                var appointments = await _appointment.GetAll();
 
-            return Ok(appointments);
+                return Ok(appointments);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [Authorize(Policy = "Recep")]
@@ -117,8 +138,22 @@ namespace API.Controllers
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)  //getting an appointment by id
         {
-            var appointment = await _appointment.GetAppointment(id);
-            return Ok(appointment);
+            try
+            {  
+                
+                var appointment = await _appointment.GetAppointment(id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+                return Ok(appointment);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
         [Authorize(Policy = "Recep")]
@@ -192,8 +227,16 @@ namespace API.Controllers
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
         public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)  //getting all the appointments of a specific doctor
         {
-            var doctorAppointments = await _appointment.GetDoctorAppointments(doctorId);
-            return Ok(doctorAppointments);
+            try
+            {
+                var doctorAppointments = await _appointment.GetDoctorAppointments(doctorId);
+                return Ok(doctorAppointments);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [Authorize(Policy = "Doct&Recep")]
@@ -212,10 +255,19 @@ namespace API.Controllers
         }
         [Authorize(Policy = "Recep")]
         [HttpPost("patients")]
-        public async Task RegisterPatient(Patient patient)  //registering a patient
+        public async Task<ActionResult> RegisterPatient(Patient patient)  //registering a patient
         {
+            try
+            {
+               await _appointment.RegisterPatient(patient);
+               return Ok();
 
-            await _appointment.RegisterPatient(patient);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+           
 
         }
         [Authorize(Policy = "Doct&Recep")]
@@ -345,23 +397,17 @@ namespace API.Controllers
         [HttpGet("patients")]
         public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var Role = identity.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-            if (Role == "Receptionist")
+            try
             {
-
                 var patients = await _appointment.GetPatients();
                 return Ok(patients);
 
-            }
-            else
+            }catch (Exception ex)
             {
-                return Unauthorized();
+                return BadRequest(ex.Message);
             }
-
-
-
+            
         }
 
         [Authorize(Policy = "Recep")]

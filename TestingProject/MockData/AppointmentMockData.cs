@@ -17,30 +17,30 @@ namespace TestingProject.MockData
                 new Appointment
                 {
                     Id = 5,
-                    DateTime= DateTime.Now,
+                    DateTime= new DateTime(2024, 6, 17, 0, 0, 0),
                     Status="new",
                     PatientId=1,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
                     DoctorId=1,
                     RecepId=7
                 },
                 new Appointment
                 {
                     Id = 2,
-                    DateTime= DateTime.Now,
+                    DateTime= new DateTime(2024, 6, 1, 0, 0, 0),
                     Status="new",
                     PatientId=2,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
                     DoctorId=2,
                     RecepId=7
 
                 }, new Appointment
                 {
                     Id = 3,
-                    DateTime= DateTime.Now,
+                    DateTime= new DateTime(2024, 6, 27, 0, 0, 0),
                     Status="new",
                     PatientId=3,
-                    CreatedAt= DateTime.Now,
+                    CreatedAt= new DateTime(2024, 6, 23, 0, 0, 0),
                     DoctorId=3,
                     RecepId=7
 
@@ -48,11 +48,11 @@ namespace TestingProject.MockData
                 new Appointment
                 {
                     Id = 4,
-                    DateTime= DateTime.Now,
+                    DateTime= new DateTime(2024, 6, 11, 0, 0, 0),
                     Status="new",
                     PatientId=4,
-                    CreatedAt= DateTime.Now,
-                    DoctorId=4,
+                    CreatedAt= new DateTime(2024, 6, 9, 0, 0, 0),
+                    DoctorId=1,
                     RecepId=7
                 }
             };
@@ -146,10 +146,10 @@ namespace TestingProject.MockData
             return new Appointment
             {
                 Id = 43,
-                DateTime = DateTime.Now,
+                DateTime = new DateTime(2024, 6, 17, 0, 0, 0),
                 Status = "new",
                 PatientId = 78,
-                CreatedAt = DateTime.Now,
+                CreatedAt = new DateTime(2024, 6, 17, 0, 0, 0),
                 DoctorId = 6,
                 RecepId = 7
             };
@@ -166,6 +166,86 @@ namespace TestingProject.MockData
                     Email="dfaf@gmail.com",
                     FullName="fdsaf",
 
+                },
+                new Patient()
+                {
+                    Id=21,
+                    Email="dfaf@gmail.com",
+                    FullName="fdsaf",
+
+                }
+            };
+        }
+
+        public static Patient GetPatient()
+        {
+            return new Patient()
+            {
+                Id = 88,
+                Email = "dfaf@gmail.com",
+                FullName = "fdsaf",
+
+
+            };
+        }
+        public static Appointment getAppointment()
+        {
+            return new Appointment()
+            {
+                Id = 55,
+                DateTime = new DateTime(2024, 6, 17, 0, 0, 0),
+                Status = "new",
+                PatientId = 1,
+                CreatedAt = new DateTime(2024, 6, 17, 0, 0, 0),
+                DoctorId = 1,
+                RecepId = 7
+
+            };
+        }
+        public static List<Appointment> getDoctor1Appointment()
+        {
+            return new List<Appointment>
+            {
+                new Appointment
+                {
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 17, 0, 0, 0),
+                    Status="new",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 2,
+                    DateTime= new DateTime(2024, 6, 1, 0, 0, 0),
+                    Status="new",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 27, 0, 0, 0),
+                    Status="new",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 23, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                },
+                new Appointment
+                {
+                    Id = 4,
+                    DateTime= new DateTime(2024, 6, 11, 0, 0, 0),
+                    Status="new",
+                    PatientId=4,
+                    CreatedAt= new DateTime(2024, 6, 9, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
                 }
             };
         }

@@ -30,7 +30,7 @@ namespace TestingProject.System.Services
 
         }
 
-
+        //----getAll()---
         [Fact]
         public async Task getAll_ReturnsAllAppointments()
         {
@@ -67,7 +67,7 @@ namespace TestingProject.System.Services
             _dbContext.Database.EnsureDeleted();
             _dbContext.Dispose();
         }
-
+        //----getDoctors()---
         [Fact]
         public async Task getDoctors_ReturnsAllDoctors()
         {
@@ -96,6 +96,7 @@ namespace TestingProject.System.Services
 
 
         }
+        //-----AddAppointment(Appointment app)---
         [Fact]
         public async Task AddAppointment_ShouldAddAppointment()
         {
@@ -145,6 +146,172 @@ namespace TestingProject.System.Services
            
 
         }
+        //----GetPatient(int id)----
+        [Fact]
+        public async Task GetPatient_SholudReturnPatient()
+        {
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+
+            _dbContext.patients.AddRange(AppointmentMockData.GetPatients());
+            _dbContext.SaveChangesAsync();
+            mockPatientRepository.Setup(repo => repo.Get(AppointmentMockData.GetPatient().Id)).ReturnsAsync(AppointmentMockData.GetPatient());
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+
+            //Act
+            var result = await sut.GetPatient(AppointmentMockData.GetPatient().Id);
+
+
+            //Assert
+
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(AppointmentMockData.GetPatient());
+            mockPatientRepository.Verify(repo => repo.Get(AppointmentMockData.GetPatient().Id), Times.Once);
+
+
+        }
+        //----getAppointment(int id)----
+        [Fact]
+        public async Task GetAppointment_SholudReturnAppointment()
+        {
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+            _dbContext.appointments.AddRange(AppointmentMockData.getAppointments());
+            _dbContext.SaveChangesAsync();
+            mockAppointmentRepository.Setup(repo => repo.Get(AppointmentMockData.getAppointments()[0].Id)).ReturnsAsync(AppointmentMockData.getAppointments()[0]);
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+            //Act
+            var result = await sut.GetAppointment(AppointmentMockData.getAppointments()[0].Id);
+
+            //Assert
+            result.Should().NotBeNull();
+            result.Should().BeEquivalentTo(AppointmentMockData.getAppointments()[0]);
+            mockAppointmentRepository.Verify(repo => repo.Get(AppointmentMockData.getAppointments()[0].Id), Times.Once);
+
+
+        }
+        //----GetDoctorAppointments(int id)------
+        [Fact]
+        public async Task getDoctorAppointments_shouldReturnDoctorAppointment()
+        {
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+            _dbContext.appointments.AddRange(AppointmentMockData.getDoctor1Appointment());
+            _dbContext.SaveChangesAsync();
+
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+            //Act
+
+            var result = await sut.GetDoctorAppointments(1);
+
+
+            //Assert
+
+            Assert.Equal(AppointmentMockData.getDoctor1Appointment().Count, result.Count);
+            Assert.Equal(AppointmentMockData.getDoctor1Appointment()[0].Id, result[0].Id);
+            Assert.Equal(AppointmentMockData.getDoctor1Appointment()[1].Id, result[1].Id);
+
+
+        }
+
+        //---getPatients()---
+        [Fact]
+        public async Task getPatients_ReturnsAllPatients()
+        {
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+            _dbContext.patients.AddRange(AppointmentMockData.GetPatients());
+            _dbContext.SaveChangesAsync();
+            mockPatientRepository.Setup(repo => repo.GetAll()).ReturnsAsync(AppointmentMockData.GetPatients());
+
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+            //Act
+
+            var result = await sut.GetPatients();
+
+
+            //Assert
+
+            Assert.Equal(AppointmentMockData.GetPatients().Count, result.Count);
+            Assert.Equal(AppointmentMockData.GetPatients()[0].Id, result[0].Id);
+            Assert.Equal(AppointmentMockData.GetPatients()[1].Id, result[1].Id);
+
+
+        }
+
+        //----RegisterPatient(Patient patient)
+        [Fact]
+        public async Task RegisterPatient_shouldCallRepoAdd()
+        {
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+
+            _dbContext.users.AddRange(AppointmentMockData.getUsers());
+            _dbContext.doctors.AddRange(AppointmentMockData.getDoctUserDoctors());
+            _dbContext.patients.AddRange(AppointmentMockData.GetPatients());
+            _dbContext.appointments.AddRange(AppointmentMockData.getAppointments());
+            _dbContext.SaveChangesAsync();
+
+          ;
+
+            mockPatientRepository.Setup(repo => repo.Add(It.IsAny<Patient>()))
+                   .Returns((Patient patient) =>
+                   {
+                       _dbContext.patients.Add(patient);
+                       return Task.CompletedTask;
+                   });
+
+
+
+            var mockEmailSender = new Mock<IEmailSender>();
+            mockEmailSender.Setup(sender => sender.SendMail(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                           .Returns(Task.CompletedTask);
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+            //Act
+
+            var result =  sut.RegisterPatient(AppointmentMockData.GetPatient());
+            _dbContext.SaveChangesAsync();
+
+
+            //Assert
+            mockPatientRepository.Verify(repo => repo.Add(It.IsAny<Patient>()), Times.Once);
+            Assert.Equal(_dbContext.patients.Count(), 3); ;
+
+        }
+
+
+
+
 
     }
 }
