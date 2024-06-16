@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.PharmacyService;
 
 namespace API.Controllers.PharmacyControllers
 {
+    [Authorize(Policy = "Cash")]
     [Route("api/[controller]")]
     [ApiController]
     public class DrugsController : ControllerBase
@@ -20,7 +22,7 @@ namespace API.Controllers.PharmacyControllers
             var result = await _drg.AddDrug(item);
             if (!result)
             {
-                return BadRequest("Drug with the same combination of generic name, brand name, and weight already exists.");
+                return BadRequest("Drug already exists");
             }
             return Ok("Success");
         }
