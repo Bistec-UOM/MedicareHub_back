@@ -62,7 +62,7 @@ namespace API.Controllers.PharmacyControllers
                     From = "System",
                     To = connection.Id.ToString(),
                     Message = message,
-                    SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"),
+                    SendAt = DateTime.Now.AddMinutes(330),
                     Seen = false
                 };
 

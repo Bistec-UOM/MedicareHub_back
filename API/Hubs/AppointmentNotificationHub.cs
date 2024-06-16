@@ -187,7 +187,8 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
             ? "All drugs are available"
             : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-        DateTime twentyFourHoursAgo = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time").AddHours(-24);
+        DateTime twentyFourHoursAgo = DateTime.Now.AddMinutes(330)
+            .AddHours(-24);
         bool messageExists = await _dbContext.notification
             .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
 
@@ -204,7 +205,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
                     From = "System",
                     To = connection.Id.ToString(),
                     Message = message,
-                    SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"),
+                    SendAt = DateTime.Now.AddMinutes(330),
                     Seen = false
                 };
                 if (connection.connectionId != null && Clients.Client(connection.connectionId) != null)

@@ -103,7 +103,7 @@ namespace API.Controllers
                 newNotification.Message = notification;
                 newNotification.From = appointment.RecepId.ToString();
                 newNotification.To = appointment.DoctorId.ToString();
-                newNotification.SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
+                newNotification.SendAt = DateTime.Now.AddMinutes(330);
                 newNotification.Seen = false;
 
 
