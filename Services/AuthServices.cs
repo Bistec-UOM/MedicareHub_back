@@ -44,6 +44,7 @@ namespace Services
         public async Task<string> CheckUser(UserLog data)
         {
             var tmp =await _user.Get(data.UserId);
+            if (tmp.IsDeleted) { tmp = null; }
             if(tmp != null) 
             {
                 if (BCrypt.Net.BCrypt.Verify(data.Password, tmp.Password))
@@ -111,8 +112,10 @@ namespace Services
         public async Task<string> SendOTP(int id)
         {
             var tmp = await _cnt.users.Where(e => e.Id == id).FirstOrDefaultAsync();
+            
             if (tmp != null)
             {
+                if (tmp.IsDeleted) { return ""; }
                 Otp obj = new Otp();
 
                 Random RndNm = new Random();
