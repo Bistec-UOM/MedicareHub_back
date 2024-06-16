@@ -98,7 +98,7 @@ namespace Services
 
             var token = new JwtSecurityToken(
                     claims: claims,
-                    expires: TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time").AddDays(1),
+                    expires: DateTime.Now.AddDays(1),
                     signingCredentials: creds
                 );
 
