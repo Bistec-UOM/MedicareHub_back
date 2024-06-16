@@ -39,9 +39,9 @@ namespace API.Controllers.PharmacyControllers
         public async Task<ActionResult<IDictionary<string, List<Drug>>>> GetMedicineDetails([FromBody] List<string> medicineNames)
         {
             var medicineDetails = await _billService.GetMedicineDetails(medicineNames);
+            //check not available medicines which assigned by a doctor
             var removedData = await _billService.GetMedicinesNotInStock(medicineNames);
             string message = removedData.Count == 0 ? "All medicines are available in our store" : $"{string.Join(", ", removedData)}, are not available in our store which is assigned by doctor";
-            //var message = $"{string.Join(", ", removedData)}, are not available in our store";
             var pharmacistConnections = _dbContext.users
                     .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
                     .Select(u => new
@@ -62,7 +62,7 @@ namespace API.Controllers.PharmacyControllers
                     From = "System",
                     To = connection.Id.ToString(),
                     Message = message,
-                    SendAt = DateTime.Now,
+                    SendAt = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"),
                     Seen = false
                 };
 
