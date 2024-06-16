@@ -73,7 +73,7 @@ namespace Services.LabService
             if (tmp != null)
             {
                 tmp.Status = "accepted";
-                tmp.AcceptedDate = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time");
+                tmp.AcceptedDate = DateTime.Now;
                 await _rep.Update(tmp);
                 return true;
             }

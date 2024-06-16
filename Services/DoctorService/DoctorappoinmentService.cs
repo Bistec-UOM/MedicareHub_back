@@ -147,7 +147,7 @@ namespace Services.DoctorService
             {
                 var x = new Prescription
                 {
-                    DateTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, TimeZoneInfo.Local.Id, "Sri Lanka Standard Time"),
+                    DateTime = DateTime.Now,
                     AppointmentID = data.Id,
                     description = data.Description,
                     Total = 0,
