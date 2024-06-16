@@ -118,6 +118,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //Receptionist-----------------------------------------------------------
 
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IRepository<Appointment>, Repository<Appointment>>();
 builder.Services.AddScoped<IRepository<Patient>, Repository<Patient>>();
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();

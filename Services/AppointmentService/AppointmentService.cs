@@ -66,7 +66,7 @@ namespace Services.AppointmentService
                 var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
                 var time = appointment.DateTime.ToString("f");
                 var venue = "Medicare Hub Clinic, 123 Main Street, City";
-                var doctorName = doctorUser.Name;
+                var doctorName = doctorUser?.Name;
                 var message = "Dear "+ userName+", <br/><br/>We are delighted to confirm your appointment with Medicare Hub.";
 
                 var htmlContent = $@"
@@ -103,10 +103,20 @@ namespace Services.AppointmentService
 </body>
 </html>";
 
-
+                string pemail;
+                if(patient!=null)
+                {
+                    pemail= patient.Email;
+                }
+                else
+                {
+                    pemail = "abc@gmail.com";
+                }
                
                 EmailSender emailSernder = new EmailSender();
-                await emailSernder.SendMail(emailSubject, patient.Email, userName, htmlContent);
+                await emailSernder.SendMail(emailSubject, pemail, userName, htmlContent);
+
+
                 return 0;   
 
             }
@@ -540,6 +550,8 @@ namespace Services.AppointmentService
             return dates.ToList();
 
         }
+
+       
       
 
         

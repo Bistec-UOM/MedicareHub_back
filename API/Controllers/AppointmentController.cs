@@ -11,6 +11,7 @@ using Models;
 using Models.DTO;
 using Services.AppointmentService;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -58,22 +59,24 @@ namespace API.Controllers
         public async Task<ActionResult> AddAppointment(Appointment appointment)  //Adding an appointment
         {
             var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
-            int roleId = int.Parse(claim);
-
-            if (roleId == 0)
+            if (claim != null)
             {
-                return Unauthorized();
-            }
+                int roleId = int.Parse(claim);
 
-            var app = appointment;
-            app.RecepId = roleId;
+                if (roleId == 0)
+                {
+                    return Unauthorized();
+                }
 
-            try
-            {
-                var result = await _appointment.AddAppointment(app);
-                var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
-                var userId = doctor?.UserId;  //get the user id of the doctor
-                var notification = $"New appointment added for {appointment.DateTime}";
+                var app = appointment;
+                app.RecepId = roleId;
+
+                try
+                {
+                    var result = await _appointment.AddAppointment(app);
+                    var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                    var userId = doctor?.UserId;  //get the user id of the doctor
+                    var notification = $"New appointment added for {appointment.DateTime}";
 
                 Notification newNotification = new Notification();
                 newNotification.Message = notification;
@@ -83,26 +86,29 @@ namespace API.Controllers
                 newNotification.Seen = false;
 
 
-                if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
-                {
-                    Debug.WriteLine($"User ConnectionId: {connectionId}");
-                    await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                    Debug.WriteLine("Notification sent via SignalR.");
+                    if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                    {
+                        Debug.WriteLine($"User ConnectionId: {connectionId}");
+                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                        Debug.WriteLine("Notification sent via SignalR.");
+                    }
+
+
+
+                    await AddNotification(newNotification);
+
+
+                    return Ok(result);
+
                 }
-
-
-
-                await AddNotification(newNotification);
-
-
-                return Ok(result);
-
-            }
-            catch (Exception ex)
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }else
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
-
 
         }
 
@@ -118,28 +124,28 @@ namespace API.Controllers
         [Authorize(Policy = "Recep")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
-        {
-            var targetAppointment = await _appointment.GetAppointment(id);  //get the sepecific appointment and check whether it exists
-            if (targetAppointment is null)
             {
-                return NotFound();
-            }
+                var targetAppointment = await _appointment.GetAppointment(id);  //get the sepecific appointment and check whether it exists
+                if (targetAppointment is null)
+                {
+                    return NotFound();
+                }
 
-            var deletedAppointment = await _appointment.DeleteAppointment(id);  //deleting the appointment
-            var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);    //sending an email for patient after succesfull appointment cancellation
-            if (targetPatient != null)
-            {
+                var deletedAppointment = await _appointment.DeleteAppointment(id);  //deleting the appointment
+                var targetPatient = await _appointment.GetPatient(deletedAppointment.PatientId);    //sending an email for patient after succesfull appointment cancellation
+                if (targetPatient != null)
+                {
 
-                var targetEmail = targetPatient.Email ?? "default@gmail.com";
-                var targetday = deletedAppointment.DateTime.Date;
-                var targettime = deletedAppointment.DateTime.ToString("f");
+                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
+                    var targetday = deletedAppointment.DateTime.Date;
+                    var targettime = deletedAppointment.DateTime.ToString("f");
 
-                string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
-                string userName = targetPatient.FullName;
-                var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
-                string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                    string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                    string userName = targetPatient.FullName;
+                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
 
-                var htmlContent = $@"
+                    var htmlContent = $@"
 <html>
 <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
@@ -173,11 +179,13 @@ namespace API.Controllers
 
 
 
-                EmailSender emailSernder = new EmailSender();
-                await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
+                    EmailSender emailSernder = new EmailSender();
+                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
-            }
-            return Ok(deletedAppointment);
+                }
+                return Ok(deletedAppointment);
+            
+           
         }
 
         [Authorize(Policy = "Doct&Recep")]

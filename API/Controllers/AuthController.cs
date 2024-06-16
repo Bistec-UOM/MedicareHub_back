@@ -42,7 +42,7 @@ namespace API.Controllers
         async public Task<ActionResult> SendOTP(int id)
         {
             string tmp=await _auth.SendOTP(id);
-            if (tmp != null)
+            if (tmp != "")
             {
                 return Ok(tmp);
             }

@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace Services.AppointmentService
 {
-    public class EmailSender
+    public class EmailSender:IEmailSender
     {
         string ApiKey = Environment.GetEnvironmentVariable("API_KEY");
+        
 
         
 
@@ -21,6 +22,12 @@ namespace Services.AppointmentService
         public async Task SendMail(string subject,string toEmail,string userName,string htmlContent)
         {
             var apiKey = ApiKey;
+            if (ApiKey == null)
+            {
+                apiKey = "aactest";
+                
+            }
+           
             var client = new SendGridClient(apiKey);
             var from = new EmailAddress("chathuraishara63@gmail.com", "Medicare Hub");
            
