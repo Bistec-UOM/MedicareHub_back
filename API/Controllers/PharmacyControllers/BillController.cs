@@ -1,5 +1,6 @@
 ﻿using AppointmentNotificationHandler;
 using DataAccessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -11,6 +12,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers.PharmacyControllers
 {
+    [Authorize(Policy = "Cash")]
     [Route("api/[controller]")]
     [ApiController]
     public class BillController : ControllerBase
@@ -26,14 +28,12 @@ namespace API.Controllers.PharmacyControllers
             _dbContext = dbcontext;
         }
 
-
         [HttpGet("DrugRequest")]
         public async Task<ActionResult<IEnumerable<object>>> GetPatientPrescriptionData()
         {
             var pe = await _billService.RequestList();
             return Ok(pe);
         }
-
 
         [HttpPost("GetMedicineDetails")]
         public async Task<ActionResult<IDictionary<string, List<Drug>>>> GetMedicineDetails([FromBody] List<string> medicineNames)
@@ -83,23 +83,23 @@ namespace API.Controllers.PharmacyControllers
 
 
 
-            if (medicineDetails == null || medicineDetails.Count == 0)
-            {
-                return NotFound();
-            }
+            //if (medicineDetails == null || medicineDetails.Count == 0)
+            //{
+            //   return NotFound();
+            //}
             return Ok(medicineDetails);
         }
 
-        //Add bill details (paid drugs)
+        [Authorize(Policy = "Cash")]
         [HttpPost("AddBillDrugs")]
         public async Task<IActionResult> AddBillDrugs([FromBody] Bill billDrugs)
         {
+            var claim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "RoleId")?.Value;
+            int roleId = int.Parse(claim);
             try
             {
-                await _billService.AddBillDrugs(billDrugs);
-                // Call the NotiToPharmacist method
-               
-                var noti =await _billService.ReadNoti();
+                await _billService.AddBillDrugs(billDrugs,roleId);
+                var noti =  await _billService.ReadNoti();
                 if (noti.Message!="")
                 {
                     if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
@@ -109,6 +109,9 @@ namespace API.Controllers.PharmacyControllers
                     await _dbContext.notification.AddAsync(noti);
                 }
 
+
+
+               
 
                 return Ok("Bill drugs added successfully and appointment status updated to 'paid'");
             }

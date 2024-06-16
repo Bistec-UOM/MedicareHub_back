@@ -22,10 +22,10 @@ namespace API.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly AppointmentService _appointment;
+        private readonly IAppointmentService _appointment;
         private readonly IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
 
-        public AppointmentController(ApplicationDbContext dbContext, AppointmentService appointment, IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> hubContext)
+        public AppointmentController(ApplicationDbContext dbContext, IAppointmentService appointment, IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> hubContext)
         {
 
             _appointment = appointment;
@@ -46,7 +46,7 @@ namespace API.Controllers
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
 
-        public async Task<ActionResult<ICollection<Appointment>>> GetAllAppointments()   //getting all appointments
+        public async Task<IActionResult> GetAllAppointments()   //getting all appointments
         {
             var appointments = await _appointment.GetAll();
 
