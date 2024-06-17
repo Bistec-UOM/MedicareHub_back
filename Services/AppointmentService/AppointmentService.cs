@@ -193,7 +193,7 @@ namespace Services.AppointmentService
         }
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)   //getting all the appointments of a specific doctor
         {   
-            var doctorAppointments =     _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
+            var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
 
