@@ -510,6 +510,7 @@ namespace Services.AppointmentService
         public async  Task AddNotification(Notification notification)
         {
              await _notification.Add(notification);  
+           
 
         }
 

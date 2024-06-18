@@ -99,24 +99,32 @@ namespace API.Controllers
                     var userId = doctor?.UserId;  //get the user id of the doctor
                     var notification = $"New appointment added for {appointment.DateTime}";
 
-                Notification newNotification = new Notification();
-                newNotification.Message = notification;
-                newNotification.From = appointment.RecepId.ToString();
-                newNotification.To = appointment.DoctorId.ToString();
-                newNotification.SendAt = DateTime.Now.AddMinutes(330);
-                newNotification.Seen = false;
+               
 
 
-                    if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
-                    {
-                        Debug.WriteLine($"User ConnectionId: {connectionId}");
-                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                        Debug.WriteLine("Notification sent via SignalR.");
-                    }
+                  
+                        Notification newNotification = new Notification();
+                        newNotification.Message = notification;
+                        newNotification.From = appointment.RecepId.ToString();
+                        newNotification.To = appointment.DoctorId.ToString();
+                        newNotification.SendAt = DateTime.Now.AddMinutes(330);
+                        newNotification.Seen = false;
+
+                        if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                        {
+
+                            Debug.WriteLine($"User ConnectionId: {connectionId}");
+                            await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                            Debug.WriteLine("Notification sent via SignalR.");
+                        }
 
 
 
-                    await AddNotification(newNotification);
+                        await AddNotification(newNotification);
+
+
+                    
+
 
 
                     return Ok(result);
@@ -390,8 +398,16 @@ namespace API.Controllers
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
         {
-            var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
-            return Ok(appointments);
+            try
+            {
+                var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
+                return Ok(appointments);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
+            
         }
         [Authorize(Policy = "Recep")]
         [HttpGet("patients")]
@@ -484,9 +500,18 @@ namespace API.Controllers
         }
         [Authorize(Policy = "Doct")]
         [HttpPost("unableDates")]
-        public async Task AddUnableDate(Unable_Date uDate)  //adding unable dates
+        public async Task<ActionResult> AddUnableDate(Unable_Date uDate)  //adding unable dates
         {
-            await _appointment.AddUnableDate(uDate);
+            try
+            {
+                await _appointment.AddUnableDate(uDate);
+                return Ok();
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
 
         }
 
@@ -495,22 +520,45 @@ namespace API.Controllers
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {
-            var uDates = await _appointment.getUnableDates(doctorId);
-            return Ok(uDates);
+            try
+            {
+                var uDates = await _appointment.getUnableDates(doctorId);
+                return Ok(uDates);
+
+            }catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         [HttpGet("Notifications/{userId}")]
         public async Task<ActionResult<ICollection<Notification>>> getNotifications(int userId)
         {
-            var notifications = await _appointment.getNotifications(userId);
-            return Ok(notifications);
+            try
+            {
+                var notifications = await _appointment.getNotifications(userId);
+                return Ok(notifications);
+
+            }catch(Exception ex) { 
+            return BadRequest(ex.Message);
+             }
+           
         }
 
 
         [HttpPost("Notifications")]
-        public async Task AddNotification(Notification notification)  //adding notifications
+        public async Task<ActionResult> AddNotification(Notification notification)  //adding notifications
         {
-            await _appointment.AddNotification(notification);
+            try
+            {
+                await _appointment.AddNotification(notification);
+                return Ok();
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
 
         }
 

@@ -250,5 +250,171 @@ namespace TestingProject.MockData
                 }
             };
         }
+
+        public static List<Appointment> getONlyDoctor1TuesDayAppointment()
+        {
+
+            return new List<Appointment>
+            {
+                new Appointment
+                {
+
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 18, 0, 0, 0),
+                    Status="new",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 8,
+                    DateTime= new DateTime(2024, 6, 18, 0, 0, 0),
+                    Status="new",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 11, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 18, 0, 0, 0),
+                    Status="new",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 2, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }
+                
+            };
+
+
+        }
+
+        public static List<Unable_Date> GetUnableDates()
+        {
+            return new List<Unable_Date>
+            {
+
+                new Unable_Date
+                {
+                    Id=1,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 18, 0, 0, 0),
+                },
+                new Unable_Date
+                {
+                    Id=2,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 23, 0, 0, 0),
+                }
+            };
+        }
+        public static Unable_Date AddNewUnableDate()
+        {
+            return new Unable_Date
+            {
+                Id = 3,
+                doctorId = 1,
+                Date = new DateTime(2024, 6, 28, 0, 0, 0),
+            };
+        }
+
+        public static List<Unable_Date> GetUnableDatesDoc1()
+        {
+            return new List<Unable_Date>
+            {
+
+                new Unable_Date
+                {
+                    Id=1,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 18, 0, 0, 0),
+                    StartTime=new DateTime(2024,6,18,0,0,0),
+                    EndTime=new DateTime(2024,6,18,23,59,0)
+
+                },
+                new Unable_Date
+                {
+                    Id=2,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 23, 0, 0, 0),
+                    StartTime=new DateTime(2024,6,23,0,0,0),
+                    EndTime=new DateTime(2024,6,23,23,59,0)
+                }
+            };
+        }
+
+        public static List<Notification> GetNotifications() {
+
+            return new List<Notification> { 
+                new Notification { 
+                    Id=1,
+                    From="7"
+                },
+                new Notification {
+                    Id=2,
+                    From="8"
+                }
+        };
+        }
+
+        public static Notification AddNewNotification()
+        {
+            return new Notification
+            {
+                Id = 3,
+                From = "11"
+            };
+        }
+        public static List<Notification> GetNotificationsTo3()
+        {
+
+            return new List<Notification> {
+                new Notification {
+                    Id=1,
+                    From="7",
+                    To="3",
+                    Seen=false,
+                    SendAt=DateTime.Today
+                },
+                new Notification {
+                    Id=2,
+                    From="8",
+                    To="3",
+                    Seen=false,
+                    SendAt=DateTime.Today
+                }
+        };
+        }
+
+        public static List<Unable_Date> GetUnableTimeSlotsDoc1Date18()
+        {
+            return new List<Unable_Date>
+            {
+
+                new Unable_Date
+                {
+                    Id=1,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 18, 0, 0, 0),
+                    StartTime=new DateTime(2024,6,18,08,0,0),
+                    EndTime=new DateTime(2024,6,18,09,00,0)
+
+                },
+                new Unable_Date
+                {
+                    Id=2,
+                    doctorId=1,
+                    Date=new DateTime(2024, 6, 18, 0, 0, 0),
+                    StartTime=new DateTime(2024,6,18,01,0,0),
+                    EndTime=new DateTime(2024,6,18,04,0,0)
+                }
+            };
+        }
+
     }
 }
