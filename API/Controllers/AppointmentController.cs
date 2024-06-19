@@ -95,14 +95,16 @@ namespace API.Controllers
                 try
                 {
                     var result = await _appointment.AddAppointment(app);
-                    var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
-                    var userId = doctor?.UserId;  //get the user id of the doctor
-                    var notification = $"New appointment added for {appointment.DateTime}";
+                    if(result==0)
+                    {
+                        var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                        var userId = doctor?.UserId;  //get the user id of the doctor
+                        var notification = $"New appointment added for {appointment.DateTime}";
 
-               
 
 
-                  
+
+
                         Notification newNotification = new Notification();
                         newNotification.Message = notification;
                         newNotification.From = appointment.RecepId.ToString();
@@ -123,7 +125,10 @@ namespace API.Controllers
                         await AddNotification(newNotification);
 
 
-                    
+                    }
+
+
+
 
 
 
@@ -573,6 +578,15 @@ namespace API.Controllers
         {
             var results=await _appointment.getUnableTimeslots(doctorId, day);
             return Ok(results);
+        }
+
+        [HttpDelete("Unblock/{id}")]
+        public async Task<ActionResult<Unable_Date>> UnblockDay(int id)
+        {
+            var result = await _appointment.UnblockDay(id);
+            return Ok(result);
+
+
         }
 
 
