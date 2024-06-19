@@ -17,6 +17,7 @@ using API;
 using AppointmentNotificationHandler;
 using Services.PharmacyService;
 using Services.DoctorService;
+using System.Reflection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
 });
 
 // Configure Authorization
