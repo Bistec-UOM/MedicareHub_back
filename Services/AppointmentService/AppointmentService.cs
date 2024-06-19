@@ -552,6 +552,21 @@ namespace Services.AppointmentService
 
         }
 
+        public async Task<Unable_Date> UnblockDay(int id)
+        {
+            var unableDay =_dbcontext.unable_Dates.Where(d=>d.Id == id).FirstOrDefault();   
+            if (unableDay != null)
+            {
+                await _unable_date.Delete(id);
+                return unableDay;
+
+            }
+            else
+            {
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
+        }
+
        
       
 
