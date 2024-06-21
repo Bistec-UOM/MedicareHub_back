@@ -164,64 +164,57 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
     //------------------------------------------------------message to pharmacist using analytics | admin related------------------------------------------------
     public async Task NotiToPharmacist()
     {
-        var drugAvailability = _dbContext.drugs
-            .Where(d => d.Avaliable < 10)
-            .Select(d => new
-            {
-                Name = d.BrandN + "(" + d.Weight + "mg)",
-                Available = d.Avaliable
-            })
-            .ToList();
 
-        var pharmacistConnections = _dbContext.users
+        var drugAvailability = await _dbContext.drugs
+                       .Where(d => d.Avaliable < 10)
+                       .Select(d => new
+                       {
+                           Name = d.GenericN + "(" + d.Weight + "mg)",
+                           Available = d.Avaliable
+                       })
+                       .ToListAsync();
+
+        var pharmacistConnections = await _dbContext.users
             .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
             .Select(u => new
             {
                 connectionId = u.ConnectionId,
                 Id = u.Id
             })
-            .ToList();
+            .ToListAsync();
 
         var unavailableDrugs = drugAvailability.Select(d => d.Name);
         string message = unavailableDrugs.Count() == 0
-            ? "All drugs are available"
+            ? ""
             : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
 
-        DateTime twentyFourHoursAgo = DateTime.Now.AddMinutes(330)
-            .AddHours(-24);
+        DateTime twentyFourHoursAgo = DateTime.Now.AddMinutes(330).AddHours(-24);
         bool messageExists = await _dbContext.notification
             .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
+        Notification noti = new Notification();
 
-        //if (!messageExists)
-        //{
-            var notifications = new List<Notification>();
+        // noti.Message = message;
+        // noti.SendAt = DateTime.Now;
+        // noti.Seen = false;
+        // noti.From = "System";
+        // noti.To = 7.ToString();
 
+        List<Notification> notiList = new List<Notification>();
         foreach (var connection in pharmacistConnections)
         {
-            if (connection.connectionId != null)
+            noti.Message = message;
+            noti.SendAt = DateTime.Now.AddMinutes(330);
+            noti.Seen = false;
+            noti.From = "system";
+            noti.To = connection.Id.ToString();
+
+            if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
             {
-                var notification = new Notification
-                {
-                    From = "System",
-                    To = connection.Id.ToString(),
-                    Message = message,
-                    SendAt = DateTime.Now.AddMinutes(330),
-                    Seen = false
-                };
-                if (connection.connectionId != null && Clients.Client(connection.connectionId) != null)
-                {
-                    await Clients.Client(connection.connectionId).ReceiveNotification(notification);
-                }
-
-
-                notifications.Add(notification);
-                await _dbContext.notification.AddAsync(notification);
-                await _dbContext.SaveChangesAsync();
+                await Clients.Client(connectionId).ReceiveNotification(noti);
             }
+            await _dbContext.notification.AddAsync(noti);
         }
 
-
-        //}
     }
 
 

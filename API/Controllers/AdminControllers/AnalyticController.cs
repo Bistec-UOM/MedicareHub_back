@@ -14,6 +14,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace API.Controllers.AdminControllers
 {
+    [Authorize(Policy = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticController : ControllerBase
@@ -28,6 +29,10 @@ namespace API.Controllers.AdminControllers
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Retrive number of patients for each date for each gender
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("male-female-patients-count")]
         public async Task<IActionResult> GetMaleFemalePatientsCountAllDays()
         {
@@ -42,6 +47,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
+        /// <summary>
+        /// Retrive income on each day
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("total-Income")]
         public async Task<IActionResult> GetTotalAmount()
         {
@@ -56,6 +65,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
+        /// <summary>
+        /// Retrive Drug available count
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("available-count")]
         public async Task<IActionResult> GetAvailableCount()
         {
@@ -70,6 +83,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
+        /// <summary>
+        /// Retrive drug usage in each day
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("daily-drug-usage")]
         public async Task<IActionResult> GetTotalDrugUsage()
         {
@@ -84,6 +101,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
+        /// <summary>
+        /// Retrive attendance of each role in each month
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("attendance")]
         public async Task<IActionResult> GetAttendance()
         {
@@ -98,20 +119,11 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var res = await _analyticsService.GetUsers();
-                return Ok(res);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
-            }
-        }
 
+        /// <summary>
+        /// Retrive attendance of each role in selected month
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("userCheck{date}")]
         public async Task<IActionResult> CheckAttendance(DateTime date)
         {
@@ -126,6 +138,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
+        /// <summary>
+        /// Retrive count of lab reports in each day
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("lab-report-Count")]
         public async Task<IActionResult> GetLabReports()
         {
@@ -139,6 +155,11 @@ namespace API.Controllers.AdminControllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Retrive drugs which is less than 10
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetScaredDrugs")]
         public async Task<IActionResult> GetScaredDrugs()
         {

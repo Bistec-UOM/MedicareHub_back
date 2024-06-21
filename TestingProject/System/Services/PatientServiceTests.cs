@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Services.Tests
+namespace TestingProject.System.Services
 {
     public class PatientServiceTests
     {
@@ -87,4 +87,6 @@ namespace Services.Tests
             _mockRepository.Verify(repo => repo.Update(patient), Times.Once);
         }
     }
+
+
 }
