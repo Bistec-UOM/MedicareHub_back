@@ -63,6 +63,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Doct&Recep", policy =>
        policy.RequireAssertion(context =>
            context.User.HasClaim(c => c.Type == "Role" && (c.Value == "Receptionist" || c.Value == "Doctor"))));
+    options.AddPolicy("Doct&Admin", policy =>
+       policy.RequireAssertion(context =>
+           context.User.HasClaim(c => c.Type == "Role" && (c.Value == "Doctor" || c.Value == "Admin"))));
 });
 
 // Configure Authentication
