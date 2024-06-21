@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace Models.DTO
 {
-    public class AppointmentWithPatientDetails
+    public class AppointmentWithDoctorDetails
     {
-        public Appointment Appointment { get; set; }
-        public Patient patient { get; set; }
-       
+        public Appointment appointment { get; set; }
+        public User doctor { get; set; }
     }
-
-   
 }

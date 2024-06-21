@@ -75,6 +75,9 @@ namespace Services.AppointmentService
 
         public Task<List<Unable_Date>> getUnableTimeslots(int doctorId, DateTime day);
         public  Task<Unable_Date> UnblockDay(int id);
+        public Task<List<AppointmentWithDoctorDetails>> getPatientAppointmentAnalysis(int patientId);
+        public Task<Doctor> getDoctor(int doctorId);
+        public Task<User> getUser(int userId);
 
 
     }
