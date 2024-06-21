@@ -567,6 +567,43 @@ namespace Services.AppointmentService
             }
         }
 
+        public async Task<Doctor> getDoctor(int doctorId)
+        {
+            var doctor=_dbcontext.doctors.Where(d=>d.Id==doctorId).FirstOrDefault();
+            return  doctor;
+        }
+        public async Task<User> getUser(int userId)
+        {
+            var userObject=_doctor.Get(userId);
+            return await userObject;
+        }
+
+        public async Task<List<AppointmentWithDoctorDetails>> getPatientAppointmentAnalysis(int patientId)
+        {
+            var today = DateTime.Today;
+            var previousAppointments = _dbcontext.appointments
+       .Where(a => a.PatientId == patientId && a.DateTime < today && a.Status!="cancelled").ToList();
+            List<AppointmentWithDoctorDetails> appointmentsWithDetails = new List<AppointmentWithDoctorDetails>();
+            foreach (var appointment in previousAppointments)   //returning the appointment details as well as patient details of the relevent appointment
+            {
+               
+                var doctorObject = await getDoctor(appointment.DoctorId);
+                var userId = doctorObject.UserId;
+                var doctorDetails = await getUser(userId); 
+                AppointmentWithDoctorDetails newappointment = new AppointmentWithDoctorDetails
+                {
+                    appointment = appointment,
+                    doctor = doctorDetails
+
+                };
+
+                appointmentsWithDetails.Add(newappointment);
+            }
+            return appointmentsWithDetails;
+
+
+        }
+
        
       
 

@@ -706,6 +706,20 @@ namespace API.Controllers
         }
 
 
+        /// <summary>
+        /// Get previous appointments of a given patient with doctor details
+        /// </summary>
+        /// <param name="patientId">Specific patient Id</param>
+        /// <returns></returns>
+
+        [HttpGet("PreviousAppointments/{patientId}")]
+        public async Task<ActionResult<ICollection<AppointmentWithDoctorDetails>>> getPreviousAppointments(int patientId)
+        {
+            var results = await _appointment.getPatientAppointmentAnalysis(patientId);
+            return Ok(results);
+        }
+
+
 
 
 
