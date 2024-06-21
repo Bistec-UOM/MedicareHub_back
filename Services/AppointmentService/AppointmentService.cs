@@ -193,7 +193,7 @@ namespace Services.AppointmentService
         }
         public async Task<List<Appointment>> GetDoctorAppointments(int doctorId)   //getting all the appointments of a specific doctor
         {   
-            var doctorAppointments =     _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
+            var doctorAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId);
             return doctorAppointments.ToList();
         }
 
@@ -510,6 +510,7 @@ namespace Services.AppointmentService
         public async  Task AddNotification(Notification notification)
         {
              await _notification.Add(notification);  
+           
 
         }
 
@@ -549,6 +550,21 @@ namespace Services.AppointmentService
             var dates= _dbcontext.unable_Dates.Where(u => u.doctorId == doctorId && u.Date == day);
             return dates.ToList();
 
+        }
+
+        public async Task<Unable_Date> UnblockDay(int id)
+        {
+            var unableDay =_dbcontext.unable_Dates.Where(d=>d.Id == id).FirstOrDefault();   
+            if (unableDay != null)
+            {
+                await _unable_date.Delete(id);
+                return unableDay;
+
+            }
+            else
+            {
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
         }
 
        

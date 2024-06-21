@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.AdminServices;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace API.Controllers.AdminControllers
 {
+
+    [Authorize(Policy = "Doct&Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientController : ControllerBase
@@ -18,7 +21,10 @@ namespace API.Controllers.AdminControllers
             _patientService = patientService;
         }
 
-        // GET: api/<PatientController>
+        /// <summary>
+        /// Get all patient data from database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -33,7 +39,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // GET api/<PatientController>/5
+        /// <summary>
+        /// Get selected patient data from database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -54,7 +63,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // POST api/<PatientController>
+        /// <summary>
+        /// add new patient to database
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Patient value)
         {
@@ -69,7 +81,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // PUT api/<PatientController>/5
+        /// <summary>
+        /// update selected patient data values
+        /// </summary>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Patient value)
         {
@@ -84,7 +99,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // DELETE api/<PatientController>/5
+        /// <summary>
+        /// delete patient using {id}
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

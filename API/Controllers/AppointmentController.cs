@@ -35,24 +35,61 @@ namespace API.Controllers
 
 
         }
+        /// <summary>
+        /// Get a patient by id
+        /// </summary>
+        /// <param name="id">patient id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Recep")]
         [HttpGet("patient/{id}", Name = "GetPatient")]
 
         public async Task<ActionResult<Patient>> GetPatient(int id)  //get patient by id
         {
-            return Ok(await _appointment.GetPatient(id));
+            try
+            {
+                var patient = await _appointment.GetPatient(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+                return Ok(await _appointment.GetPatient(id));
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
+
+        /// <summary>
+        /// Fetching all appointments
+        /// </summary>
+        /// <param></param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
 
         public async Task<IActionResult> GetAllAppointments()   //getting all appointments
         {
-            var appointments = await _appointment.GetAll();
+            try
+            {
+                var appointments = await _appointment.GetAll();
 
-            return Ok(appointments);
+                return Ok(appointments);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
+        /// <summary>
+        /// Adding a new appointment,Send an email,send real time notification
+        /// </summary>
+        /// <param name="appointment">new appointment object</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Recep")]
         [HttpPost]
@@ -74,28 +111,41 @@ namespace API.Controllers
                 try
                 {
                     var result = await _appointment.AddAppointment(app);
-                    var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
-                    var userId = doctor?.UserId;  //get the user id of the doctor
-                    var notification = $"New appointment added for {appointment.DateTime}";
-
-                Notification newNotification = new Notification();
-                newNotification.Message = notification;
-                newNotification.From = appointment.RecepId.ToString();
-                newNotification.To = appointment.DoctorId.ToString();
-                newNotification.SendAt = DateTime.Now.AddMinutes(330);
-                newNotification.Seen = false;
-
-
-                    if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                    if(result==0)
                     {
-                        Debug.WriteLine($"User ConnectionId: {connectionId}");
-                        await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                        Debug.WriteLine("Notification sent via SignalR.");
+                        var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                        var userId = doctor?.UserId;  //get the user id of the doctor
+                        var notification = $"New appointment added for {appointment.DateTime}";
+
+
+
+
+
+                        Notification newNotification = new Notification();
+                        newNotification.Message = notification;
+                        newNotification.From = appointment.RecepId.ToString();
+                        newNotification.To = appointment.DoctorId.ToString();
+                        newNotification.SendAt = DateTime.Now.AddMinutes(330);
+                        newNotification.Seen = false;
+
+                        if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                        {
+
+                            Debug.WriteLine($"User ConnectionId: {connectionId}");
+                            await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                            Debug.WriteLine("Notification sent via SignalR.");
+                        }
+
+
+
+                        await AddNotification(newNotification);
+
+
                     }
 
 
 
-                    await AddNotification(newNotification);
+
 
 
                     return Ok(result);
@@ -111,16 +161,40 @@ namespace API.Controllers
             }
 
         }
+        /// <summary>
+        /// Get an appointment by id
+        /// </summary>
+        /// <param name="id">appointment id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("{id}", Name = "GetAppointment")]
 
         public async Task<ActionResult<Appointment>> GetAppointment(int id)  //getting an appointment by id
         {
-            var appointment = await _appointment.GetAppointment(id);
-            return Ok(appointment);
+            try
+            {  
+                
+                var appointment = await _appointment.GetAppointment(id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
+                return Ok(appointment);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
         }
 
+        /// <summary>
+        /// Deleting an appointment by id
+        /// </summary>
+        /// <param name="id">Deleted appointment id</param>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
@@ -187,15 +261,34 @@ namespace API.Controllers
             
            
         }
+        /// <summary>
+        /// Getting all the appointments of a specific doctor using docotorId
+        /// </summary>
+        /// <param name="doctorId">specific doctor id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
         public async Task<ActionResult<ICollection<Appointment>>> GetDoctorAppointments(int doctorId)  //getting all the appointments of a specific doctor
         {
-            var doctorAppointments = await _appointment.GetDoctorAppointments(doctorId);
-            return Ok(doctorAppointments);
+            try
+            {
+                var doctorAppointments = await _appointment.GetDoctorAppointments(doctorId);
+                return Ok(doctorAppointments);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
+        /// <summary>
+        /// Getting all the appointments of a specific day for a specific doctor
+        /// </summary>
+        /// <param name="doctorId">The Id of the doctor</param>
+        /// <param name="date">The date for which to retrive appointments</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
@@ -203,6 +296,11 @@ namespace API.Controllers
 
             return Ok(await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId, date));
         }
+
+        /// <summary>
+        /// Getting all the doctors list
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors() //getting the doctors list
@@ -210,14 +308,34 @@ namespace API.Controllers
             var doctors = _appointment.GetDoctors();
             return Ok(doctors);
         }
+        /// <summary>
+        /// Registering a new patient
+        /// </summary>
+        /// <param name="patient">new patient object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpPost("patients")]
-        public async Task RegisterPatient(Patient patient)  //registering a patient
+        public async Task<ActionResult> RegisterPatient(Patient patient)  //registering a patient
         {
+            try
+            {
+               await _appointment.RegisterPatient(patient);
+               return Ok();
 
-            await _appointment.RegisterPatient(patient);
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+           
 
         }
+        /// <summary>
+        /// Cancel the appointment by a doctor,send an email to the patient
+        /// </summary>
+        /// <param name="id">appoinntment id</param>
+         /// <param name="appointment">cancelled appointment object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)  //cancel the appointment by doctor
@@ -277,6 +395,12 @@ namespace API.Controllers
             }
             return Ok(targetAppointment);
         }
+        /// <summary>
+        /// Cancel all the appointments by a doctor for a specific day,send  emails to the patients
+        /// </summary>
+        /// <param name="doctorId">specific doctor id</param>
+        /// <param name="date">specific date</param>
+        /// <returns></returns>
 
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date) //cancel all apps of a day by doctor
@@ -334,43 +458,67 @@ namespace API.Controllers
             }
             return NoContent();
         }
+        /// <summary>
+        /// Get monthly appointment list of a doctor
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="mId">MonthId</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
         {
-            var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
-            return Ok(appointments);
+            try
+            {
+                var appointments = await _appointment.GetAppointmentCountOfDays(doctorId, mId);
+                return Ok(appointments);
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
+            
         }
+        /// <summary>
+        /// Get patient list
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpGet("patients")]
         public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            var Role = identity.Claims.FirstOrDefault(c => c.Type == "Role")?.Value;
 
-            if (Role == "Receptionist")
+            try
             {
-
                 var patients = await _appointment.GetPatients();
                 return Ok(patients);
 
-            }
-            else
+            }catch (Exception ex)
             {
-                return Unauthorized();
+                return BadRequest(ex.Message);
             }
-
-
-
+            
         }
+        /// <summary>
+        /// Update the appointment details,send an email
+        /// </summary>
+        /// <param name="id">Appointment id</param>
+        /// <param name="appointment">new updated appointment</param>
+        /// <returns></returns>
 
-        [Authorize(Policy = "Recep")]
+        [Authorize(Policy = "Recep")]   
         [HttpPut("{id}")]
         public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment
         {
 
             return Ok(await _appointment.UpdateAppointment(id, appointment));
         }
+        /// <summary>
+        /// Delete all the appointments of a specific doctor of a specific day
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="date">The day which need to delete appointments</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
@@ -436,49 +584,125 @@ namespace API.Controllers
             return NoContent();
 
         }
+        /// <summary>
+        /// Add a new unable date
+        /// </summary>
+        /// <param name="uDate">Unable date object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct")]
         [HttpPost("unableDates")]
-        public async Task AddUnableDate(Unable_Date uDate)  //adding unable dates
+        public async Task<ActionResult> AddUnableDate(Unable_Date uDate)  //adding unable dates
         {
-            await _appointment.AddUnableDate(uDate);
+            try
+            {
+                await _appointment.AddUnableDate(uDate);
+                return Ok();
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
 
         }
 
-
+        /// <summary>
+        /// Getting unable dates of a specific doctor
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <returns></returns>
         // [Authorize(Policy = "Doct&Recep")]
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
         {
-            var uDates = await _appointment.getUnableDates(doctorId);
-            return Ok(uDates);
+            try
+            {
+                var uDates = await _appointment.getUnableDates(doctorId);
+                return Ok(uDates);
+
+            }catch (Exception ex) { 
+                return BadRequest(ex.Message);
+            }
+            
         }
 
+        /// <summary>
+        /// Get notifications of a specific user
+        /// </summary>
+        /// <param name="userId">Specific user Id</param>
+        /// <returns></returns>
         [HttpGet("Notifications/{userId}")]
         public async Task<ActionResult<ICollection<Notification>>> getNotifications(int userId)
         {
-            var notifications = await _appointment.getNotifications(userId);
-            return Ok(notifications);
+            try
+            {
+                var notifications = await _appointment.getNotifications(userId);
+                return Ok(notifications);
+
+            }catch(Exception ex) { 
+            return BadRequest(ex.Message);
+             }
+           
         }
 
-
+        /// <summary>
+        /// Add a new notification
+        /// </summary>
+        /// <param name="notification">New notification object</param>
+        /// <returns></returns>
         [HttpPost("Notifications")]
-        public async Task AddNotification(Notification notification)  //adding notifications
+        public async Task<ActionResult> AddNotification(Notification notification)  //adding notifications
         {
-            await _appointment.AddNotification(notification);
+            try
+            {
+                await _appointment.AddNotification(notification);
+                return Ok();
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
 
         }
-
+        /// <summary>
+        /// Mark an appointment as seen
+        /// </summary>
+        /// <param name="userId">Specific user Id</param>
+        /// <param name="newSeenValue">new bool value of Seen</param>
+        /// <returns></returns>
         [HttpPut("notifications/{userId}/user/{newSeenValue}")]
         public async Task MarkAsSeenNotifications(int userId, bool newSeenValue)
         {
             await _appointment.markAsSeenNotifications(userId, newSeenValue);
         }
 
+        /// <summary>
+        /// Get Unable time slots of a specific doctor for a specific day
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="day">specific day</param>
+        /// <returns></returns>
+
         [HttpGet("BlockDates/{doctorId}/date/{day}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> getUnableTimeSlots(int doctorId,DateTime day)
         {
             var results=await _appointment.getUnableTimeslots(doctorId, day);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// unblock a blocked day
+        /// </summary>
+        /// <param name="id">unblock day id</param>
+        /// <returns></returns>
+        [HttpDelete("Unblock/{id}")]
+        public async Task<ActionResult<Unable_Date>> UnblockDay(int id)
+        {
+            var result = await _appointment.UnblockDay(id);
+            return Ok(result);
+
+
         }
 
 

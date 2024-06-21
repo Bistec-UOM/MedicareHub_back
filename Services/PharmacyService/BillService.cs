@@ -174,11 +174,21 @@ namespace Services.PharmacyService
                 .AnyAsync(n => n.Message == message && n.SendAt > twentyFourHoursAgo);
             Notification noti = new Notification();
 
-            noti.Message = message;
-            noti.SendAt = DateTime.Now;
-            noti.Seen = false;
-            noti.From = "System";
-            noti.To = 7.ToString();
+           // noti.Message = message;
+           // noti.SendAt = DateTime.Now;
+           // noti.Seen = false;
+           // noti.From = "System";
+           // noti.To = 7.ToString();
+
+            List<Notification> notiList = new List<Notification>();
+            foreach(var connection in pharmacistConnections)
+            {
+                noti.Message = message;
+                noti.SendAt = DateTime.Now.AddMinutes(330);
+                noti.Seen = false;
+                noti.From = "system";
+                noti.To = connection.Id.ToString();
+            }
 
             return noti;
 
