@@ -1,5 +1,6 @@
 ﻿using AppointmentNotificationHandler;
 using DataAccessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace API.Controllers.AdminControllers
 {
+
+    [Authorize(Policy = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -27,7 +30,10 @@ namespace API.Controllers.AdminControllers
             _dbContext = dbContext;
         }
 
-        // GET: api/<UserController>
+        /// <summary>
+        /// Get all users data from database
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -42,7 +48,11 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // GET api/<UserController>/5
+        /// <summary>
+        /// Get selected users data from database
+        /// </summary>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -61,7 +71,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // POST api/<UserController>
+        /// <summary>
+        /// add new user to database
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] User value)
         {
@@ -76,7 +89,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // PUT api/<UserController>/5
+        /// <summary>
+        /// update selected user which is in database
+        /// </summary>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] User value)
         {
@@ -91,7 +107,10 @@ namespace API.Controllers.AdminControllers
             }
         }
 
-        // DELETE api/<UserController>/5
+        /// <summary>
+        /// Delete user which is in database using {id}
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
