@@ -687,8 +687,14 @@ namespace API.Controllers
         [HttpGet("BlockDates/{doctorId}/date/{day}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> getUnableTimeSlots(int doctorId,DateTime day)
         {
-            var results=await _appointment.getUnableTimeslots(doctorId, day);
-            return Ok(results);
+            try
+            {
+                var results = await _appointment.getUnableTimeslots(doctorId, day);
+                return Ok(results);
+            }catch(Exception ex) { 
+                return BadRequest(ex.Message);  
+            }
+           
         }
 
         /// <summary>
@@ -699,8 +705,16 @@ namespace API.Controllers
         [HttpDelete("Unblock/{id}")]
         public async Task<ActionResult<Unable_Date>> UnblockDay(int id)
         {
-            var result = await _appointment.UnblockDay(id);
-            return Ok(result);
+            try
+            {
+                var result = await _appointment.UnblockDay(id);
+                return Ok(result);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
 
 
         }
@@ -715,6 +729,7 @@ namespace API.Controllers
         [HttpGet("PreviousAppointments/{patientId}")]
         public async Task<ActionResult<ICollection<AppointmentWithDoctorDetails>>> getPreviousAppointments(int patientId)
         {
+            
             var results = await _appointment.getPatientAppointmentAnalysis(patientId);
             return Ok(results);
         }
