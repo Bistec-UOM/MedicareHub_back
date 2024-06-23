@@ -570,7 +570,15 @@ namespace Services.AppointmentService
         public async Task<Doctor> getDoctor(int doctorId)
         {
             var doctor=_dbcontext.doctors.Where(d=>d.Id==doctorId).FirstOrDefault();
-            return  doctor;
+            if (doctor !=null)
+            {
+                return doctor;
+                
+            }
+            else
+            {
+                throw new ArgumentException("Doctor not found");
+            }
         }
         public async Task<User> getUser(int userId)
         {

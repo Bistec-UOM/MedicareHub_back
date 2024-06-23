@@ -350,14 +350,16 @@ namespace TestingProject.MockData
 
         public static List<Notification> GetNotifications() {
 
-            return new List<Notification> { 
-                new Notification { 
+            return new List<Notification> {
+                new Notification {
                     Id=1,
-                    From="7"
+                    From="7",
+                    Seen=false
                 },
                 new Notification {
                     Id=2,
-                    From="8"
+                    From="8",
+                    Seen=false
                 }
         };
         }
