@@ -201,6 +201,7 @@ namespace Services.AppointmentService
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)   //getting all the appointments of a specific doctor of a specific date
         {
             var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
+           // updateToShowOffAppointment();
             return doctorDayAppointments.ToList();   
         }
 
@@ -398,6 +399,7 @@ namespace Services.AppointmentService
                 try
                 {
                     await _dbcontext.SaveChangesAsync();
+                    await updateToShowOffAppointment();
                     return oldAppointment;
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -494,6 +496,7 @@ namespace Services.AppointmentService
         }
         public async Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId)  //get monthly appointments  of a doctor for progress bar
         {
+
             var targetAppointment=_dbcontext.appointments.Where(a=>a.DoctorId==doctorId && (a.DateTime.Month)-1==monthId).ToList();
             return targetAppointment;
         }
@@ -542,6 +545,7 @@ namespace Services.AppointmentService
 
 
             await _dbcontext.SaveChangesAsync();
+         
 
         }
 
@@ -609,6 +613,20 @@ namespace Services.AppointmentService
             }
             return appointmentsWithDetails;
 
+
+        }
+
+        public async Task updateToShowOffAppointment()
+        {
+            var today = DateTime.Today;
+            var previousAppointments = _dbcontext.appointments.Where(a => a.DateTime < today && a.Status == "new").ToList();
+            foreach(var appointment in previousAppointments)
+            {
+                appointment.Status = "noshow";
+               
+            }
+            await  _dbcontext.SaveChangesAsync();
+          
 
         }
 
