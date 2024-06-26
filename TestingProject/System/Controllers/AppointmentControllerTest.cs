@@ -650,6 +650,47 @@ namespace TestingProject.System.Controllers
 
         }
 
+        //--------- CancelAllUpdates(int doctorId, DateTime date)-----
+        [Fact]
+        public async Task cancelAllUpdates_shouldCallServiceCancelAllUpdates()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getCancelledAppointmentsByDoctor());
+             
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            appointmentService.Verify(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date), Times.Once);
+
+
+        }
+        [Fact]
+        public async Task cancelAllUpdates_ThrowsAnException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).Throws(new Exception("Test exception"));
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result =await sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+
 
 
 
