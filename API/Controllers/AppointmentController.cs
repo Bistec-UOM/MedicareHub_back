@@ -405,22 +405,24 @@ namespace API.Controllers
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date) //cancel all apps of a day by doctor
         {
-            var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
-            foreach (var app in await targetCancelledAppointments)
+            try
             {
-                var targetPatient = await _appointment.GetPatient(app.PatientId);
-                if (targetPatient != null)
+                var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
+                foreach (var app in await targetCancelledAppointments)
                 {
+                    var targetPatient = await _appointment.GetPatient(app.PatientId);
+                    if (targetPatient != null)
+                    {
 
-                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
-                    var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime.ToString("f");
-                    string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
-                    string userName = targetPatient.FullName;
-                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
-                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                        var targetEmail = targetPatient.Email ?? "default@gmail.com";
+                        var targetday = app.DateTime.Date;
+                        var targettime = app.DateTime.ToString("f");
+                        string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                        string userName = targetPatient.FullName;
+                        var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                        string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
 
-                    var htmlContent = $@"
+                        var htmlContent = $@"
 <html>
 <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
@@ -451,12 +453,18 @@ namespace API.Controllers
     </div>
 </body>
 </html>";
-                    EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
+                        EmailSender emailSernder = new EmailSender();
+                        await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
+                    }
                 }
+                return NoContent();
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return NoContent();
+           
         }
         /// <summary>
         /// Get monthly appointment list of a doctor
@@ -510,8 +518,17 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment
         {
+            try
+            {
+                var result = await _appointment.UpdateAppointment(id, appointment);
+                return Ok();
 
-            return Ok(await _appointment.UpdateAppointment(id, appointment));
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            
         }
         /// <summary>
         /// Delete all the appointments of a specific doctor of a specific day
