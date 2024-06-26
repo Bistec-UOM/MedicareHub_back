@@ -546,6 +546,154 @@ namespace TestingProject.System.Controllers
 
         }
 
+        //----------getUnableTimeSlots(int doctorId,DateTime day)---
+        [Fact]
+        public async Task getUnableTimeSlots_sholudCallServicegetUnableTimeSlots()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(_ => _.getUnableTimeslots(1, new DateTime(2024, 6, 18))).ReturnsAsync(AppointmentMockData.GetUnableTimeSlotsDoc1Date18);
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = await sut.getUnableTimeSlots(1, new DateTime(2024, 6, 18));
+
+            //Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            okResult.StatusCode.Should().Be(200);
+            appointmentService.Verify(_ => _.getUnableTimeslots(1, new DateTime(2024, 6, 18)), Times.Exactly(1));
+
+        }
+
+        [Fact]
+
+        public async Task getUnableTimeSlots_ThrowsAnException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(_ => _.getUnableTimeslots(1, new DateTime(2024, 6, 18))).Throws(new Exception("Test exception"));
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = await sut.getUnableTimeSlots(1, new DateTime(2024, 6, 18));
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+        //---------UnblockDay(int id)----
+        [Fact]
+        public async Task UnblockDay_shouldCallServiceUnblockDay()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(_ => _.UnblockDay(AppointmentMockData.GetUnableDatesDoc1()[0].Id)).ReturnsAsync(AppointmentMockData.GetUnableDatesDoc1()[0]);
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = await sut.UnblockDay(AppointmentMockData.GetUnableDatesDoc1()[0].Id);
+
+            //Assert
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            okResult.StatusCode.Should().Be(200);
+            appointmentService.Verify(_ => _.UnblockDay(AppointmentMockData.GetUnableDatesDoc1()[0].Id), Times.Exactly(1));
+
+        }
+        [Fact]
+        public async Task UnblockDay_ThrowsException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(_ => _.UnblockDay(AppointmentMockData.GetUnableDatesDoc1()[0].Id)).Throws(new Exception("Test exception"));
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = await sut.UnblockDay(AppointmentMockData.GetUnableDatesDoc1()[0].Id);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+
+        }
+
+        //---------markAsSeenNotifications(int userId, bool newSeenValue)---
+        [Fact]
+        public async Task MarkasSeenNotifications_ShouldCannServiceMarkasSeen()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.markAsSeenNotifications(7, true))
+             .Returns(Task.CompletedTask)
+             .Verifiable();
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result =  sut.MarkAsSeenNotifications(7,true);
+
+            //Assert
+           // result.Should().BeOfType<OkResult>();
+            appointmentService.Verify(service => service.markAsSeenNotifications(7, true), Times.Once);
+
+
+        }
+
+        //--------- CancelAllUpdates(int doctorId, DateTime date)-----
+        [Fact]
+        public async Task cancelAllUpdates_shouldCallServiceCancelAllUpdates()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getCancelledAppointmentsByDoctor());
+             
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            appointmentService.Verify(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date), Times.Once);
+
+
+        }
+        [Fact]
+        public async Task cancelAllUpdates_ThrowsAnException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).Throws(new Exception("Test exception"));
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result =await sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+
+
+
+
 
 
         public void Dispose()
