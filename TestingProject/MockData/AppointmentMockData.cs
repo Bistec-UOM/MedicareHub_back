@@ -590,6 +590,48 @@ namespace TestingProject.MockData
 
             };
         }
+        public static List<Appointment> getDeletedAppointments()
+        {
+            return new List<Appointment> {
+                 new Appointment
+                {
+
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 17, 05, 0, 0),
+                    Status="new",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 2,
+                    DateTime= new DateTime(2024, 6, 17, 08, 0, 0),
+                    Status="new",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 17, 04, 10, 0),
+                    Status="new",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 6, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }
+
+
+
+            };
+        }
+
+      
 
     }
 }
