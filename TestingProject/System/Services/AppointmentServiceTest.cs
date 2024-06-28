@@ -753,6 +753,97 @@ namespace TestingProject.System.Services
         }
 
 
+        //---------------DeleteAllDoctorDayAppointments(int doctorId, DateTime date)---------------
+        [Fact]
+        public async Task DeleteAllDoctorDayAppointments_ShouldDeleteAllApps()
+        {
+
+            ResetDatabase();
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+            _dbContext.appointments.AddRange(AppointmentMockData.getDeletedAppointments());
+            _dbContext.SaveChangesAsync();
+
+           
+
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+
+
+            //Act
+
+
+            var result = await sut.DeleteAllDoctorDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date);
+
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(AppointmentMockData.getDeletedAppointments().Count, result.Count);
+            Assert.Equal(_dbContext.appointments.Count(),0);
+
+
+
+
+
+        }
+
+        //---------DeleteAppointment(int id) ---------
+        [Fact]
+        public async Task DeleteAppointment_shouldDeleteApp()
+        {
+
+            ResetDatabase();
+            //Arrange
+            var mockAppointmentRepository = new Mock<IRepository<Appointment>>();
+            var mockPatientRepository = new Mock<IRepository<Patient>>();
+            var mockDoctorRepository = new Mock<IRepository<User>>();
+            var mockUnableDateRepository = new Mock<IRepository<Unable_Date>>();
+            var mockNotificationRepository = new Mock<IRepository<Notification>>();
+
+            _dbContext.appointments.AddRange(AppointmentMockData.getDeletedAppointments());
+            _dbContext.SaveChangesAsync();
+
+            mockAppointmentRepository.Setup(repo => repo.Get(It.IsAny<int>())).ReturnsAsync((int id) => _dbContext.appointments.FirstOrDefault(a => a.Id == id));
+            mockAppointmentRepository.Setup(repo => repo.Delete(It.IsAny<int>()))
+      .Callback<int>(id =>
+      {
+          var appointment = _dbContext.appointments.FirstOrDefault(a => a.Id == id);
+          if (appointment != null)
+          {
+              _dbContext.appointments.Remove(appointment);
+              _dbContext.SaveChanges();
+          }
+      });
+            var sut = new AppointmentService(_dbContext, mockAppointmentRepository.Object, mockPatientRepository.Object, mockDoctorRepository.Object, mockUnableDateRepository.Object, mockNotificationRepository.Object);
+
+
+
+            //Act
+
+
+            var result = await sut.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id);
+
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(_dbContext.appointments.Count(), AppointmentMockData.getDeletedAppointments().Count-1);
+            Assert.Equal(AppointmentMockData.getDeletedAppointments()[0].Id,result.Id);
+
+
+
+
+
+        }
+
+
+
+
+
 
 
 

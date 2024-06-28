@@ -199,6 +199,8 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
             {
+            try
+            {
                 var targetAppointment = await _appointment.GetAppointment(id);  //get the sepecific appointment and check whether it exists
                 if (targetAppointment is null)
                 {
@@ -258,6 +260,12 @@ namespace API.Controllers
 
                 }
                 return Ok(deletedAppointment);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+                
             
            
         }
@@ -540,29 +548,31 @@ namespace API.Controllers
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
         {
-            var targetAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
-            if (targetAppointments is null)
+            try
             {
-                return NotFound();
-            }
-
-            var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);  //appointment list of a day real deleting by receptionist
-            foreach (var app in await targetDeletedAppointments)
-            {
-                var targetPatient = await _appointment.GetPatient(app.PatientId);
-                if (targetPatient != null)
+                var targetAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
+                if (targetAppointments is null)
                 {
-                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
-                    var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime.ToString("f");
+                    return NotFound();
+                }
 
-                    //sending emails after deleting prescheduled appointments by a receptionsist
-                    string emailSubject = "Appointment Update: Cancellation Notification";
-                    string userName = targetPatient.FullName;
-                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
-                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);  //appointment list of a day real deleting by receptionist
+                foreach (var app in await targetDeletedAppointments)
+                {
+                    var targetPatient = await _appointment.GetPatient(app.PatientId);
+                    if (targetPatient != null)
+                    {
+                        var targetEmail = targetPatient.Email ?? "default@gmail.com";
+                        var targetday = app.DateTime.Date;
+                        var targettime = app.DateTime.ToString("f");
 
-                    var htmlContent = $@"
+                        //sending emails after deleting prescheduled appointments by a receptionsist
+                        string emailSubject = "Appointment Update: Cancellation Notification";
+                        string userName = targetPatient.FullName;
+                        var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                        string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                        var htmlContent = $@"
 <html>
 <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
@@ -593,12 +603,18 @@ namespace API.Controllers
     </div>
 </body>
 </html>";
-                    EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
-                }
+                        EmailSender emailSernder = new EmailSender();
+                        await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
+                    }
 
+                }
+                return NoContent();
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return NoContent();
+           
 
         }
         /// <summary>
