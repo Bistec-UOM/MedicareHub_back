@@ -301,8 +301,16 @@ namespace API.Controllers
         [HttpGet("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
         {
+            try
+            {
+                var results = await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId, date);
+                return Ok(results);
 
-            return Ok(await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId, date));
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
 
         /// <summary>
@@ -705,9 +713,17 @@ namespace API.Controllers
         /// <param name="newSeenValue">new bool value of Seen</param>
         /// <returns></returns>
         [HttpPut("notifications/{userId}/user/{newSeenValue}")]
-        public async Task MarkAsSeenNotifications(int userId, bool newSeenValue)
+        public async Task<ActionResult>MarkAsSeenNotifications(int userId, bool newSeenValue)
         {
-            await _appointment.markAsSeenNotifications(userId, newSeenValue);
+            try
+            {
+                await _appointment.markAsSeenNotifications(userId, newSeenValue);
+                return Ok();    
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
+            
         }
 
         /// <summary>
@@ -762,12 +778,42 @@ namespace API.Controllers
         [HttpGet("PreviousAppointments/{patientId}")]
         public async Task<ActionResult<ICollection<AppointmentWithDoctorDetails>>> getPreviousAppointments(int patientId)
         {
+            try
+            {
+                var results = await _appointment.getPatientAppointmentAnalysis(patientId);
+                return Ok(results);
+
+            }catch(Exception ex) { 
+                return BadRequest(ex.Message);
+            }
             
-            var results = await _appointment.getPatientAppointmentAnalysis(patientId);
-            return Ok(results);
+           
         }
 
-       
+        /// <summary>
+        /// unblock a blocked day
+        /// </summary>
+        /// <param name="id">Remove blocked time slot</param>
+        /// <returns></returns>
+        [HttpDelete("UnblockTime/{id}")]
+        public async Task<ActionResult<Unable_Date>> RemoveBlockedTimeSlot(int id)
+        {
+            try
+            {
+                var result = await _appointment.RemoveUnblockTimeSlot(id);
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+
+        }
+
+
 
 
 
