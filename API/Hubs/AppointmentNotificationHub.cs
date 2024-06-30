@@ -186,7 +186,7 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         var unavailableDrugs = drugAvailability.Select(d => d.Name);
         string message = unavailableDrugs.Count() == 0
             ? ""
-            : string.Join(", ", unavailableDrugs) + " drugs are less than 10 available";
+            : string.Join(", ", unavailableDrugs) + " less than 10 available";
 
         DateTime twentyFourHoursAgo = DateTime.Now.AddMinutes(330).AddHours(-24);
         bool messageExists = await _dbContext.notification
@@ -215,6 +215,8 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
                 noti.To = connection.Id.ToString();
 
                 await _dbContext.notification.AddAsync(noti);
+                await _dbContext.SaveChangesAsync();
+
                 if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
                 {
                     await Clients.Client(connectionId).ReceiveNotification(noti);
