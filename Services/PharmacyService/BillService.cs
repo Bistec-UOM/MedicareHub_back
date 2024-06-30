@@ -25,7 +25,7 @@ namespace Services.PharmacyService
             var prescriptionData = await _cntx.prescriptions
                 .Include(p => p.Appointment)
                 .ThenInclude(a => a.Patient)
-                .Where(p => p.Appointment.Status == "completed")
+                .Where(p => p.Appointment.Status == "completed" && p.DateTime == DateTime.UtcNow.Date)
                 .Select(p => new
                 {
                     id = p.Id,
