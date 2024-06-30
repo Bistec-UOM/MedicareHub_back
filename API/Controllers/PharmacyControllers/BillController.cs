@@ -52,10 +52,10 @@ namespace API.Controllers.PharmacyControllers
                     .ToList();
 
 
-            var notifications = new List<Notification>();
+            //var notification = new Notification();
+           // var notifications = new List<Notification>();
             if (message != "")
             {
-            }
            foreach (var connection in pharmacistConnections)
            {
 
@@ -67,20 +67,22 @@ namespace API.Controllers.PharmacyControllers
                     SendAt = DateTime.Now.AddMinutes(330),
                     Seen = false
                 };
+                    //notifications.Add(notification);
 
+                    if (removedData.Count > 0)
+                {
+                    await _dbContext.notification.AddAsync(notification);
+                    await _dbContext.SaveChangesAsync();
+                }
 
-                if (connection.Id!= null && removedData.Count > 0 && ConnectionManager._userConnections.TryGetValue(connection.Id.ToString(), out var connectionId))
+                if ( removedData.Count > 0 && ConnectionManager._userConnections.TryGetValue(7.ToString(), out var connectionId))
                 {
                     await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
                 }
-                notifications.Add(notification);
            }
-           if(removedData.Count > 0)
-            {
-                await _dbContext.notification.AddRangeAsync(notifications);
-                await _dbContext.SaveChangesAsync();
-
             }
+
+
 
 
 
@@ -104,11 +106,13 @@ namespace API.Controllers.PharmacyControllers
                 var noti =  await _billService.ReadNoti();
                 if (noti.Message!="")
                 {
+                    await _dbContext.notification.AddAsync(noti);
+                    await _dbContext.SaveChangesAsync();
                     if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
                     {
                         await _hubContext.Clients.Client(connectionId).ReceiveNotification(noti);
                     }
-                    await _dbContext.notification.AddAsync(noti);
+                    
                 }
 
 
