@@ -49,7 +49,7 @@ namespace API.Controllers.PharmacyControllers
             var medicineDetails = await _billService.GetMedicineDetails(medicineNames);
             //check not available medicines which assigned by a doctor
             var removedData = await _billService.GetMedicinesNotInStock(medicineNames);
-            string message = removedData.Count == 0 ? "All medicines are available in our store" : $"{string.Join(", ", removedData)}, are not available in our store which is assigned by doctor";
+            string message = removedData.Count == 0 ? "Available" : $"{string.Join(", ", removedData)} not available in our store which is assigned by doctor";
             var pharmacistConnections = _dbContext.users
                     .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
                     .Select(u => new
@@ -60,8 +60,10 @@ namespace API.Controllers.PharmacyControllers
                     .ToList();
 
 
-            var notifications = new List<Notification>();
-
+            //var notification = new Notification();
+           // var notifications = new List<Notification>();
+            if (message != "")
+            {
            foreach (var connection in pharmacistConnections)
            {
 
@@ -73,20 +75,22 @@ namespace API.Controllers.PharmacyControllers
                     SendAt = DateTime.Now.AddMinutes(330),
                     Seen = false
                 };
+                    //notifications.Add(notification);
 
+                    if (removedData.Count > 0)
+                {
+                    await _dbContext.notification.AddAsync(notification);
+                    await _dbContext.SaveChangesAsync();
+                }
 
-                if (connection.Id!= null && removedData.Count > 0 && ConnectionManager._userConnections.TryGetValue(connection.Id.ToString(), out var connectionId))
+                if ( removedData.Count > 0 && ConnectionManager._userConnections.TryGetValue(7.ToString(), out var connectionId))
                 {
                     await _hubContext.Clients.Client(connectionId).ReceiveNotification(notification);
                 }
-                notifications.Add(notification);
            }
-           if(removedData.Count > 0)
-            {
-                await _dbContext.notification.AddRangeAsync(notifications);
-                await _dbContext.SaveChangesAsync();
-
             }
+
+
 
 
 
@@ -114,11 +118,13 @@ namespace API.Controllers.PharmacyControllers
                 var noti =  await _billService.ReadNoti();
                 if (noti.Message!="")
                 {
+                    await _dbContext.notification.AddAsync(noti);
+                    await _dbContext.SaveChangesAsync();
                     if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
                     {
                         await _hubContext.Clients.Client(connectionId).ReceiveNotification(noti);
                     }
-                    await _dbContext.notification.AddAsync(noti);
+                    
                 }
 
 

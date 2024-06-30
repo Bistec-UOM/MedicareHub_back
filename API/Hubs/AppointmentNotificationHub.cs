@@ -199,22 +199,28 @@ public class AppointmentNotificationHub : Hub<IAppointmentNotificationClient>
         // noti.From = "System";
         // noti.To = 7.ToString();
 
-        List<Notification> notiList = new List<Notification>();
-        foreach (var connection in pharmacistConnections)
+        //List<Notification> notiList = new List<Notification>();
+        if(message=="")
         {
-            noti.Message = message;
-            noti.SendAt = DateTime.Now.AddMinutes(330);
-            noti.Seen = false;
-            noti.From = "system";
-            noti.To = connection.Id.ToString();
-
-            if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
-            {
-                await Clients.Client(connectionId).ReceiveNotification(noti);
-            }
-            await _dbContext.notification.AddAsync(noti);
+            return;
         }
+        else
+        {
+            foreach (var connection in pharmacistConnections)
+            {
+                noti.Message = message;
+                noti.SendAt = DateTime.Now.AddMinutes(330);
+                noti.Seen = false;
+                noti.From = "system";
+                noti.To = connection.Id.ToString();
 
+                await _dbContext.notification.AddAsync(noti);
+                if (noti.To != null && ConnectionManager._userConnections.TryGetValue(noti.To.ToString(), out var connectionId))
+                {
+                    await Clients.Client(connectionId).ReceiveNotification(noti);
+                }
+            }
+        }
     }
 
 
