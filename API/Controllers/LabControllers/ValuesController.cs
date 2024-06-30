@@ -130,7 +130,7 @@ namespace API.Controllers.LabControllers
 
                     if (data.Servere == true)
                     {
-                        emsg = emsg + "<br> It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+                        emsg = emsg + "<br><p style='font-size: 16px; color: #fc2d2d;'> It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.</p>";
                         notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
                     }
 
