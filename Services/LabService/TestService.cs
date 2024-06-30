@@ -157,6 +157,7 @@ namespace Services.LabService
                     }
                     else if(item.Stat == "deleted") 
                     {
+                        _cntx.records.RemoveRange(_cntx.records.Where(a=>a.ReportFieldId==item.Id));
                         ReportFields x = new ReportFields
                         {
                             Id = item.Id,
