@@ -113,32 +113,43 @@ namespace API.Controllers
                     var result = await _appointment.AddAppointment(app);
                     if(result==0)
                     {
-                        var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
-                        var userId = doctor?.UserId;  //get the user id of the doctor
-                        var notification = $"New appointment added for {appointment.DateTime}";
-
-
-
-
-
-                        Notification newNotification = new Notification();
-                        newNotification.Message = notification;
-                        newNotification.From = appointment.RecepId.ToString();
-                        newNotification.To = appointment.DoctorId.ToString();
-                        newNotification.SendAt = DateTime.Now.AddMinutes(330);
-                        newNotification.Seen = false;
-
-                        if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                        bool hasAppointments = _dbContext.appointments
+                                 .Any(a => a.DoctorId == app.DoctorId && a.DateTime.Date == app.DateTime.Date);
+                        if (!hasAppointments)
                         {
+                            var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                            var userId = doctor?.UserId;  //get the user id of the doctor
+                            var notification = $"New appointment added for {appointment.DateTime}";
 
-                            Debug.WriteLine($"User ConnectionId: {connectionId}");
-                            await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
-                            Debug.WriteLine("Notification sent via SignalR.");
+
+
+
+
+                            Notification newNotification = new Notification();
+                            newNotification.Message = notification;
+                            newNotification.From = appointment.RecepId.ToString();
+                            newNotification.To = appointment.DoctorId.ToString();
+                            newNotification.SendAt = DateTime.Now.AddMinutes(330);
+                            newNotification.Seen = false;
+
+                            await AddNotification(newNotification);
+
+                            if (userId != null && ConnectionManager._userConnections.TryGetValue(userId.ToString(), out var connectionId))
+                            {
+
+                                Debug.WriteLine($"User ConnectionId: {connectionId}");
+                                await _hubContext.Clients.Client(connectionId).ReceiveNotification(newNotification);
+                                Debug.WriteLine("Notification sent via SignalR.");
+                            }
+
+
+
                         }
 
 
 
-                        await AddNotification(newNotification);
+
+
 
 
                     }
