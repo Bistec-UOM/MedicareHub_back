@@ -19,7 +19,11 @@ namespace API.Controllers.DoctorControllers
             _appointments = appoinments;
             _prescription = prescription;
         }
-
+        /// <summary>
+        ///  Retrieve all new appointments
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpGet("AppointList")]
         public async Task<ActionResult<List<object>>> GetPatientNamesForApp()
         {
@@ -31,6 +35,11 @@ namespace API.Controllers.DoctorControllers
         //........................................................................................................................................
         //....................................................................................................................................
 
+        /// <summary>
+        /// Retrieve all appointments of that specific doctor
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpGet("AppointList2")]
         public async Task<ActionResult<List<object>>> GetPatientNamesForApp2()
         {
@@ -43,14 +52,22 @@ namespace API.Controllers.DoctorControllers
         //....................................................................................................................................
         //........................................................................................................................................
         //....................................................................................................................................
-
+        /// <summary>
+        ///  Post the prescription details
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost("Prescription")]
         public async Task<ActionResult<Appointment>> AddPrescription(AddDrugs data)
         {
             var tmp = await _prescription.AddPrescription(data);
             return Ok(tmp);
         }
-
+        /// <summary>
+        /// Get history reocrds of the patient
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
 
         [HttpGet("prescription/{patientId}")]
         public async Task<ActionResult> PrescriptionByPatientId(int patientId)

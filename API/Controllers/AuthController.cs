@@ -16,6 +16,11 @@ namespace API.Controllers
             _auth = authServices;
         }
 
+        /// <summary>
+        /// Hashed value string for a password (only for test)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost("reg")]
         public ActionResult RegUser(String data)
         {
@@ -23,6 +28,11 @@ namespace API.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Login : Check if userId matches with password
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost("log")]
         public async Task<ActionResult> LoginUser(UserLog data)
         {
@@ -38,6 +48,11 @@ namespace API.Controllers
             }
         }
 
+        /// <summary>
+        /// Initiate an OTP code to reset password, recieve an Email
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpPost("reset/sendOTP")]
         async public Task<ActionResult> SendOTP(int id)
         {
@@ -52,6 +67,11 @@ namespace API.Controllers
             }
         }
 
+        /// <summary>
+        /// Check if entered OTP code is correct
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost("reset/checkOTP")]
         async public Task<ActionResult> CheckOTP(SentOTP data)
         {
@@ -66,6 +86,11 @@ namespace API.Controllers
             }
         }
 
+        /// <summary>
+        /// Enter new password
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost("reset/new")]
         async public Task<ActionResult> NewPassword(NewPassword data)
         {

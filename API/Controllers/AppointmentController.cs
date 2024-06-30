@@ -35,6 +35,11 @@ namespace API.Controllers
 
 
         }
+        /// <summary>
+        /// Get a patient by id
+        /// </summary>
+        /// <param name="id">patient id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Recep")]
         [HttpGet("patient/{id}", Name = "GetPatient")]
@@ -57,6 +62,12 @@ namespace API.Controllers
             
         }
 
+        /// <summary>
+        /// Fetching all appointments
+        /// </summary>
+        /// <param></param>
+        /// <returns></returns>
+
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet]
 
@@ -74,6 +85,11 @@ namespace API.Controllers
             }
            
         }
+        /// <summary>
+        /// Adding a new appointment,Send an email,send real time notification
+        /// </summary>
+        /// <param name="appointment">new appointment object</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Recep")]
         [HttpPost]
@@ -95,14 +111,16 @@ namespace API.Controllers
                 try
                 {
                     var result = await _appointment.AddAppointment(app);
-                    var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
-                    var userId = doctor?.UserId;  //get the user id of the doctor
-                    var notification = $"New appointment added for {appointment.DateTime}";
+                    if(result==0)
+                    {
+                        var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
+                        var userId = doctor?.UserId;  //get the user id of the doctor
+                        var notification = $"New appointment added for {appointment.DateTime}";
 
-               
 
 
-                  
+
+
                         Notification newNotification = new Notification();
                         newNotification.Message = notification;
                         newNotification.From = appointment.RecepId.ToString();
@@ -123,7 +141,10 @@ namespace API.Controllers
                         await AddNotification(newNotification);
 
 
-                    
+                    }
+
+
+
 
 
 
@@ -140,6 +161,11 @@ namespace API.Controllers
             }
 
         }
+        /// <summary>
+        /// Get an appointment by id
+        /// </summary>
+        /// <param name="id">appointment id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("{id}", Name = "GetAppointment")]
@@ -164,9 +190,16 @@ namespace API.Controllers
            
         }
 
+        /// <summary>
+        /// Deleting an appointment by id
+        /// </summary>
+        /// <param name="id">Deleted appointment id</param>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<Appointment>> DeleteAppointment(int id)
+            {
+            try
             {
                 var targetAppointment = await _appointment.GetAppointment(id);  //get the sepecific appointment and check whether it exists
                 if (targetAppointment is null)
@@ -227,9 +260,20 @@ namespace API.Controllers
 
                 }
                 return Ok(deletedAppointment);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+                
             
            
         }
+        /// <summary>
+        /// Getting all the appointments of a specific doctor using docotorId
+        /// </summary>
+        /// <param name="doctorId">specific doctor id</param>
+        /// <returns></returns>
 
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}", Name = "GetDoctorAppointments")]
@@ -247,13 +291,32 @@ namespace API.Controllers
             
         }
 
+        /// <summary>
+        /// Getting all the appointments of a specific day for a specific doctor
+        /// </summary>
+        /// <param name="doctorId">The Id of the doctor</param>
+        /// <param name="date">The date for which to retrive appointments</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<ICollection<AppointmentWithPatientDetails>>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)  //getting the appointments with patient details of a specific doc for a specific date
         {
+            try
+            {
+                var results = await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId, date);
+                return Ok(results);
 
-            return Ok(await _appointment.GetDoctorAppointmentsByDateWithPatientDetails(doctorId, date));
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            
         }
+
+        /// <summary>
+        /// Getting all the doctors list
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpGet("doctors")]
         public async Task<ActionResult<ICollection<User>>> GetDoctors() //getting the doctors list
@@ -261,6 +324,11 @@ namespace API.Controllers
             var doctors = _appointment.GetDoctors();
             return Ok(doctors);
         }
+        /// <summary>
+        /// Registering a new patient
+        /// </summary>
+        /// <param name="patient">new patient object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpPost("patients")]
         public async Task<ActionResult> RegisterPatient(Patient patient)  //registering a patient
@@ -278,6 +346,12 @@ namespace API.Controllers
            
 
         }
+        /// <summary>
+        /// Cancel the appointment by a doctor,send an email to the patient
+        /// </summary>
+        /// <param name="id">appoinntment id</param>
+         /// <param name="appointment">cancelled appointment object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpPut("/updateStatus/{id}")]
         public async Task<ActionResult<Appointment>> UpdateAppointmentStatus(int id, [FromBody] Appointment appointment)  //cancel the appointment by doctor
@@ -337,26 +411,34 @@ namespace API.Controllers
             }
             return Ok(targetAppointment);
         }
+        /// <summary>
+        /// Cancel all the appointments by a doctor for a specific day,send  emails to the patients
+        /// </summary>
+        /// <param name="doctorId">specific doctor id</param>
+        /// <param name="date">specific date</param>
+        /// <returns></returns>
 
         [HttpPut("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult<List<Appointment>>> CancelAllUpdates(int doctorId, DateTime date) //cancel all apps of a day by doctor
         {
-            var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
-            foreach (var app in await targetCancelledAppointments)
+            try
             {
-                var targetPatient = await _appointment.GetPatient(app.PatientId);
-                if (targetPatient != null)
+                var targetCancelledAppointments = _appointment.CancelAllAppointments(doctorId, date);
+                foreach (var app in await targetCancelledAppointments)
                 {
+                    var targetPatient = await _appointment.GetPatient(app.PatientId);
+                    if (targetPatient != null)
+                    {
 
-                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
-                    var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime.ToString("f");
-                    string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
-                    string userName = targetPatient.FullName;
-                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
-                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                        var targetEmail = targetPatient.Email ?? "default@gmail.com";
+                        var targetday = app.DateTime.Date;
+                        var targettime = app.DateTime.ToString("f");
+                        string emailSubject = "Appointment Update: Cancellation Notification"; // Sending the cancel notification mail
+                        string userName = targetPatient.FullName;
+                        var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                        string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
 
-                    var htmlContent = $@"
+                        var htmlContent = $@"
 <html>
 <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
@@ -387,13 +469,25 @@ namespace API.Controllers
     </div>
 </body>
 </html>";
-                    EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
+                        EmailSender emailSernder = new EmailSender();
+                        await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
 
+                    }
                 }
+                return NoContent();
+
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return NoContent();
+           
         }
+        /// <summary>
+        /// Get monthly appointment list of a doctor
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="mId">MonthId</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpGet("doctor/{doctorId}/month/{mId}")]
         public async Task<ActionResult<Appointment>> GetDoctorMonthAppointments(int doctorId, int mId) //get monthly appointment list for progress bar count
@@ -409,6 +503,10 @@ namespace API.Controllers
             }
             
         }
+        /// <summary>
+        /// Get patient list
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Recep")]
         [HttpGet("patients")]
         public async Task<ActionResult<ICollection<User>>> GetPatients() //get patients list
@@ -425,41 +523,64 @@ namespace API.Controllers
             }
             
         }
+        /// <summary>
+        /// Update the appointment details,send an email
+        /// </summary>
+        /// <param name="id">Appointment id</param>
+        /// <param name="appointment">new updated appointment</param>
+        /// <returns></returns>
 
-        [Authorize(Policy = "Recep")]
+        [Authorize(Policy = "Recep")]   
         [HttpPut("{id}")]
         public async Task<ActionResult<Appointment>> updateAppointment(int id, [FromBody] Appointment appointment) //update the time of an appointment
         {
+            try
+            {
+                var result = await _appointment.UpdateAppointment(id, appointment);
+                return Ok();
 
-            return Ok(await _appointment.UpdateAppointment(id, appointment));
+            }catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            
         }
+        /// <summary>
+        /// Delete all the appointments of a specific doctor of a specific day
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="date">The day which need to delete appointments</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct&Recep")]
         [HttpDelete("doctor/{doctorId}/day/{date}")]
         public async Task<ActionResult> DeleteDoctorAllDayAppointments(int doctorId, DateTime date)
         {
-            var targetAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
-            if (targetAppointments is null)
+            try
             {
-                return NotFound();
-            }
-
-            var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);  //appointment list of a day real deleting by receptionist
-            foreach (var app in await targetDeletedAppointments)
-            {
-                var targetPatient = await _appointment.GetPatient(app.PatientId);
-                if (targetPatient != null)
+                var targetAppointments = await _appointment.GetDoctorAppointmentsByDate(doctorId, date);
+                if (targetAppointments is null)
                 {
-                    var targetEmail = targetPatient.Email ?? "default@gmail.com";
-                    var targetday = app.DateTime.Date;
-                    var targettime = app.DateTime.ToString("f");
+                    return NotFound();
+                }
 
-                    //sending emails after deleting prescheduled appointments by a receptionsist
-                    string emailSubject = "Appointment Update: Cancellation Notification";
-                    string userName = targetPatient.FullName;
-                    var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
-                    string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+                var targetDeletedAppointments = _appointment.DeleteAllDoctorDayAppointments(doctorId, date);  //appointment list of a day real deleting by receptionist
+                foreach (var app in await targetDeletedAppointments)
+                {
+                    var targetPatient = await _appointment.GetPatient(app.PatientId);
+                    if (targetPatient != null)
+                    {
+                        var targetEmail = targetPatient.Email ?? "default@gmail.com";
+                        var targetday = app.DateTime.Date;
+                        var targettime = app.DateTime.ToString("f");
 
-                    var htmlContent = $@"
+                        //sending emails after deleting prescheduled appointments by a receptionsist
+                        string emailSubject = "Appointment Update: Cancellation Notification";
+                        string userName = targetPatient.FullName;
+                        var iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdq0Qw2AUbCppR3IQBWOZx94oZ2NWVuY1vMQ&s";
+                        string emailMessage = "Dear " + targetPatient.Name + ",<br/><br/> We regret to inform you that your scheduled appointment with Medicare Hub on " + targettime + " has been cancelled. We apologize for any inconvenience this may cause you.";
+
+                        var htmlContent = $@"
 <html>
 <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
     <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);'>
@@ -490,14 +611,25 @@ namespace API.Controllers
     </div>
 </body>
 </html>";
-                    EmailSender emailSernder = new EmailSender();
-                    await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
-                }
+                        EmailSender emailSernder = new EmailSender();
+                        await emailSernder.SendMail(emailSubject, targetEmail, userName, htmlContent);
+                    }
 
+                }
+                return NoContent();
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
-            return NoContent();
+           
 
         }
+        /// <summary>
+        /// Add a new unable date
+        /// </summary>
+        /// <param name="uDate">Unable date object</param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct")]
         [HttpPost("unableDates")]
         public async Task<ActionResult> AddUnableDate(Unable_Date uDate)  //adding unable dates
@@ -515,7 +647,11 @@ namespace API.Controllers
 
         }
 
-
+        /// <summary>
+        /// Getting unable dates of a specific doctor
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <returns></returns>
         // [Authorize(Policy = "Doct&Recep")]
         [HttpGet("BlockedDates/{doctorId}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> GetUnableDates(int doctorId)
@@ -531,6 +667,11 @@ namespace API.Controllers
             
         }
 
+        /// <summary>
+        /// Get notifications of a specific user
+        /// </summary>
+        /// <param name="userId">Specific user Id</param>
+        /// <returns></returns>
         [HttpGet("Notifications/{userId}")]
         public async Task<ActionResult<ICollection<Notification>>> getNotifications(int userId)
         {
@@ -545,7 +686,11 @@ namespace API.Controllers
            
         }
 
-
+        /// <summary>
+        /// Add a new notification
+        /// </summary>
+        /// <param name="notification">New notification object</param>
+        /// <returns></returns>
         [HttpPost("Notifications")]
         public async Task<ActionResult> AddNotification(Notification notification)  //adding notifications
         {
@@ -561,19 +706,114 @@ namespace API.Controllers
            
 
         }
-
+        /// <summary>
+        /// Mark an appointment as seen
+        /// </summary>
+        /// <param name="userId">Specific user Id</param>
+        /// <param name="newSeenValue">new bool value of Seen</param>
+        /// <returns></returns>
         [HttpPut("notifications/{userId}/user/{newSeenValue}")]
-        public async Task MarkAsSeenNotifications(int userId, bool newSeenValue)
+        public async Task<ActionResult>MarkAsSeenNotifications(int userId, bool newSeenValue)
         {
-            await _appointment.markAsSeenNotifications(userId, newSeenValue);
+            try
+            {
+                await _appointment.markAsSeenNotifications(userId, newSeenValue);
+                return Ok();    
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);  
+            }
+            
         }
+
+        /// <summary>
+        /// Get Unable time slots of a specific doctor for a specific day
+        /// </summary>
+        /// <param name="doctorId">Specific doctor Id</param>
+        /// <param name="day">specific day</param>
+        /// <returns></returns>
 
         [HttpGet("BlockDates/{doctorId}/date/{day}")]
         public async Task<ActionResult<ICollection<Unable_Date>>> getUnableTimeSlots(int doctorId,DateTime day)
         {
-            var results=await _appointment.getUnableTimeslots(doctorId, day);
-            return Ok(results);
+            try
+            {
+                var results = await _appointment.getUnableTimeslots(doctorId, day);
+                return Ok(results);
+            }catch(Exception ex) { 
+                return BadRequest(ex.Message);  
+            }
+           
         }
+
+        /// <summary>
+        /// unblock a blocked day
+        /// </summary>
+        /// <param name="id">unblock day id</param>
+        /// <returns></returns>
+        [HttpDelete("Unblock/{id}")]
+        public async Task<ActionResult<Unable_Date>> UnblockDay(int id)
+        {
+            try
+            {
+                var result = await _appointment.UnblockDay(id);
+                return Ok(result);
+
+            }catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
+
+
+        }
+
+
+        /// <summary>
+        /// Get previous appointments of a given patient with doctor details
+        /// </summary>
+        /// <param name="patientId">Specific patient Id</param>
+        /// <returns></returns>
+
+        [HttpGet("PreviousAppointments/{patientId}")]
+        public async Task<ActionResult<ICollection<AppointmentWithDoctorDetails>>> getPreviousAppointments(int patientId)
+        {
+            try
+            {
+                var results = await _appointment.getPatientAppointmentAnalysis(patientId);
+                return Ok(results);
+
+            }catch(Exception ex) { 
+                return BadRequest(ex.Message);
+            }
+            
+           
+        }
+
+        /// <summary>
+        /// unblock a blocked day
+        /// </summary>
+        /// <param name="id">Remove blocked time slot</param>
+        /// <returns></returns>
+        [HttpDelete("UnblockTime/{id}")]
+        public async Task<ActionResult<Unable_Date>> RemoveBlockedTimeSlot(int id)
+        {
+            try
+            {
+                var result = await _appointment.RemoveUnblockTimeSlot(id);
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+
+        }
+
+
 
 
 
