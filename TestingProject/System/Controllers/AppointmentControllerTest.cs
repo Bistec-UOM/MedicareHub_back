@@ -1,29 +1,24 @@
 ﻿using API.Controllers;
 using AppointmentNotificationHandler;
 using DataAccessLayer;
+using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Models;
 using Moq;
 using Services.AppointmentService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestingProject.MockData;
-using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Models;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
+using TestingProject.MockData;
 
 namespace TestingProject.System.Controllers
 {
-    public class AppointmentControllerTest:IDisposable
+    public class AppointmentControllerTest : IDisposable
     {
 
-         ApplicationDbContext _dbContext;
-         IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
+        ApplicationDbContext _dbContext;
+        IHubContext<AppointmentNotificationHub, IAppointmentNotificationClient> _hubContext;
         public AppointmentControllerTest()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -40,7 +35,7 @@ namespace TestingProject.System.Controllers
         {
             //arrange
 
-            var appointmentService=new Mock<IAppointmentService>();
+            var appointmentService = new Mock<IAppointmentService>();
             appointmentService.Setup(_ => _.GetAll()).ReturnsAsync(AppointmentMockData.getAppointments());
 
 
@@ -48,7 +43,7 @@ namespace TestingProject.System.Controllers
 
             //act
 
-            var result=await sut.GetAllAppointments();
+            var result = await sut.GetAllAppointments();
 
 
             //assert
@@ -63,7 +58,7 @@ namespace TestingProject.System.Controllers
             //Arranage
             var appointmentService = new Mock<IAppointmentService>();
             appointmentService.Setup(_ => _.GetDoctors()).ReturnsAsync(AppointmentMockData.getDoctors());
-            var sut=new AppointmentController(_dbContext,appointmentService.Object, _hubContext);
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
 
 
             //Act
@@ -73,7 +68,7 @@ namespace TestingProject.System.Controllers
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             okResult.StatusCode.Should().Be(200);
-            appointmentService.Verify(_ => _.GetDoctors(),Times.Exactly(1));
+            appointmentService.Verify(_ => _.GetDoctors(), Times.Exactly(1));
 
 
         }
@@ -83,7 +78,7 @@ namespace TestingProject.System.Controllers
         {
             // Arrange
             var appointmentService = new Mock<IAppointmentService>();
-            
+
             _dbContext.doctors.AddRange(AppointmentMockData.getDoctUserDoctors());
 
             // Set up a mock HttpContext with a claim
@@ -113,19 +108,19 @@ namespace TestingProject.System.Controllers
             var appointmentToAdd = AppointmentMockData.AddNewAppointment();
 
             appointmentService.Setup(service => service.AddAppointment(It.IsAny<Appointment>())).ReturnsAsync(0);
-                              
+
 
             // Act
             var result = await sut.AddAppointment(appointmentToAdd);
 
             // Assert
 
-           
+
 
             var okResult = Assert.IsType<OkObjectResult>(result);  //for checking the 200 status code
             var resultValue = Assert.IsType<Int32>(okResult.Value); //for getting the value of okresult
             resultValue.Should().Be(0);
-            appointmentService.Verify(service=>service.AddAppointment(It.IsAny<Appointment>()), Times.Once);
+            appointmentService.Verify(service => service.AddAppointment(It.IsAny<Appointment>()), Times.Once);
         }
 
         //--------getPatient(int id)----------
@@ -360,18 +355,18 @@ namespace TestingProject.System.Controllers
         {
             //Arranage
             var appointmentService = new Mock<IAppointmentService>();
-            appointmentService.Setup(_ => _.GetAppointmentCountOfDays(1,5)).ReturnsAsync(AppointmentMockData.getONlyDoctor1TuesDayAppointment());
+            appointmentService.Setup(_ => _.GetAppointmentCountOfDays(1, 5)).ReturnsAsync(AppointmentMockData.getONlyDoctor1TuesDayAppointment());
             var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
 
 
             //Act
 
-            var result = await sut.GetDoctorMonthAppointments(1,5);
+            var result = await sut.GetDoctorMonthAppointments(1, 5);
 
             //Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             okResult.StatusCode.Should().Be(200);
-            appointmentService.Verify(_ => _.GetAppointmentCountOfDays(1,5), Times.Exactly(1));
+            appointmentService.Verify(_ => _.GetAppointmentCountOfDays(1, 5), Times.Exactly(1));
 
         }
 
@@ -641,14 +636,143 @@ namespace TestingProject.System.Controllers
 
             //Act
 
-            var result =  sut.MarkAsSeenNotifications(7,true);
+            var result = sut.MarkAsSeenNotifications(7, true);
 
             //Assert
-           // result.Should().BeOfType<OkResult>();
+            // result.Should().BeOfType<OkResult>();
             appointmentService.Verify(service => service.markAsSeenNotifications(7, true), Times.Once);
 
 
         }
+
+        //--------- CancelAllUpdates(int doctorId, DateTime date)-----
+        [Fact]
+        public async Task cancelAllUpdates_shouldCallServiceCancelAllUpdates()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getCancelledAppointmentsByDoctor());
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            appointmentService.Verify(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date), Times.Once);
+
+
+        }
+        [Fact]
+        public async Task cancelAllUpdates_ThrowsAnException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.CancelAllAppointments(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date)).Throws(new Exception("Test exception"));
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = await sut.CancelAllUpdates(1, AppointmentMockData.getCancelledAppointmentsByDoctor()[0].DateTime.Date);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+        //--------- DeleteDoctorAllDayAppointments(int doctorId, DateTime date)-----------
+        [Fact]
+        public async Task DeleteDoctorAllDayAppointments_shouldCallServiceAllAppDelete()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.GetDoctorAppointmentsByDate(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getDeletedAppointments());
+            appointmentService.Setup(service => service.DeleteAllDoctorDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getDeletedAppointments());
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.DeleteDoctorAllDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date);
+
+            //Assert
+            appointmentService.Verify(service => service.DeleteAllDoctorDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date), Times.Once);
+
+
+        }
+        [Fact]
+        public async Task DeleteDoctorAllDayAppointments_ThrowsException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.GetDoctorAppointmentsByDate(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date)).ReturnsAsync(AppointmentMockData.getDeletedAppointments());
+            appointmentService.Setup(service => service.DeleteAllDoctorDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date)).Throws(new Exception("Test exception"));
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.DeleteDoctorAllDayAppointments(AppointmentMockData.getDeletedAppointments()[0].DoctorId, AppointmentMockData.getDeletedAppointments()[0].DateTime.Date);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+        //------------ DeleteAppointment(int id)------
+        [Fact]
+        public async Task DeleteAppointment_shouldCallServiceAppDelete()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.GetAppointment(AppointmentMockData.getDeletedAppointments()[0].Id)).ReturnsAsync(AppointmentMockData.getDeletedAppointments()[0]);
+
+            appointmentService.Setup(service => service.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id)).ReturnsAsync(AppointmentMockData.getDeletedAppointments()[0]);
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result = sut.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id);
+
+            //Assert
+            appointmentService.Verify(service => service.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id), Times.Once);
+
+
+        }
+        [Fact]
+        public async Task DeleteAppointment_ThrowsException()
+        {
+            //Arranage
+            var appointmentService = new Mock<IAppointmentService>();
+            appointmentService.Setup(service => service.GetAppointment(AppointmentMockData.getDeletedAppointments()[0].Id)).ReturnsAsync(AppointmentMockData.getDeletedAppointments()[0]);
+
+            appointmentService.Setup(service => service.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id)).ThrowsAsync(new Exception("Test exception"));
+
+            var sut = new AppointmentController(_dbContext, appointmentService.Object, _hubContext);
+
+
+            //Act
+
+            var result =await sut.DeleteAppointment(AppointmentMockData.getDeletedAppointments()[0].Id);
+
+            //Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+            Assert.Equal("Test exception", badRequestResult.Value);
+
+        }
+
+
+
 
 
 

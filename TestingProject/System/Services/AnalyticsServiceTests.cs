@@ -150,13 +150,6 @@ namespace TestingProject.System.Services
 
                 // Assert
                 Assert.NotNull(result);
-
-                //var drugAvailability = result as List<dynamic>;
-                //Assert.NotNull(drugAvailability);
-               // Assert.Equal(3, drugAvailability.Count);
-
-             
-
                 
             }
 

@@ -28,6 +28,10 @@ namespace API.Controllers.PharmacyControllers
             _dbContext = dbcontext;
         }
 
+        /// <summary>
+        /// Retrieve a list of patient prescription data
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("DrugRequest")]
         public async Task<ActionResult<IEnumerable<object>>> GetPatientPrescriptionData()
         {
@@ -35,6 +39,10 @@ namespace API.Controllers.PharmacyControllers
             return Ok(pe);
         }
 
+        /// <summary>
+        /// Requests to retrieve details of medicines based on provided medicine names
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("GetMedicineDetails")]
         public async Task<ActionResult<IDictionary<string, List<Drug>>>> GetMedicineDetails([FromBody] List<string> medicineNames)
         {
@@ -94,6 +102,10 @@ namespace API.Controllers.PharmacyControllers
             return Ok(medicineDetails);
         }
 
+        /// <summary>
+        /// Add bill drugs to a patient’s record and updates the appointment status to 'paid'.
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Cash")]
         [HttpPost("AddBillDrugs")]
         public async Task<IActionResult> AddBillDrugs([FromBody] Bill billDrugs)
