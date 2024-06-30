@@ -316,16 +316,19 @@ namespace Services.AdminServices
 
             var doct_attendance = await _dbcontext.prescriptions
                 .Include(p => p.Appointment)
-                .ThenInclude(ap => ap.Doctor)
-                .ThenInclude(d => d.User)
-                .Where(p => p.Appointment.Status == "Completed" && p.Appointment.DateTime.Year == date.Year && p.Appointment.DateTime.Month == date.Month)
-                .GroupBy(p => new { p.Appointment.DoctorId })
+                    .ThenInclude(ap => ap.Doctor)
+                        .ThenInclude(d => d.User)
+                .Where(p => p.Appointment.Status == "Completed")
+                .GroupBy(p => new { p.Appointment.DoctorId, Year = p.DateTime.Year, Month = p.DateTime.Month })
                 .Select(g => new
                 {
+                    doctId = g.Key.DoctorId,
                     Id = g.First().Appointment.Doctor.User.Id,
                     Name = g.First().Appointment.Doctor.User.Name,
                     Role = "Doctor",
-                    Count = g.Select(p => p.DateTime.Date).Distinct().Count()
+                    // Concatenate year and month as a string
+                    doctDate = g.Key.Year.ToString() + "-" + g.Key.Month.ToString(),
+                    count = g.Select(p => p.DateTime.Date).Distinct().Count()
                 })
                 .ToListAsync();
 
