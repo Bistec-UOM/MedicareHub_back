@@ -41,7 +41,7 @@ namespace API.Controllers.PharmacyControllers
             var medicineDetails = await _billService.GetMedicineDetails(medicineNames);
             //check not available medicines which assigned by a doctor
             var removedData = await _billService.GetMedicinesNotInStock(medicineNames);
-            string message = removedData.Count == 0 ? "All medicines are available in our store" : $"{string.Join(", ", removedData)}, are not available in our store which is assigned by doctor";
+            string message = removedData.Count == 0 ? "Available" : $"{string.Join(", ", removedData)} not available in our store which is assigned by doctor";
             var pharmacistConnections = _dbContext.users
                     .Where(u => u.Role == "Cashier" && u.ConnectionId != null)
                     .Select(u => new
@@ -53,7 +53,9 @@ namespace API.Controllers.PharmacyControllers
 
 
             var notifications = new List<Notification>();
-
+            if (message != "")
+            {
+            }
            foreach (var connection in pharmacistConnections)
            {
 
