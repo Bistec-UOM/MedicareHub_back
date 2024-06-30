@@ -123,14 +123,14 @@ namespace API.Controllers.LabControllers
                     };
                     
                     var sendMail = new EmailSender();
-                    string emsg = "Mr/Mrs. " + labReportInfo.PatientName + "<br/><br/>Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
+                    string emsg ="<br/><br/>Results of your recent lab test (" + labReportInfo.TestName + ") on " + labReportInfo.AcceptedDate + "" +
                         " is ready and available.";
                     string notMsg = "Results of recent lab test (" + labReportInfo.TestName + ") of " + labReportInfo.PatientName + " on " + labReportInfo.AcceptedDate +
                     " is ready and available.";
 
                     if (data.Servere == true)
                     {
-                        emsg = emsg + "<br> It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.";
+                        emsg = emsg + "<br><p style='font-size: 16px; color: #fc2d2d;'> It appears that there are some conditions that require immediate attention.Therefore, we strongly recommend that you schedule an appointment with your doctor as soon as possible.</p>";
                         notMsg = notMsg + "It appears that there are some conditions that require immediate attention.";
                     }
 
@@ -145,6 +145,7 @@ namespace API.Controllers.LabControllers
             <img src='{iconUrl}' style='margin-right: 8px;' width='32' height='32' alt='Hospital Icon'/>
             Medicare <span style='color: #AFDCBB;'>Hub</span>
         </h1>
+        <p style='color: #555555; font-size: 16px;'>Mr/Mrs.{labReportInfo.PatientName},</p>
         <p style='color: #555555; font-size: 16px; font-weight :bold'>{emsg}</p>
         <p style='font-size: 16px; color: #555;'>
             <span >Our team looks forward to providing you with exceptional care and service.</span> 
@@ -168,11 +169,15 @@ namespace API.Controllers.LabControllers
                     newNotification.Message = notMsg;
                     newNotification.From = "1";//Add lab Id when authorized
                     newNotification.To = labReportInfo.UserId.ToString();
-                    newNotification.SendAt = DateTime.Now;
+                    newNotification.SendAt = DateTime.Now.AddMinutes(330);
                     newNotification.Seen = false;
                     
                     await sendMail.SendMail(labReportInfo.TestName + " results", "kwalskinick@gmail.com", labReportInfo.PatientName, htmlContent);
                     
+                    await _dbContext.notification.AddAsync(newNotification);
+                    await _dbContext.SaveChangesAsync();
+
+
                     if (labReportInfo.UserId != null && ConnectionManager._userConnections.TryGetValue(labReportInfo.UserId.ToString(), out var connectionId))
                     {
                         Debug.WriteLine($"User ConnectionId: {connectionId}");
@@ -180,8 +185,6 @@ namespace API.Controllers.LabControllers
                         Debug.WriteLine("Notification sent via SignalR.");
                     }
                     
-                    await _dbContext.notification.AddAsync(newNotification);
-
                     return Ok();
                 }
                 else
