@@ -201,6 +201,7 @@ namespace Services.AppointmentService
         public async Task<List<Appointment>> GetDoctorAppointmentsByDate(int doctorId, DateTime date)   //getting all the appointments of a specific doctor of a specific date
         {
             var doctorDayAppointments =  _dbcontext.appointments.Where(a => a.DoctorId == doctorId && a.DateTime.Date == date);
+           // updateToShowOffAppointment();
             return doctorDayAppointments.ToList();   
         }
 
@@ -398,6 +399,7 @@ namespace Services.AppointmentService
                 try
                 {
                     await _dbcontext.SaveChangesAsync();
+                    await updateToShowOffAppointment();
                     return oldAppointment;
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -494,6 +496,7 @@ namespace Services.AppointmentService
         }
         public async Task<List<Appointment>> GetAppointmentCountOfDays(int doctorId, int monthId)  //get monthly appointments  of a doctor for progress bar
         {
+
             var targetAppointment=_dbcontext.appointments.Where(a=>a.DoctorId==doctorId && (a.DateTime.Month)-1==monthId).ToList();
             return targetAppointment;
         }
@@ -542,6 +545,7 @@ namespace Services.AppointmentService
 
 
             await _dbcontext.SaveChangesAsync();
+         
 
         }
 
@@ -567,9 +571,80 @@ namespace Services.AppointmentService
             }
         }
 
-       
-      
+        public async Task<Doctor> getDoctor(int doctorId)
+        {
+            var doctor=_dbcontext.doctors.Where(d=>d.Id==doctorId).FirstOrDefault();
+            if (doctor !=null)
+            {
+                return doctor;
+                
+            }
+            else
+            {
+                throw new ArgumentException("Doctor not found");
+            }
+        }
+        public async Task<User> getUser(int userId)
+        {
+            var userObject=_doctor.Get(userId);
+            return await userObject;
+        }
 
-        
+        public async Task<List<AppointmentWithDoctorDetails>> getPatientAppointmentAnalysis(int patientId)
+        {
+            var today = DateTime.Today;
+            var previousAppointments = _dbcontext.appointments
+       .Where(a => a.PatientId == patientId && a.DateTime < today && a.Status!="cancelled").ToList();
+            List<AppointmentWithDoctorDetails> appointmentsWithDetails = new List<AppointmentWithDoctorDetails>();
+            foreach (var appointment in previousAppointments)   //returning the appointment details as well as patient details of the relevent appointment
+            {
+               
+                var doctorObject = await getDoctor(appointment.DoctorId);
+                var userId = doctorObject.UserId;
+                var doctorDetails = await getUser(userId); 
+                AppointmentWithDoctorDetails newappointment = new AppointmentWithDoctorDetails
+                {
+                    appointment = appointment,
+                    doctor = doctorDetails
+
+                };
+
+                appointmentsWithDetails.Add(newappointment);
+            }
+            return appointmentsWithDetails;
+
+
+        }
+
+        public async Task updateToShowOffAppointment()
+        {
+            var today = DateTime.Today;
+            var previousAppointments = _dbcontext.appointments.Where(a => a.DateTime < today && a.Status == "new").ToList();
+            foreach(var appointment in previousAppointments)
+            {
+                appointment.Status = "noshow";
+               
+            }
+            await  _dbcontext.SaveChangesAsync();
+        }
+
+        public async Task<Unable_Date> RemoveUnblockTimeSlot(int id)
+        {
+            var unableDay = _dbcontext.unable_Dates.Where(d => d.Id == id).FirstOrDefault();
+            if (unableDay != null)
+            {
+                await _unable_date.Delete(id);
+                return unableDay;
+
+            }
+            else
+            {
+                throw new ArgumentException($"Appointment with id {id} not found.");
+            }
+        }
+
+
+
+
     }
 }

@@ -30,6 +30,10 @@ namespace API.Controllers.LabControllers
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Get requested lab reports with patient details
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Lab")]
         [HttpGet("ReportRequest")]
         public async Task<ActionResult<object>> GetPatientPrescriptionData()
@@ -38,6 +42,11 @@ namespace API.Controllers.LabControllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Mark a lab report request's sample "accepted"
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [Authorize(Policy = "Lab")]
         [HttpGet("SetAccept")]
         async public Task<ActionResult> AccceptSample(int id)
@@ -53,6 +62,10 @@ namespace API.Controllers.LabControllers
             }
         }
 
+        /// <summary>
+        /// List of lab report requests with accepted samples
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Policy = "Lab")]
         [HttpGet("Accept")]
         async public Task<ActionResult<IEnumerable<Object>>> AcceptedSamplesList()
@@ -61,6 +74,23 @@ namespace API.Controllers.LabControllers
             return Ok(tmp);
         }
 
+        /// <summary>
+        /// Check if results of the report is available
+        /// </summary>
+        /// <param name="Pid"></param>
+        /// <returns></returns>
+        [Authorize(Policy = "Doct")]
+        [HttpGet("Result")]
+        public async Task<ActionResult> CheckResult(int Pid)
+        {
+            return Ok(await _vs.CheckResult(Pid));
+        }
+
+        /// <summary>
+        /// Upload the results of a lab report request
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [Authorize(Policy = "Lab")]
         [HttpPost("Result")]
         async public Task<ActionResult> UploadResults(Result data)
@@ -167,16 +197,13 @@ namespace API.Controllers.LabControllers
         }
 
 
-        //check the results of the report doctor requested is available
+        /// <summary>
+        /// Mark a labreport as "Checked" (seen by doctor)
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         [Authorize(Policy = "Doct")]
-        [HttpGet("Result")]
-        public async Task<ActionResult> CheckResult(int Pid)
-        {
-            return Ok(await _vs.CheckResult(Pid));
-        }
-
-        [Authorize(Policy = "Doct")]
-        [HttpPost("Mark")]//mark a labreport as visited as it is opened
+        [HttpPost("Mark")]
         public async Task<ActionResult> MarkCheck(List<int> ids)
         {
             await _vs.MarkCheck(ids);

@@ -44,7 +44,7 @@ namespace Services
         public async Task<string> CheckUser(UserLog data)
         {
             var tmp =await _user.Get(data.UserId);
-            if (tmp.IsDeleted) { tmp = null; }
+            if (tmp!=null && tmp.IsDeleted) { tmp = null; }
             if(tmp != null) 
             {
                 if (BCrypt.Net.BCrypt.Verify(data.Password, tmp.Password))

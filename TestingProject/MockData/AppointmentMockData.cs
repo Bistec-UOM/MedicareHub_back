@@ -350,14 +350,16 @@ namespace TestingProject.MockData
 
         public static List<Notification> GetNotifications() {
 
-            return new List<Notification> { 
-                new Notification { 
+            return new List<Notification> {
+                new Notification {
                     Id=1,
-                    From="7"
+                    From="7",
+                    Seen=false
                 },
                 new Notification {
                     Id=2,
-                    From="8"
+                    From="8",
+                    Seen=false
                 }
         };
         }
@@ -415,6 +417,221 @@ namespace TestingProject.MockData
                 }
             };
         }
+
+        public static Appointment getAppointmentToBeUpdated()
+        {
+            return new Appointment
+            {
+
+                Id = 234,
+                DateTime = new DateTime(2024, 6, 17, 0, 0, 0),
+                Status = "new",
+                PatientId = 33,
+                CreatedAt = new DateTime(2024, 6, 17, 0, 0, 0),
+                DoctorId = 1,
+                RecepId = 7
+
+            };
+        }
+        public static Appointment getnewUpdatedAppointment()
+        {
+            return new Appointment
+            {
+
+                Id = 234,
+                DateTime = new DateTime(2024, 6, 19, 0, 0, 0),
+                Status = "Cancelled",
+                PatientId = 33,
+                CreatedAt = new DateTime(2024, 6, 17, 0, 0, 0),
+                DoctorId = 1,
+                RecepId = 7
+
+            };
+        }
+        public static Patient getUpdatedAppointmentPatient() {
+            return new Patient
+            {
+                Id = 33,
+                Email = "dfaf@gmail.com",
+                FullName = "fdsaf",
+            };
+        }
+
+        public static Doctor getUpDatedAppointmentDoctor()
+        {
+            return new Doctor
+            {
+
+                Id = 1,
+                UserId = 24,
+
+            };
+        }
+
+        public static User getUpdateAppointmentDoctorUser() {
+            return new User
+            {
+                Id = 24,
+                Name = "Yasiry",
+                Role = "Doctor"
+
+            };
+
+
+        }
+
+        public static List<Appointment> getAppointments_DoctorToBeCancelled() {
+            return new List<Appointment> {
+                 new Appointment
+                {
+
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 17, 05, 0, 0),
+                    Status="new",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 2,
+                    DateTime= new DateTime(2024, 6, 17, 08, 0, 0),
+                    Status="new",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 17, 04, 10, 0),
+                    Status="new",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 6, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }
+
+
+
+            };
+        }
+
+        public static List<Patient> getAppointmentCancelledPatients()
+        {
+            {
+                return new List<Patient> {
+                     new Patient()
+                {
+                    Id=1,
+                    Email="kamal@mailnator.com",
+                    Name="kamal",
+
+                },
+                new Patient()
+                {
+                    Id=2,
+                    Email="saman@mailinator.com",
+                    Name="Saman",
+
+                },
+                 new Patient()
+                {
+                    Id=3,
+                    Email="anil@mailinator.com",
+                    Name="Anil",
+
+                }
+
+                };
+            }
+        }
+
+        public static List<Appointment> getCancelledAppointmentsByDoctor()
+        {
+            return new List<Appointment> {
+                 new Appointment
+                {
+
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 17, 05, 0, 0),
+                    Status="cancelled",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 2,
+                    DateTime= new DateTime(2024, 6, 17, 08, 0, 0),
+                    Status="cancelled",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 17, 04, 10, 0),
+                    Status="cancelled",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 6, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }
+
+
+
+            };
+        }
+        public static List<Appointment> getDeletedAppointments()
+        {
+            return new List<Appointment> {
+                 new Appointment
+                {
+
+                    Id = 5,
+                    DateTime= new DateTime(2024, 6, 17, 05, 0, 0),
+                    Status="new",
+                    PatientId=1,
+                    CreatedAt= new DateTime(2024, 6, 17, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+                },
+                new Appointment
+                {
+                    Id = 2,
+                    DateTime= new DateTime(2024, 6, 17, 08, 0, 0),
+                    Status="new",
+                    PatientId=2,
+                    CreatedAt= new DateTime(2024, 6, 19, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }, new Appointment
+                {
+                    Id = 3,
+                    DateTime= new DateTime(2024, 6, 17, 04, 10, 0),
+                    Status="new",
+                    PatientId=3,
+                    CreatedAt= new DateTime(2024, 6, 6, 0, 0, 0),
+                    DoctorId=1,
+                    RecepId=7
+
+                }
+
+
+
+            };
+        }
+
+      
 
     }
 }
