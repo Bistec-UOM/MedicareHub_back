@@ -147,7 +147,7 @@ namespace Services.DoctorService
             {
                 var x = new Prescription
                 {
-                    DateTime = DateTime.Now,
+                    DateTime = DateTime.Now.AddMinutes(330),
                     AppointmentID = data.Id,
                     description = data.Description,
                     Total = 0,

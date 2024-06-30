@@ -23,30 +23,22 @@ namespace API.Controllers.LabControllers
         }
 
 
-        //Get the list of all lab tests to display in test list=================
+        /// <summary>
+        /// List of all lab tests available
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Test>>> GetAllTests()
         {
             return Ok(await _tst.GetAllTests());
         }
 
-        //Delete a test from available test list=================================
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTest(int id)
-        {
-            await _tst.DeleteTest(id);
-            return Ok();
-        }
 
-        //Edit test details from popup box=======================================
-        [HttpPut]
-        public async Task<ActionResult> EditTest(Test data)
-        {
-            await _tst.EditTest(data);
-            return Ok();
-        }
-
-        //Get all fields of a Test====================================
+        /// <summary>
+        /// Get all fields (whole template) of a lab test 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("Template{id}")]
         public async Task<ActionResult<IEnumerable<ReportFields>>> GetFieldsByTest(int id)
         {
@@ -54,7 +46,11 @@ namespace API.Controllers.LabControllers
         }
 
 
-        //Add new test (with templates)====================================
+        /// <summary>
+        /// Add new lab test (with template structure)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         [HttpPost("Template")]
         public async Task<ActionResult> Addtmp(TemplateObj item)
         {
@@ -69,7 +65,23 @@ namespace API.Controllers.LabControllers
             }
         }
 
-        //edit existing template=============================================
+        /// <summary>
+        /// Edit the basic details of a lab test
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<ActionResult> EditTest(Test data)
+        {
+            await _tst.EditTest(data);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Edit template of an existing lab test
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPut("Template")]
         public async Task<ActionResult> Edittmplt(EdittemplateObj data)
         {
@@ -77,6 +89,13 @@ namespace API.Controllers.LabControllers
             return Ok();
         }
 
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteTest(int id)
+        {
+            await _tst.DeleteTest(id);
+            return Ok();
+        }
 
     }
 }

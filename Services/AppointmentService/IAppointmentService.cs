@@ -78,6 +78,8 @@ namespace Services.AppointmentService
         public Task<List<AppointmentWithDoctorDetails>> getPatientAppointmentAnalysis(int patientId);
         public Task<Doctor> getDoctor(int doctorId);
         public Task<User> getUser(int userId);
+        public Task updateToShowOffAppointment();
+        public Task<Unable_Date> RemoveUnblockTimeSlot(int id);
 
 
     }
