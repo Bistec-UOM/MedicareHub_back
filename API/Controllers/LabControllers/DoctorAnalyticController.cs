@@ -6,7 +6,7 @@ using Models;
 using SendGrid.Helpers.Mail;
 using Services.LabService;
 
-namespace API.Controllers.LabControllers
+/*namespace API.Controllers.LabControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -61,4 +61,4 @@ namespace API.Controllers.LabControllers
 
 
     }
-}
+}*/

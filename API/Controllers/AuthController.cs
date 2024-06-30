@@ -7,7 +7,7 @@ using Services;
 namespace API.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    [ApiController] 
     public class AuthController : ControllerBase
     {
         private readonly AuthServices _auth;
