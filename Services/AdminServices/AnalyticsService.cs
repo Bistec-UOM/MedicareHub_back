@@ -318,8 +318,8 @@ namespace Services.AdminServices
                 .Include(p => p.Appointment)
                     .ThenInclude(ap => ap.Doctor)
                         .ThenInclude(d => d.User)
-                .Where(p => p.Appointment.Status == "Completed")
-                .GroupBy(p => new { p.Appointment.DoctorId, Year = p.DateTime.Year, Month = p.DateTime.Month })
+                .Where(p => p.Appointment.Status == "Completed" && p.DateTime.Month == date.Month && p.DateTime.Year == date.Year)
+                .GroupBy(p => new { p.Appointment.DoctorId})
                 .Select(g => new
                 {
                     doctId = g.Key.DoctorId,
@@ -327,7 +327,7 @@ namespace Services.AdminServices
                     Name = g.First().Appointment.Doctor.User.Name,
                     Role = "Doctor",
                     // Concatenate year and month as a string
-                    doctDate = g.Key.Year.ToString() + "-" + g.Key.Month.ToString(),
+                    //doctDate = g.Key.Year.ToString() + "-" + g.Key.Month.ToString(),
                     count = g.Select(p => p.DateTime.Date).Distinct().Count()
                 })
                 .ToListAsync();
