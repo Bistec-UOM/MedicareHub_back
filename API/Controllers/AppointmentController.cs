@@ -113,9 +113,12 @@ namespace API.Controllers
                     var result = await _appointment.AddAppointment(app);
                     if(result==0)
                     {
-                        bool hasAppointments = _dbContext.appointments
-                                 .Any(a => a.DoctorId == app.DoctorId && a.DateTime.Date == app.DateTime.Date);
-                        if (!hasAppointments)
+                        int appointmentCount = _dbContext.appointments
+     .Count(a => a.DoctorId == app.DoctorId && a.DateTime.Date == app.DateTime.Date);
+
+                        bool hasExactlyOneAppointment = appointmentCount == 1;
+
+                        if (hasExactlyOneAppointment)
                         {
                             var doctor = await _dbContext.doctors.FirstOrDefaultAsync(d => d.Id == app.DoctorId); // Get the specific doctor
                             var userId = doctor?.UserId;  //get the user id of the doctor
